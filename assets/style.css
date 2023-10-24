@@ -1,0 +1,132 @@
+.navbar-bg {
+  background-color: #33d9b2 !important;
+}
+
+.btn-success {
+  background-color: #33d9b2 !important;
+}
+
+.btn-success:hover {
+  background-color: #00a46d !important;
+}
+
+.page-item.active .page-link {
+  color: #ffffff !important;
+  background-color: #33d9b2 !important;
+  border-color: #00d992 !important;
+  border-radius: 1rem;
+}
+
+.page-item.disabled .page-link {
+  color: #009b68 !important;
+}
+
+.breadcrumb-item a {
+  color: #00be7c !important;
+}
+
+/* 
+.main-sidebar .sidebar-menu li.dropdown.active a.nav-link {
+    color: #009b68 !important;
+} */
+.main-sidebar .sidebar-menu li ul.dropdown-menu li.active > a {
+  color: #33d9b2 !important;
+}
+
+.main-sidebar .sidebar-menu li.dropdown.active a.has-dropdown {
+  color: #ffffff !important;
+  font-weight: 600;
+  background-color: #33d9b2 !important;
+  border-radius: 8px;
+}
+
+.sidebar-brand {
+  padding-top: 1rem;
+  height: auto !important;
+}
+
+.sidebar-brand img {
+  max-height: 5rem;
+}
+
+.sidebar-brand-sm img {
+  max-height: 3rem;
+}
+
+.sidebar-brand a {
+  font-weight: 900 !important;
+  font-size: 1.4rem !important;
+}
+
+body:not(.sidebar-mini) .sidebar-style-2 .sidebar-menu > li.active > a:before {
+  background-color: #ffffff !important;
+}
+
+.modal-body,
+.modal-header {
+  border-bottom: 1px solid #d3d3d3 !important;
+  padding: 1rem 1rem 0.7rem 1rem !important;
+}
+
+.card .card-header .btn:not(.note-btn) {
+  border-radius: 5px !important;
+}
+
+.text-invalid {
+  color: #c70000;
+  font-size: 13px;
+}
+
+.alert.alert-success {
+  background-color: #33d9b2 !important;
+}
+
+.page-item .page-link {
+  color: #33d9b2 !important;
+}
+
+.page-item .page-link:hover {
+  background-color: #33d9b2 !important;
+  border-color: #00d992 !important;
+  color: #ffffff !important;
+  border-radius: 1rem;
+}
+
+.page-item.previous .page-link:hover,
+.page-item.next .page-link:hover {
+  border-radius: 3px !important;
+}
+
+.main-sidebar .sidebar-menu li ul.dropdown-menu li a:hover {
+  color: #33d9b2 !important;
+}
+
+body:not(.sidebar-mini) .sidebar-style-2 .sidebar-menu li.active ul.dropdown-menu li a {
+  padding-left: 2.5rem !important;
+}
+
+li.active a.nav-link,
+li.active a.nav-link.self {
+  color: #ffffff !important;
+  font-weight: 600;
+  background-color: #33d9b2 !important;
+  border-radius: 8px;
+}
+
+.custom-file {
+  width: 15rem;
+  max-width: 100%;
+}
+
+.text-valid {
+  color: #43b25c;
+}
+
+.card-stats-item.card__custom {
+  width: calc(100% / 2) !important;
+}
+@media (min-width: 992px) {
+  .w-lg-auto {
+    width: auto !important;
+  }
+}
