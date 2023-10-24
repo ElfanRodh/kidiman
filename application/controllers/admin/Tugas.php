@@ -33,7 +33,7 @@ class Tugas extends CI_Controller
 									<button class="btn btn-icon btn-warning update-data" data-id="' . (string)$tgs->jbt_id . '">
 										<i class="fa fa-edit"></i>
 									</button>
-									<button class="btn btn-icon btn-danger delete-data" data-id="' . (string)$tgs->jbt_id . '" data-name="' . (string)$tgs->tgs_nama . '">
+									<button class="btn btn-icon btn-danger delete-data" data-id="' . (string)$tgs->jbt_id . '" data-name="' . (string) strip_tags($tgs->tgs_nama) . '">
 										<i class="fa fa-trash"></i>
 									</button>
 								</div>';

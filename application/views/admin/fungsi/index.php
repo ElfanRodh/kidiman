@@ -18,9 +18,9 @@ $this->load->view('dist/_partials/header');
       <div class="col-12 col-md-6">
         <h2 class="section-title">Data Fungsi</h2>
       </div>
-      <div class="col-12 col-md-6 text-center text-md-right m-auto">
+      <!-- <div class="col-12 col-md-6 text-center text-md-right m-auto">
         <button class="btn btn-primary" id="add-form-data">Tambah Data</button>
-      </div>
+      </div> -->
     </div>
 
     <div class="section-body">
@@ -64,7 +64,8 @@ $this->load->view('dist/_partials/header');
       <div class="modal-body pb-0">
         <form id="form-data" class="form form-horizontal">
           <div class="form-body">
-            <input type="hidden" name="jf_id" id="jf_id">
+            <!-- <input type="hidden" name="jf_jabatan" id="jf_jabatan"> -->
+            <input type="hidden" name="jf_edit" id="jf_edit" value="0">
             <div class="row">
               <div class="col-12 col-md-6">
                 <div class="form-group">
@@ -156,11 +157,14 @@ $this->load->view('dist/_partials/header');
               backdrop: false
             });
             $("#modal-form div.modal-header h4.modal-title").html("Ubah Data Fungsi");
-            $("#modal-form form#form-data #jf_id").val(res.data.jf_id);
+            // $("#modal-form form#form-data #jf_jabatan").val(res.data.jf_jabatan);
+            $("#modal-form form#form-data #jf_edit").val(1);
             getJabatan('jf_jabatan', res.data.jabatan, 1).done(function() {
-              console.log(res.data);
-              $("#modal-form form#form-data #jf_jabatan").val(res.data.jabatan);
+              $("#modal-form form#form-data #jf_jabatan").val(res.data.jabatan).trigger('change');
             });
+            getFungsiData('jf_fungsi').done(function() {
+              $("#modal-form form#form-data #jf_fungsi").val(res.data.fun_ids).trigger("change");
+            })
           } else {
             swal({
               title: "Error",
@@ -233,6 +237,7 @@ $this->load->view('dist/_partials/header');
       $("#modal-form div.modal-header h4.modal-title").html("Tambah Data Fungsi");
       $("#modal-form form#form-data input").val(null);
       getJabatan('jf_jabatan');
+      getFungsiData('jf_fungsi')
     });
 
   $(document).off("click", "#modal-form button#save-form")
@@ -333,7 +338,7 @@ $this->load->view('dist/_partials/header');
     });
   }
 
-  function getFungsiData(elem, id, isEdit = 0) {
+  function getFungsiData(elem, id = null, isEdit = 0) {
     var link = base_url() + "admin/fungsi/getFungsiData";
     var param = null;
     if (id) {

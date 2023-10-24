@@ -125,10 +125,12 @@ class Fungsi extends CI_Controller
       $data['ok']   = 200;
       $data['data']  = $dt->result_array();
       $data['data']['jabatan']  = $this->input->post('id');
+      $data['data']['fun_ids']  = array_column($dt->result_array(), 'fun_id');
     } else {
       $data['ok']   = 200;
       $data['data']  = [];
       $data['data']['jabatan']  = $this->input->post('id');
+      $data['data']['fun_ids']  = [];
     }
 
     echo json_encode($data);
@@ -138,37 +140,34 @@ class Fungsi extends CI_Controller
   {
     $cek = $this->validateData();
     if ($cek) {
-      if ($this->input->post('fun_id')) {
-        $wr['fun_id'] = $this->input->post('fun_id');
+      if ($this->input->post('jf_edit')) {
+        $wr['jf_jabatan'] = $this->input->post('jf_jabatan');
 
         $data = [];
-        $pass = ['fun_id'];
-        foreach ($_POST as $k => $v) {
-          if (!in_array($k, $pass)) {
-            $data[$k] = $v;
+        $jf_fungsi = $this->input->post('jf_fungsi');
+        if (!empty($jf_fungsi)) {
+          foreach ($jf_fungsi as $i => $value) {
+            $insert[$i]['jf_jabatan'] = $this->input->post('jf_jabatan');
+            $insert[$i]['jf_fungsi']  = $value;
           }
-        }
-        $ex = $this->db
-          ->where(['fun_id !=' => $this->input->post('fun_id')])
-          ->join('perangkat', 'perangkat.prt_id = perangkat_jabatan.prj_perangkat', 'left')
-          ->get_where('perangkat_jabatan', $data);
-        if ($ex->num_rows() > 0) {
-          $ret['ok'] = 500;
-          $ret['form'] = 'Data Sudah Ada Sebelumnya';
-        } else {
-          $update_prj = $this->db->update('perangkat_jabatan', [
-            'fun_jabatan' => $this->input->post('fun_jabatan')
-          ], $wr);
-          $wr2['prt_id'] = $this->db->get_where('perangkat_jabatan', $wr)->row()->prj_perangkat;
-          $update_prt = $this->db->update('perangkat', [
-            'prt_nama' => $this->input->post('prt_nama')
-          ], $wr2);
-          if ($update_prj && $update_prt) {
-            $ret['ok'] = 200;
-            $ret['form'] = 'Sukses Update Data';
-          } else {
+
+          $this->db->trans_begin(); // Memulai transaksi
+
+          // Langkah 1: Hapus data
+          $this->db->where($wr)->delete('jabatan_fungsi');
+
+          // Langkah 2: Input batch data
+          $this->db->insert_batch('jabatan_fungsi', $insert);
+
+          // Cek jika transaksi berhasil atau gagal
+          if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback(); // Transaksi gagal, rollback
             $ret['ok'] = 500;
             $ret['form'] = 'Gagal Update Data';
+          } else {
+            $this->db->trans_commit(); // Transaksi berhasil, commit
+            $ret['ok'] = 200;
+            $ret['form'] = 'Sukses Update Data';
           }
         }
       } else {
@@ -213,8 +212,8 @@ class Fungsi extends CI_Controller
         }
       }
     } else {
-      $ret['form']['fun_jabatan'] = form_error('fun_jabatan');
-      $ret['form']['prt_nama']    = form_error('prt_nama');
+      $ret['form']['jf_jabatan'] = form_error('jf_jabatan');
+      $ret['form']['jf_fungsi']    = form_error('jf_fungsi');
       $ret['ok']    = 400;
     }
     echo json_encode($ret);
@@ -223,8 +222,8 @@ class Fungsi extends CI_Controller
   public function delete()
   {
     if ($this->input->post('id')) {
-      $wr['fun_id'] = $this->input->post('id');
-      if ($this->db->update('perangkat_jabatan', ['fun_status' => 0], $wr)) {
+      $wr['jf_jabatan'] = $this->input->post('id');
+      if ($this->db->update('jabatan_fungsi', ['jf_status' => 0], $wr)) {
         $out["ok"]    = 200;
         $out["data"]  = "Berhasil Menghapus Data";
       } else {
@@ -240,22 +239,33 @@ class Fungsi extends CI_Controller
     $this->load->library('form_validation');
     $config = [
       [
-        'field' => 'fun_jabatan',
+        'field' => 'jf_jabatan',
         'label' => 'Jabatan',
         'rules' => 'required',
         'errors' => [
           'required' => '{field} harus diisi',
         ],
       ],
-      [
-        'field' => 'prt_nama',
-        'label' => 'Nama Fungsi',
-        'rules' => 'required',
-        'errors' => [
-          'required' => '{field} harus diisi',
-        ],
-      ],
+      // [
+      //   'field' => 'jf_fungsi',
+      //   'label' => 'Fungsi Perangkat',
+      //   'rules' => 'required',
+      //   'errors' => [
+      //     'required' => '{field} harus diisi',
+      //   ],
+      // ],
     ];
+
+    $jf_fungsi = $this->input->post('jf_fungsi');
+    if (!empty($jf_fungsi)) {
+      foreach ($jf_fungsi as $index => $value) {
+        $field = "jf_fungsi[$index]";
+        $label = "Fungsi Perangkat (indeks $index)";
+        $this->form_validation->set_rules($field, $label, 'required', [
+          'required' => '{field} harus diisi'
+        ]);
+      }
+    }
 
     $this->form_validation->set_rules($config);
     return $this->form_validation->run();
@@ -314,6 +324,32 @@ class Fungsi extends CI_Controller
     $ret = array_column($data->result_array(), 'prt_nama');
     header('Content-Type: application/json');
     echo json_encode($ret);
+  }
+
+  function getFungsiData()
+  {
+    // if ($this->input->post('id')) {
+    //   if ($this->input->post('is_edit')) {
+    //     $this->db->where(
+    //       'jbt_id',
+    //       $this->input->post('id')
+    //     );
+    //   }
+    // } else {
+    //   $ids = $this->db->select('jf_jabatan')->from('jabatan_fungsi')->where('jf_status', 1)->get();
+    //   if ($ids->num_rows() > 0) {
+    //     $this->db->where_not_in(
+    //       'jbt_id',
+    //       array_column(
+    //         $ids->result_array(),
+    //         'jf_jabatan'
+    //       )
+    //     );
+    //   }
+    // }
+
+    $data = $this->db->get_where('fungsi', ['fun_status' => 1]);
+    echo json_encode($data->result());
   }
 }
 
