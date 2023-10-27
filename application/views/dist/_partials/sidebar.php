@@ -22,6 +22,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
           <i class="fa fa-users"></i> <span>Perangkat Desa</span>
         </a>
       </li>
+      <li class="<?= $this->uri->segment(2) == 'user' ? 'active' : ''; ?>">
+        <a class="nav-link" href="<?= site_url('admin/user'); ?>">
+          <i class="fa fa-users"></i> <span>Data User</span>
+        </a>
+      </li>
       <li class="menu-header">Perangkat</li>
       <li class="<?= $this->uri->segment(2) == 'tugas' ? 'active' : ''; ?>">
         <a class="nav-link" href="<?= site_url('admin/tugas'); ?>">
