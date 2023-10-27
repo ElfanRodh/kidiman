@@ -91,6 +91,58 @@ $this->load->view('dist/_partials/header');
   </div>
 </div>
 
+<div class="modal fade text-left" id="modal-kegiatan" tabindex="-1" role="dialog" aria-labelledby="modal-kegiatan-data" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title"></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body pb-0">
+        <div class="col-12">
+          <h6 id="keg-text" class="mb-4"></h6>
+          <div id="accordion-kegiatan" class="accordion-kegiatan">
+            <div class="accordion">
+              <div class="accordion-header" role="button" data-toggle="collapse" data-target="#panel-body-2">
+                <h4>Panel 2</h4>
+              </div>
+              <div class="accordion-body collapse" id="panel-body-2" data-parent="#accordion-kegiatan">
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>No</th>
+                      <th>Progres</th>
+                      <th>Bukti</th>
+                      <th>Keterangan</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>1</td>
+                      <td>
+                        <div class="progress mb-3">
+                          <div class="progress-bar" role="progressbar" data-width="75%" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%;">75%</div>
+                        </div>
+                      </td>
+                      <td>1</td>
+                      <td>1</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" data-dismiss="modal" aria-label="Close" class="btn btn-outline-danger">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <?php $this->load->view('dist/_partials/footer'); ?>
 <script src="https://cdn.jsdelivr.net/gh/xcash/bootstrap-autocomplete@v2.3.7/dist/latest/bootstrap-autocomplete.min.js"></script>
 
@@ -125,7 +177,8 @@ $this->load->view('dist/_partials/header');
         },
         {
           data: "fungsi",
-          className: "text-left align-top"
+          className: "text-left align-top",
+          orderable: false
         },
         {
           data: "opsi",
@@ -368,6 +421,65 @@ $this->load->view('dist/_partials/header');
           .val(null)
           .trigger("change");
       },
+    });
+  }
+
+  function detaiKegiatan(jbt_id, fun_id) {
+    $.ajax({
+      type: "POST",
+      url: base_url() + "admin/kegiatan/getKegiatan",
+      data: {
+        jbt_id: jbt_id,
+        fun_id: fun_id,
+      },
+      dataType: "json",
+      success: function(res) {
+        $("#modal-kegiatan").modal({
+          backdrop: false
+        });
+        $('#modal-kegiatan #keg-text').html('Fungsi : <br>' + res[0].fun_nama)
+
+        var acc = ''
+        $.each(res, function(i, v) {
+          var prog = '';
+          $.each(v.progres, function(idx, val) {
+            prog += `<tr>
+                      <td>` + (idx + 1) + `</td>
+                      <td class="py-2" style="width: 45%">
+                        <img src="` + val.prog_bukti + `" class="img-fluid mb-2">
+                        <div class="progress">
+                          <div class="progress-bar" role="progressbar" data-width="` + val.prog_persentase + `%" aria-valuenow="` + val.prog_persentase + `" aria-valuemin="0" aria-valuemax="100" style="width: ` + val.prog_persentase + `%;">` + val.prog_persentase + `%</div>
+                        </div>
+                        <div>
+                          <p>` + val.prog_tanggal + `</p>
+                        </div>
+                      </td>
+                      <td>` + val.prog_keterangan + `</td>
+                    </tr>`
+          });
+
+          acc += `<div class="accordion">
+                    <div class="accordion-header" role="button" data-toggle="collapse" data-target="#panel-body-` + i + `">
+                      <h4>` + (i + 1) + '. ' + v.keg_nama + ' (' + v.keg_progres + '%)' + `</h4> <p>(Klik untuk detail)</p>
+                    </div>
+                    <div class="accordion-body collapse" id="panel-body-` + i + `" data-parent="#accordion-kegiatan">
+                      <table class="table">
+                        <thead>
+                          <tr>
+                            <th>No</th>
+                            <th>Bukti / Progres / Tanggal</th>
+                            <th>Keterangan</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          ` + prog + `
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>`
+        });
+        $('#modal-kegiatan #accordion-kegiatan').html(acc)
+      }
     });
   }
 </script>

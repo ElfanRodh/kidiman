@@ -5,9 +5,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 class Tugas extends CI_Controller
 {
 
-  var $column_order   = array(null, 'jbt_nama', 'prt_nama', 'tgs_nama');
-  var $column_search   = array('jbt_nama', 'prt_nama', 'tgs_nama');
-  var $order = array('jbt_id' => 'asc', 'jbt_nama' => 'asc', 'prt_nama' => 'asc', 'tgs_nama' => 'asc');
+  var $column_order   = array(null, 'jbt_nama', 'tgs_nama');
+  var $column_search   = array('jbt_nama', 'tgs_nama');
+  var $order = array('jbt_id' => 'asc', 'jbt_nama' => 'asc', 'tgs_nama' => 'asc');
 
   public function index()
   {
@@ -27,7 +27,7 @@ class Tugas extends CI_Controller
       $no++;
       $row                = array();
       $row['no']          = $no;
-      $row['jbt_nama']    = $tgs->jbt_nama;
+      $row['jbt_nama']    = $tgs->jbt_nama . '<br> (' . $tgs->prt_nama . ')';
       $row['tgs_nama']    = $tgs->tgs_nama;
       $row['opsi']        = '<div class="btn-group" role="group">
 									<button class="btn btn-icon btn-warning update-data" data-id="' . (string)$tgs->jbt_id . '">
@@ -64,10 +64,12 @@ class Tugas extends CI_Controller
     $this->db->select('*');
     $this->db->from('perangkat_jabatan');
     $this->db->join('jabatan', 'jabatan.jbt_id = perangkat_jabatan.prj_jabatan', 'left');
+    $this->db->join('perangkat', 'perangkat.prt_id = perangkat_jabatan.prj_perangkat', 'left');
     $this->db->join('jabatan_tugas', 'jabatan_tugas.jt_jabatan = jabatan.jbt_id', 'left');
     $this->db->join('tugas', 'tugas.tgs_id = jabatan_tugas.jt_tugas', 'left');
     $this->db->where(['prj_status' => 1]);
     $this->db->where(['jbt_status' => 1]);
+    $this->db->where(['prt_status' => 1]);
     $this->db->where(['jt_status' => 1]);
     $this->db->where(['tgs_status' => 1]);
     if ($where) {
@@ -140,41 +142,57 @@ class Tugas extends CI_Controller
   {
     $cek = $this->validateData();
     if ($cek) {
-      if ($this->input->post('tgs_id')) {
-        $wr['tgs_id'] = $this->input->post('tgs_id');
+      if ($this->input->post('jt_id')) {
+        $wr['jt_id'] = $this->input->post('jt_id');
 
         $data = [];
-        $pass = ['tgs_id'];
+        $pass = ['jt_id', 'jt_jabatan'];
         foreach ($_POST as $k => $v) {
           if (!in_array($k, $pass)) {
             $data[$k] = $v;
           }
         }
         $ex = $this->db
-          ->where(['tgs_id !=' => $this->input->post('tgs_id')])
-          ->join('perangkat', 'perangkat.prt_id = perangkat_jabatan.prj_perangkat', 'left')
-          ->get_where('perangkat_jabatan', $data);
+          ->where(['jt_id' => $this->input->post('jt_id')])
+          ->where(['tgs_status' => 1, 'tgs_status' => 1])
+          // ->join('jabatan', 'jabatan.jbt_id = jabatan_tugas.jt_jabatan', 'left')
+          ->join('tugas', 'tugas.tgs_id = jabatan_tugas.jt_tugas', 'left')
+          ->get_where('jabatan_tugas', []);
         if ($ex->num_rows() > 0) {
-          $ret['ok'] = 500;
-          $ret['form'] = 'Data Sudah Ada Sebelumnya';
-        } else {
-          $update_prj = $this->db->update('perangkat_jabatan', [
-            'tgs_jabatan' => $this->input->post('tgs_jabatan')
-          ], $wr);
-          $wr2['prt_id'] = $this->db->get_where('perangkat_jabatan', $wr)->row()->prj_perangkat;
-          $update_prt = $this->db->update('perangkat', [
-            'prt_nama' => $this->input->post('prt_nama')
-          ], $wr2);
-          if ($update_prj && $update_prt) {
-            $ret['ok'] = 200;
-            $ret['form'] = 'Sukses Update Data';
-          } else {
+          $this->db->trans_begin(); // Memulai transaksi
+
+          // Langkah 1: Hapus data
+          $this->db->where(['tgs_nama' => $ex->row()->tgs_nama])->delete('tugas');
+
+          // Langkah 2: Input data
+          $data_tugas = [
+            'tgs_nama' => $this->input->post('tgs_nama')
+          ];
+          $tugas = $this->db->insert('tugas', $data_tugas);
+
+          if ($tugas) {
+            $data_jt['jt_tugas']      = $this->db->insert_id();
+            $data_jt['jt_jabatan']    = $this->input->post('jt_jabatan');
+            $data_jt['jt_status']     = 1;
+            $this->db->update('jabatan_tugas', $data_jt, $wr);
+          }
+
+          // Cek jika transaksi berhasil atau gagal
+          if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback(); // Transaksi gagal, rollback
             $ret['ok'] = 500;
             $ret['form'] = 'Gagal Update Data';
+          } else {
+            $this->db->trans_commit(); // Transaksi berhasil, commit
+            $ret['ok'] = 200;
+            $ret['form'] = 'Sukses Update Data';
           }
+        } else {
+          $ret['ok'] = 500;
+          $ret['form'] = 'Tidak Ada Data';
         }
       } else {
-        $wr1['tgs_nama']     = strip_tags($this->input->post('tgs_nama'));
+        $wr1['tgs_nama']     = $this->input->post('tgs_nama');
         $tugas = $this->db->get_where('tugas', $wr1);
         if ($tugas->num_rows() > 0) {
           $wr['jt_tugas']      = $tugas->row()->tgs_id;

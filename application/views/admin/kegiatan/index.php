@@ -3,40 +3,20 @@ defined('BASEPATH') or exit('No direct script access allowed');
 $this->load->view('dist/_partials/header');
 ?>
 
-<style>
-  .card .card-header {
-    border-bottom-color: #f9f9f9;
-    line-height: 30px;
-    -ms-grid-row-align: center;
-    align-self: center;
-    width: 100%;
-    min-height: 70px;
-    padding: 15px 25px;
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    align-content: center;
-  }
-
-  .note-toolbar-wrapper {
-    height: auto !important;
-  }
-</style>
-
 <!-- Main Content -->
 <div class="main-content">
   <section class="section">
     <div class="section-header">
-      <h1>Data Tugas Pokok</h1>
+      <h1>Data Kegiatan</h1>
       <div class="section-header-breadcrumb">
         <div class="breadcrumb-item active"><a href="<?= site_url() ?>">Dashboard</a></div>
-        <div class="breadcrumb-item">Data Tugas Pokok</div>
+        <div class="breadcrumb-item">Data Kegiatan</div>
       </div>
     </div>
 
     <div class="row align-items-left align-middle p-0 mb-3">
       <div class="col-12 col-md-6">
-        <h2 class="section-title">Data Tugas Pokok</h2>
+        <h2 class="section-title">Data Kegiatan</h2>
       </div>
       <div class="col-12 col-md-6 text-center text-md-right m-auto">
         <button class="btn btn-primary" id="add-form-data">Tambah Data</button>
@@ -48,7 +28,7 @@ $this->load->view('dist/_partials/header');
         <div class="col-12">
           <div class="card">
             <div class="card-header">
-              <h4>Data Tugas Pokok</h4>
+              <h4>Data Kegiatan</h4>
             </div>
             <div class="card-body">
               <div class="table-responsive">
@@ -57,7 +37,8 @@ $this->load->view('dist/_partials/header');
                     <tr>
                       <th class="text-center">No</th>
                       <th>Jabatan</th>
-                      <th>Tugas Pokok</th>
+                      <th>Kegiatan</th>
+                      <th>Progres</th>
                       <th>Action</th>
                     </tr>
                   </thead>
@@ -71,7 +52,6 @@ $this->load->view('dist/_partials/header');
     </div>
   </section>
 </div>
-
 <div class="modal fade text-left" id="modal-form" tabindex="-1" role="dialog" aria-labelledby="modal-form-data" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
@@ -84,18 +64,18 @@ $this->load->view('dist/_partials/header');
       <div class="modal-body pb-0">
         <form id="form-data" class="form form-horizontal">
           <div class="form-body">
-            <input type="hidden" name="jt_id" id="jt_id">
+            <input type="hidden" name="prj_id" id="prj_id">
             <div class="row">
               <div class="col-12 col-md-6">
                 <div class="form-group">
-                  <label for="jt_jabatan">Jabatan</label>
-                  <select class="form-control select2" data-width="100%" data-allow-clear="true" data-placeholder="Pilih Jabatan" id="jt_jabatan" name="jt_jabatan"></select>
+                  <label for="prt_nama">Nama Perangkat</label>
+                  <input type="text" class="form-control" name="prt_nama" id="prt_nama" placeholder="Nama Perangkat">
                 </div>
               </div>
-              <div class="col-12 col-md-12">
+              <div class="col-12 col-md-6">
                 <div class="form-group">
-                  <label for="tgs_nama">Tugas Pokok</label>
-                  <textarea class="form-control tgs-summernote" id="tgs_nama" name="tgs_nama"></textarea>
+                  <label for="prj_jabatan">Jabatan</label>
+                  <select class="form-control select2" data-width="100%" data-allow-clear="true" data-placeholder="Pilih Jabatan" id="prj_jabatan" name="prj_jabatan"></select>
                 </div>
               </div>
             </div>
@@ -109,7 +89,6 @@ $this->load->view('dist/_partials/header');
     </div>
   </div>
 </div>
-
 <?php $this->load->view('dist/_partials/footer'); ?>
 <script src="https://cdn.jsdelivr.net/gh/xcash/bootstrap-autocomplete@v2.3.7/dist/latest/bootstrap-autocomplete.min.js"></script>
 
@@ -128,7 +107,7 @@ $this->load->view('dist/_partials/header');
       serverSide: true,
       ajax: {
         type: "POST",
-        url: base_url() + "admin/tugas/viewData",
+        url: base_url() + "admin/kegiatan/viewData",
         data: function(posts) {
           posts.fil_nama = fil_nama ?? null;
         }
@@ -143,7 +122,11 @@ $this->load->view('dist/_partials/header');
           className: "text-left align-top"
         },
         {
-          data: "tgs_nama",
+          data: "keg_nama",
+          className: "text-left align-top"
+        },
+        {
+          data: "keg_progres",
           className: "text-left align-top"
         },
         {
@@ -165,7 +148,7 @@ $this->load->view('dist/_partials/header');
       e.preventDefault();
       $.ajax({
         type: "POST",
-        url: base_url() + "admin/tugas/getData",
+        url: base_url() + "admin/kegiatan/getData",
         data: {
           id: $(this).attr("data-id")
         },
@@ -175,25 +158,13 @@ $this->load->view('dist/_partials/header');
             $("#modal-form").modal({
               backdrop: false
             });
-            $("#modal-form div.modal-header h4.modal-title").html("Ubah Data Tugas Pokok");
-            $("#modal-form form#form-data #jt_id").val(res.data.jt_id);
-            getJabatan('jt_jabatan', res.data.jt_jabatan, 1).done(function() {
-              $("#modal-form form#form-data #jt_jabatan").val(res.data.jt_jabatan);
+            $("#modal-form div.modal-header h4.modal-title").html("Ubah Data Kegiatan");
+            $("#modal-form form#form-data #prj_id").val(res.data.prj_id);
+            getJabatan('prj_jabatan', res.data.prj_jabatan, 1).done(function() {
+              $("#modal-form form#form-data #prj_jabatan").val(res.data.prj_jabatan);
             });
-            // $("#modal-form form#form-data #tgs_nama").val(res.data.tgs_nama);
-            setTimeout(() => {
-              $("#modal-form form#form-data .tgs-summernote").summernote({
-                dialogsInBody: true,
-                // airMode: true,
-                minHeight: 200,
-                // toolbar: [
-                //   ["style", ["bold", "italic", "underline", "clear"]],
-                //   ["font", ["strikethrough"]],
-                //   ["para", ["paragraph"]],
-                // ],
-              });
-              $("#modal-form form#form-data #tgs_nama").summernote('code', res.data.tgs_nama);
-            }, 500);
+            $("#modal-form form#form-data #jbt_nama").val(res.data.jbt_nama);
+            $("#modal-form form#form-data #prt_nama").val(res.data.prt_nama);
           } else {
             swal({
               title: "Error",
@@ -239,7 +210,7 @@ $this->load->view('dist/_partials/header');
         if (conf) {
           $.ajax({
             type: "POST",
-            url: base_url() + "admin/tugas/delete",
+            url: base_url() + "admin/kegiatan/delete",
             data: {
               id: _id_
             },
@@ -263,19 +234,9 @@ $this->load->view('dist/_partials/header');
       $("#modal-form").modal({
         backdrop: false
       });
-      $("#modal-form div.modal-header h4.modal-title").html("Tambah Data Tugas Pokok");
+      $("#modal-form div.modal-header h4.modal-title").html("Tambah Data Kegiatan");
       $("#modal-form form#form-data input").val(null);
-      $("#modal-form form#form-data .tgs-summernote").summernote({
-        dialogsInBody: true,
-        // airMode: true,
-        minHeight: 200,
-        // toolbar: [
-        //   ["style", ["bold", "italic", "underline", "clear"]],
-        //   ["font", ["strikethrough"]],
-        //   ["para", ["paragraph"]],
-        // ],
-      });
-      getJabatan('jt_jabatan');
+      getJabatan('prj_jabatan');
     });
 
   $(document).off("click", "#modal-form button#save-form")
@@ -289,7 +250,6 @@ $this->load->view('dist/_partials/header');
       $("#modal-form form#form-data input").val(null);
       $("#modal-form form#form-data textarea").val(null);
       $("#modal-form form#form-data select").val(null).trigger("change");
-      $("#modal-form form#form-data .tgs-summernote").summernote('code', '');
       $("form#form-data input").removeClass("is-invalid");
       $("form#form-data textarea").removeClass("is-invalid");
       $("form#form-data select").removeClass("is-invalid");
@@ -299,7 +259,7 @@ $this->load->view('dist/_partials/header');
     var datas = new FormData($("form#form-data")[0]);
     $.ajax({
       type: "POST",
-      url: base_url() + "admin/tugas/addOrEdit",
+      url: base_url() + "admin/kegiatan/addOrEdit",
       data: datas,
       dataType: "json",
       cache: false,
@@ -344,7 +304,7 @@ $this->load->view('dist/_partials/header');
   }
 
   function getJabatan(elem, id, isEdit = 0) {
-    var link = base_url() + "admin/tugas/getJabatan";
+    var link = base_url() + "admin/kegiatan/getJabatan";
     var param = null;
     if (id) {
       param = {
@@ -375,4 +335,11 @@ $this->load->view('dist/_partials/header');
       },
     });
   }
+</script>
+<script>
+  $('#prt_nama').autoComplete({
+    resolverSettings: {
+      url: base_url() + 'admin/kegiatan/getPerangkat'
+    }
+  });
 </script>

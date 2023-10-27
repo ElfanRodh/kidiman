@@ -4,10 +4,10 @@ defined('BASEPATH') or exit('No direct script access allowed');
 <div class="main-sidebar sidebar-style-2">
   <aside id="sidebar-wrapper">
     <div class="sidebar-brand">
-      <a href="<?= base_url(); ?>dist/index">Stisla</a>
+      <a href="<?= base_url(); ?>dist/index">KIDIMAN</a>
     </div>
     <div class="sidebar-brand sidebar-brand-sm">
-      <a href="<?= base_url(); ?>dist/index">St</a>
+      <a href="<?= base_url(); ?>dist/index">KIDIMAN</a>
     </div>
     <ul class="sidebar-menu">
       <li class="menu-header">Dashboard</li>
@@ -30,12 +30,12 @@ defined('BASEPATH') or exit('No direct script access allowed');
       <li class="menu-header">Perangkat</li>
       <li class="<?= $this->uri->segment(2) == 'tugas' ? 'active' : ''; ?>">
         <a class="nav-link" href="<?= site_url('admin/tugas'); ?>">
-          <i class="fa fa-users"></i> <span>Tugas Pokok</span>
+          <i class="fa fa-box"></i> <span>Tugas Pokok</span>
         </a>
       </li>
       <li class="<?= $this->uri->segment(2) == 'fungsi' ? 'active' : ''; ?>">
         <a class="nav-link" href="<?= site_url('admin/fungsi'); ?>">
-          <i class="fa fa-users"></i> <span>Fungsi</span>
+          <i class="fa fa-hands"></i> <span>Fungsi</span>
         </a>
       </li>
       <li class="menu-header">Stisla</li>
