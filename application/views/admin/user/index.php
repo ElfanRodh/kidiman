@@ -423,7 +423,7 @@ $this->load->view('dist/_partials/header');
     if (password2.type === 'password') {
       // jika type inputnya password2
       password2.type = 'text'; // ubah type menjadi text
-      showHide.innerHTML = '<i class="fa fa-eye-slash"></i>'; // ubah icon menjadi eye slash
+      showHide2.innerHTML = '<i class="fa fa-eye-slash"></i>'; // ubah icon menjadi eye slash
     } else {
       // jika type bukan password (text)
       showHide2.innerHTML = '<i class="fa fa-eye"></i>'; // ubah icon menjadi eye
