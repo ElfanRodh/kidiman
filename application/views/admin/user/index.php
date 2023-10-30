@@ -70,7 +70,7 @@ $this->load->view('dist/_partials/header');
               <div class="col-12 col-md-12">
                 <div class="form-group">
                   <label for="usr_nama">Nama</label>
-                  <input type="text" class="form-control" name="usr_nama" id="usr_nama" placeholder="Nama User">
+                  <input type="text" class="form-control" name="usr_nama" id="usr_nama" placeholder="Nama User" />
                 </div>
               </div>
               <div class="col-12 col-md-12">
@@ -94,14 +94,14 @@ $this->load->view('dist/_partials/header');
               <div class="col-12 col-md-12">
                 <div class="form-group">
                   <label for="usr_username">Username</label>
-                  <input type="text" class="form-control" name="usr_username" id="usr_username" placeholder="Username">
+                  <input type="text" class="form-control" name="usr_username" id="usr_username" placeholder="Username" />
                 </div>
               </div>
               <div class="col-12 col-md-12">
                 <div class="form-group">
                   <label for="usr_password">Password</label>
                   <div class="input-group">
-                    <input type="password" class="form-control input-group" name="usr_password" id="usr_password">
+                    <input type="password" class="form-control" name="usr_password" id="usr_password" placeholder="Masukkan Password" />
                     <span class="input-group-text" id="showHide">
                       <i class="fa fa-eye"></i>
                     </span>
@@ -112,7 +112,7 @@ $this->load->view('dist/_partials/header');
                 <div class="form-group">
                   <label for="usr_password2">Ulangi Password</label>
                   <div class="input-group">
-                    <input type="password" class="form-control" name="usr_password2" id="usr_password2">
+                    <input type="password" class="form-control" name="usr_password2" id="usr_password2" placeholder="Ulangi Password" />
                     <span class="input-group-text" id="showHide2">
                       <i class="fa fa-eye"></i>
                     </span>
@@ -332,6 +332,9 @@ $this->load->view('dist/_partials/header');
       cache: false,
       contentType: false,
       processData: false,
+      beforeSend: function() {
+        $('form#form-data .invalid-feedback').remove();
+      },
       success: function(res) {
         if (res.ok == 200) {
           swal({
@@ -348,12 +351,15 @@ $this->load->view('dist/_partials/header');
           if (res.ok == 400) {
             var frm = Object.keys(res.form);
             var val = Object.values(res.form);
-            $('form#form-data .invalid-feedback').remove();
             frm.forEach(function(el, ind) {
               if (val[ind] != '') {
                 $('form#form-data #' + el).removeClass('is-invalid').addClass("is-invalid");
                 var app = '<div id="' + el + '-error" class="invalid-feedback" for="' + el + '">' + val[ind] + '</div>';
-                $('form#form-data #' + el).closest('.form-group').append(app);
+                if (el == 'usr_password' || el == 'usr_password2') {
+                  $('form#form-data #' + el).closest('.input-group').append(app);
+                } else {
+                  $('form#form-data #' + el).closest('.form-group').append(app);
+                }
               }
             });
           } else {

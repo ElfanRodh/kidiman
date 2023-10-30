@@ -311,10 +311,12 @@ class User extends CI_Controller
 
     public function is_password_strong($usr_password)
     {
-        if (preg_match('#[0-9]#', $usr_password) && preg_match('#[a-zA-Z]#', $usr_password)) {
-            return TRUE;
+        if ($usr_password) {
+            if (preg_match('#[0-9]#', $usr_password) && preg_match('#[a-zA-Z]#', $usr_password)) {
+                return TRUE;
+            }
+            return FALSE;
         }
-        return FALSE;
     }
 
     function getPerangkat()
