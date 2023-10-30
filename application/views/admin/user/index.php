@@ -101,7 +101,7 @@ $this->load->view('dist/_partials/header');
                 <div class="form-group">
                   <label for="usr_password">Password</label>
                   <div class="input-group">
-                    <input type="password" class="form-control" name="usr_password" id="usr_password">
+                    <input type="password" class="form-control input-group" name="usr_password" id="usr_password">
                     <span class="input-group-text" id="showHide">
                       <i class="fa fa-eye"></i>
                     </span>
@@ -300,6 +300,18 @@ $this->load->view('dist/_partials/header');
 
   $(document).off("hidden.bs.modal", "#modal-form")
     .on("hidden.bs.modal", "#modal-form", function(e) {
+      const password = document.getElementById('usr_password');
+      const password2 = document.getElementById('usr_password2');
+      const showHide = document.getElementById('showHide');
+      const showHide2 = document.getElementById('showHide2');
+
+      password.type = 'password';
+      password2.type = 'password';
+      showHide.innerHTML = '<i class="fa fa-eye"></i>';
+      showHide.style.cursor = 'pointer';
+      showHide2.innerHTML = '<i class="fa fa-eye"></i>';
+      showHide2.style.cursor = 'pointer';
+
       $("#modal-form div.modal-header h4.modal-title").html(null);
       $("#modal-form form#form-data input").val(null);
       $("#modal-form form#form-data textarea").val(null);
@@ -307,6 +319,7 @@ $this->load->view('dist/_partials/header');
       $("form#form-data input").removeClass("is-invalid");
       $("form#form-data textarea").removeClass("is-invalid");
       $("form#form-data select").removeClass("is-invalid");
+      $("#modal-form form#form-data #showHide").class("fa fa-eye");
     })
 
   function simpan() {
@@ -392,16 +405,14 @@ $this->load->view('dist/_partials/header');
 </script>
 <script>
   const password = document.getElementById('usr_password'); // id dari input password
-  const showHide = document.getElementById('showHide'); // id span showHide dalam input group password
-
   const password2 = document.getElementById('usr_password2'); // id dari input password2
+  const showHide = document.getElementById('showHide'); // id span showHide dalam input group password
   const showHide2 = document.getElementById('showHide2'); // id span showHide2 dalam input group password
 
   password.type = 'password'; // set type input password menjadi password
+  password2.type = 'password'; // set type input password menjadi password2
   showHide.innerHTML = '<i class="fa fa-eye"></i>'; // masukan icon eye dalam icon bootstrap 5
   showHide.style.cursor = 'pointer'; // ubah cursor menjadi pointer
-
-  password2.type = 'password'; // set type input password menjadi password2
   showHide2.innerHTML = '<i class="fa fa-eye"></i>'; // masukan icon eye dalam icon bootstrap 5
   showHide2.style.cursor = 'pointer'; // ubah cursor menjadi pointer
 
