@@ -287,23 +287,34 @@ class User extends CI_Controller
             [
                 'field' => 'usr_password',
                 'label' => 'Password',
-                'rules' => 'required',
+                'rules' => 'required|min_length[8]|callback_is_password_strong',
                 'errors' => [
                     'required' => '{field} harus diisi',
+                    'min_length[8]' => '{field} harus minimal 8 karakter',
+                    'is_password_strong' => '{field} harus berisi angka, huruf kapital, huruf kecil dan karakter khusus',
                 ],
             ],
             [
                 'field' => 'usr_password2',
-                'label' => 'Ulangi Password',
-                'rules' => 'required',
+                'label' => 'Kofirmasi Password',
+                'rules' => 'required|matches[usr_password]',
                 'errors' => [
                     'required' => '{field} harus diisi',
+                    'matches' => '{field} tidak sesuai dengan password awal',
                 ],
             ],
         ];
 
         $this->form_validation->set_rules($config);
         return $this->form_validation->run();
+    }
+
+    public function is_password_strong($usr_password)
+    {
+        if (preg_match('#[0-9]#', $usr_password) && preg_match('#[a-zA-Z]#', $usr_password)) {
+            return TRUE;
+        }
+        return FALSE;
     }
 
     function getPerangkat()

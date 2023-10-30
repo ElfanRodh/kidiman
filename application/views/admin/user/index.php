@@ -100,13 +100,23 @@ $this->load->view('dist/_partials/header');
               <div class="col-12 col-md-12">
                 <div class="form-group">
                   <label for="usr_password">Password</label>
-                  <input type="password" class="form-control" name="usr_password" id="usr_password">
+                  <div class="input-group">
+                    <input type="password" class="form-control" name="usr_password" id="usr_password">
+                    <span class="input-group-text" id="showHide">
+                      <i class="fa fa-eye"></i>
+                    </span>
+                  </div>
                 </div>
               </div>
               <div class="col-12 col-md-12">
                 <div class="form-group">
                   <label for="usr_password2">Ulangi Password</label>
-                  <input type="password" class="form-control" name="usr_password2" id="usr_password2">
+                  <div class="input-group">
+                    <input type="password" class="form-control" name="usr_password2" id="usr_password2">
+                    <span class="input-group-text" id="showHide2">
+                      <i class="fa fa-eye"></i>
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -380,10 +390,44 @@ $this->load->view('dist/_partials/header');
     });
   }
 </script>
-<!-- <script>
-  $('#usr_perangkat').autoComplete({
-    resolverSettings: {
-      url: base_url() + 'admin/perangkat/getPerangkat'
+<script>
+  const password = document.getElementById('usr_password'); // id dari input password
+  const showHide = document.getElementById('showHide'); // id span showHide dalam input group password
+
+  const password2 = document.getElementById('usr_password2'); // id dari input password2
+  const showHide2 = document.getElementById('showHide2'); // id span showHide2 dalam input group password
+
+  password.type = 'password'; // set type input password menjadi password
+  showHide.innerHTML = '<i class="fa fa-eye"></i>'; // masukan icon eye dalam icon bootstrap 5
+  showHide.style.cursor = 'pointer'; // ubah cursor menjadi pointer
+
+  password2.type = 'password'; // set type input password menjadi password2
+  showHide2.innerHTML = '<i class="fa fa-eye"></i>'; // masukan icon eye dalam icon bootstrap 5
+  showHide2.style.cursor = 'pointer'; // ubah cursor menjadi pointer
+
+  showHide.addEventListener('click', () => {
+    // ketika span diclick
+    if (password.type === 'password') {
+      // jika type inputnya password
+      password.type = 'text'; // ubah type menjadi text
+      showHide.innerHTML = '<i class="fa fa-eye-slash"></i>'; // ubah icon menjadi eye slash
+    } else {
+      // jika type bukan password (text)
+      showHide.innerHTML = '<i class="fa fa-eye"></i>'; // ubah icon menjadi eye
+      password.type = 'password'; // ubah type menjadi password
     }
   });
-</script> -->
+
+  showHide2.addEventListener('click', () => {
+    // ketika span diclick
+    if (password2.type === 'password') {
+      // jika type inputnya password2
+      password2.type = 'text'; // ubah type menjadi text
+      showHide.innerHTML = '<i class="fa fa-eye-slash"></i>'; // ubah icon menjadi eye slash
+    } else {
+      // jika type bukan password (text)
+      showHide2.innerHTML = '<i class="fa fa-eye"></i>'; // ubah icon menjadi eye
+      password2.type = 'password'; // ubah type menjadi password
+    }
+  });
+</script>
