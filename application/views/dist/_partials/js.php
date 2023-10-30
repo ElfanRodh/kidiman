@@ -23,7 +23,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 <script src="<?= base_url("assets/modules/summernote/summernote-bs4.js"); ?>"></script>
 
 <!-- Template JS File -->
-<!-- <script src="<?= base_url("assets/js/scripts.js"); ?>"></script> -->
+<script src="<?= base_url("assets/js/scripts.js"); ?>"></script>
 <script src="<?= base_url("assets/custom.js"); ?>"></script>
 </body>
 

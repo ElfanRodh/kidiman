@@ -5,9 +5,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 class Fungsi extends CI_Controller
 {
 
-  var $column_order   = array(null, 'jbt_nama', 'prt_nama', 'fun_nama');
-  var $column_search   = array('jbt_nama', 'prt_nama', 'fun_nama');
-  var $order = array('jbt_id' => 'asc', 'jbt_nama' => 'asc', 'prt_nama' => 'asc', 'fun_nama' => 'asc');
+  var $column_order   = array(null, 'jbt_nama');
+  var $column_search   = array('jbt_nama');
+  var $order = array('jbt_id' => 'asc', 'jbt_nama' => 'asc');
 
   public function index()
   {
@@ -27,7 +27,7 @@ class Fungsi extends CI_Controller
       $no++;
       $row                = array();
       $row['no']          = $no;
-      $row['jbt_nama']    = $fun->jbt_nama;
+      $row['jbt_nama']    = $fun->jbt_nama . '<br> (' . $fun->prt_nama . ')';
       // $row['fun_nama']    = $fun->fun_nama;
       $row['fungsi']      = $this->getFungsiJabatan($fun->jbt_id);
       $row['opsi']        = '<div class="btn-group" role="group">
@@ -65,8 +65,10 @@ class Fungsi extends CI_Controller
     $this->db->select('*');
     $this->db->from('perangkat_jabatan');
     $this->db->join('jabatan', 'jabatan.jbt_id = perangkat_jabatan.prj_jabatan', 'left');
+    $this->db->join('perangkat', 'perangkat.prt_id = perangkat_jabatan.prj_perangkat', 'left');
     $this->db->where(['prj_status' => 1]);
     $this->db->where(['jbt_status' => 1]);
+    $this->db->where(['prt_status' => 1]);
     $this->db->group_by('jbt_id');
     if ($where) {
       $this->db->where($where);
@@ -306,13 +308,47 @@ class Fungsi extends CI_Controller
     $data = $this->db->get_where('jabatan', ['jbt_id' => $jbt_id]);
 
     $list = '';
-    $list .= '<ul>';
-    foreach ($data->result() as $k => $v) {
-      $list .= '<li>' . $v->fun_nama . '</li>';
+
+    if ($data->num_rows()) {
+      $list .= '<table class="" style="width: 100%;">';
+      $list .= '<tr>';
+      $list .= '<th class="text-left">No</th>';
+      $list .= '<th class="text-left">Fungsi</th>';
+      $list .= '<th class="text-left">Kegiatan</th>';
+      $list .= '</tr>';
+      foreach ($data->result() as $k => $v) {
+        $k++;
+        $list .= '<tr>';
+        $list .= '<td class="text-left">' . $k . '</td>';
+        $list .= '<td class="text-left">' . $v->fun_nama . '</td>';
+        $list .= '<td class="text-left">' . $this->getKegiatanJabatan($jbt_id, $v->fun_id) . '</td>';
+        $list .= '</tr>';
+      }
+      $list .= '</table>';
     }
-    $list .= '</li>';
 
     return $list;
+  }
+
+  function getKegiatanJabatan($jbt_id, $fun_id)
+  {
+    $ret = '-';
+    $wr['keg_jabatan']  = $jbt_id;
+    $wr['keg_fungsi']   = $fun_id;
+    $keg = $this->db->get_where('kegiatan', $wr);
+    if ($keg->num_rows()) {
+      // $ret = '<div class="btn-group" role="group">
+      //           <a href="' . site_url('admin/kegiatan/detail/' . $jbt_id . '/' . $fun_id) . '" class="btn btn-icon btn-info text-white detail-data" data-id="' . (string)$keg->row()->keg_jabatan . '" data-name="' . (string)$keg->row()->keg_nama . '">
+      //             <i class="fa fa-list"></i>
+      //           </a>
+      //         </div>';
+      $ret = '<div class="btn-group" role="group">
+                <button class="btn btn-icon btn-info text-white detail-kegiatan" onclick="detaiKegiatan(' . $jbt_id . ', ' . $fun_id . ')">
+                  <i class="fa fa-list"></i>
+                </button>
+              </div>';
+    }
+    return $ret;
   }
 
   function getFungsi()
