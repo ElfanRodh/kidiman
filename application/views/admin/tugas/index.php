@@ -186,11 +186,11 @@ $this->load->view('dist/_partials/header');
                 dialogsInBody: true,
                 // airMode: true,
                 minHeight: 200,
-                // toolbar: [
-                //   ["style", ["bold", "italic", "underline", "clear"]],
-                //   ["font", ["strikethrough"]],
-                //   ["para", ["paragraph"]],
-                // ],
+                toolbar: [
+                  ["style", ["bold", "italic", "underline", "clear"]],
+                  ["font", ["strikethrough"]],
+                  ["para", ["paragraph"]],
+                ],
               });
               $("#modal-form form#form-data #tgs_nama").summernote('code', res.data.tgs_nama);
             }, 500);
@@ -269,11 +269,11 @@ $this->load->view('dist/_partials/header');
         dialogsInBody: true,
         // airMode: true,
         minHeight: 200,
-        // toolbar: [
-        //   ["style", ["bold", "italic", "underline", "clear"]],
-        //   ["font", ["strikethrough"]],
-        //   ["para", ["paragraph"]],
-        // ],
+        toolbar: [
+          ["style", ["bold", "italic", "underline", "clear"]],
+          ["font", ["strikethrough"]],
+          ["para", ["paragraph"]],
+        ],
       });
       getJabatan('jt_jabatan');
     });

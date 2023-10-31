@@ -30,12 +30,17 @@ class Fungsi extends CI_Controller
       $row['jbt_nama']    = $fun->jbt_nama . '<br> (' . $fun->prt_nama . ')';
       // $row['fun_nama']    = $fun->fun_nama;
       $row['fungsi']      = $this->getFungsiJabatan($fun->jbt_id);
+      // $row['opsi']        = '<div class="btn-group" role="group">
+      // 						<button class="btn btn-icon btn-warning update-data" data-id="' . (string)$fun->jbt_id . '">
+      // 							<i class="fa fa-edit"></i>
+      // 						</button>
+      // 						<button class="btn btn-icon btn-danger delete-data" data-id="' . (string)$fun->jbt_id . '" data-name="' . (string)$fun->jbt_nama . '">
+      // 							<i class="fa fa-trash"></i>
+      // 						</button>
+      // 					</div>';
       $row['opsi']        = '<div class="btn-group" role="group">
 									<button class="btn btn-icon btn-warning update-data" data-id="' . (string)$fun->jbt_id . '">
 										<i class="fa fa-edit"></i>
-									</button>
-									<button class="btn btn-icon btn-danger delete-data" data-id="' . (string)$fun->jbt_id . '" data-name="' . (string)$fun->jbt_nama . '">
-										<i class="fa fa-trash"></i>
 									</button>
 								</div>';
       $data[]        = $row;

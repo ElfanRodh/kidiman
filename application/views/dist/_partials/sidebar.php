@@ -38,6 +38,11 @@ defined('BASEPATH') or exit('No direct script access allowed');
           <i class="fa fa-hands"></i> <span>Fungsi</span>
         </a>
       </li>
+      <li class="<?= $this->uri->segment(2) == 'kegiatan' ? 'active' : ''; ?>">
+        <a class="nav-link" href="<?= site_url('admin/kegiatan'); ?>">
+          <i class="fa fa-tasks"></i> <span>Kegiatan</span>
+        </a>
+      </li>
       <li class="menu-header">Stisla</li>
       <li class="dropdown <?= $this->uri->segment(2) == 'components_article' || $this->uri->segment(2) == 'components_avatar' || $this->uri->segment(2) == 'components_chat_box' || $this->uri->segment(2) == 'components_empty_state' || $this->uri->segment(2) == 'components_gallery' || $this->uri->segment(2) == 'components_hero' || $this->uri->segment(2) == 'components_multiple_upload' || $this->uri->segment(2) == 'components_pricing' || $this->uri->segment(2) == 'components_statistic' || $this->uri->segment(2) == 'components_tab' || $this->uri->segment(2) == 'components_table' || $this->uri->segment(2) == 'components_user' || $this->uri->segment(2) == 'components_wizard' ? 'active' : ''; ?>">
         <a href="#" class="nav-link has-dropdown"><i class="fas fa-th-large"></i> <span>Components</span></a>

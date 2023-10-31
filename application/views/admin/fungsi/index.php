@@ -443,10 +443,15 @@ $this->load->view('dist/_partials/header');
         $.each(res, function(i, v) {
           var prog = '';
           $.each(v.progres, function(idx, val) {
+            if (val.prog_bukti) {
+              var bukti = `<img src="` + val.prog_bukti + `" class="img-fluid mb-2">`;
+            } else {
+              var bukti = ``;
+            }
             prog += `<tr>
-                      <td>` + (idx + 1) + `</td>
-                      <td class="py-2" style="width: 45%">
-                        <img src="` + val.prog_bukti + `" class="img-fluid mb-2">
+                      <td class="text-center">` + (idx + 1) + `</td>
+                      <td class="text-center py-2" style="width: 45%">
+                        ` + bukti + `
                         <div class="progress">
                           <div class="progress-bar" role="progressbar" data-width="` + val.prog_persentase + `%" aria-valuenow="` + val.prog_persentase + `" aria-valuemin="0" aria-valuemax="100" style="width: ` + val.prog_persentase + `%;">` + val.prog_persentase + `%</div>
                         </div>
@@ -463,11 +468,11 @@ $this->load->view('dist/_partials/header');
                       <h4>` + (i + 1) + '. ' + v.keg_nama + ' (' + v.keg_progres + '%)' + `</h4> <p>(Klik untuk detail)</p>
                     </div>
                     <div class="accordion-body collapse" id="panel-body-` + i + `" data-parent="#accordion-kegiatan">
-                      <table class="table">
+                      <table class="table table-striped">
                         <thead>
                           <tr>
                             <th>No</th>
-                            <th>Bukti / Progres / Tanggal</th>
+                            <th class="text-center">Bukti / Progres / Tanggal</th>
                             <th>Keterangan</th>
                           </tr>
                         </thead>

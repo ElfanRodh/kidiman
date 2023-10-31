@@ -21,6 +21,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 <script src="<?= base_url("assets/modules/datatables/Responsive-2.2.1/js/responsive.bootstrap4.js"); ?>"></script>
 <script src="<?= base_url("assets/modules/select2/dist/js/select2.full.min.js"); ?>"></script>
 <script src="<?= base_url("assets/modules/summernote/summernote-bs4.js"); ?>"></script>
+<script src="<?= base_url("assets/modules/bootstrap-daterangepicker/daterangepicker.js"); ?>"></script>
 
 <!-- Template JS File -->
 <script src="<?= base_url("assets/js/scripts.js"); ?>"></script>

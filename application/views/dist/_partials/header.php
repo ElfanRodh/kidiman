@@ -19,6 +19,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
   <link rel="stylesheet" href="<?= base_url("assets/modules/datatables/Responsive-2.2.1/css/responsive.bootstrap4.css"); ?>">
   <link rel="stylesheet" href="<?= base_url("assets/modules/select2/dist/css/select2.min.css"); ?>">
   <link rel="stylesheet" href="<?= base_url("assets/modules/summernote/summernote-bs4.css"); ?>">
+  <link rel="stylesheet" href="<?= base_url("assets/modules/bootstrap-daterangepicker/daterangepicker.css"); ?>">
 
   <!-- Template CSS -->
   <link rel="stylesheet" href="<?= base_url("assets/modules/izitoast/css/iziToast.min.css"); ?>">
