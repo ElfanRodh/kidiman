@@ -440,7 +440,7 @@ class Kegiatan extends CI_Controller
                   <div class="progress-bar" role="progressbar" data-width="' . $v->keg_progres . '%" aria-valuenow="' . $v->keg_progres . '" aria-valuemin="0" aria-valuemax="100" style="width: ' . $v->keg_progres . '%;">' . $v->keg_progres . '%</div>
                 </div>
                 <div class="btn-group mt-2" role="group">
-                  <button class="btn btn-sm btn-icon btn-success add-progres" data-id="' . (string)$v->keg_id . '">
+                  <button class="btn btn-sm btn-icon btn-success add-progres" data-id="' . (string)$v->keg_id . '" data-name="' . strip_tags($v->keg_nama) . '">
                     <i class="fa fa-plus mr-1"></i> Progres
                   </button>
                 </div>  
@@ -510,7 +510,7 @@ class Kegiatan extends CI_Controller
       $config['upload_path']    = './public/progress/';
       $config['allowed_types']  = 'jpg|png|jpeg|pdf|JPG|PNG|JPEG';
       // $config['allowed_types']  = 'pdf|PDF';
-      $config['max_size']      = 2048;
+      $config['max_size']      = 5120;
       $config['remove_spaces']  = TRUE;
       $ext = explode(".", $_FILES['file']["name"]);
       $config["file_name"]    = date('Y-m-d') . "-" . random_string("alnum", 20) . "." . strtolower(end($ext));
@@ -520,6 +520,12 @@ class Kegiatan extends CI_Controller
         $file  = NULL;
       } else {
         $file = $config["file_name"];
+
+        // Cek tipe file
+        if (in_array($f_type, ['jpg', 'jpeg', 'png'])) {
+          // File adalah gambar, lakukan kompresi
+          $this->compressImage('./public/progress/' . $file, 80); // Nilai 80 adalah tingkat kualitas kompresi gambar, sesuaikan dengan kebutuhan Anda
+        }
       }
     } else {
       $file  = NULL;
@@ -540,6 +546,25 @@ class Kegiatan extends CI_Controller
       $ret["form"][$_POST['id']] = 'Upload Sukses';
     }
     echo json_encode($ret);
+  }
+
+  function compressImage($source_path, $quality)
+  {
+    $config['image_library'] = 'gd2';
+    $config['source_image'] = $source_path;
+    $config['create_thumb'] = FALSE;
+    $config['maintain_ratio'] = TRUE;
+    $config['quality'] = $quality;
+    $config['width'] = 800;
+    $config['height'] = 600;
+
+    $this->load->library('image_lib');
+    $this->image_lib->initialize($config);
+
+    if (!$this->image_lib->resize()) {
+      // Jika gagal melakukan kompresi, Anda dapat menangani kesalahan di sini
+      log_message('error', 'Gagal melakukan kompresi gambar: ' . $this->image_lib->display_errors());
+    }
   }
 }
 

@@ -121,7 +121,7 @@ $this->load->view('dist/_partials/header');
               <div class="col-12 col-md-6">
                 <div class="form-group">
                   <label for="keg_foto">Foto</label>
-                  <small class="form-text text-muted my-1">File maksimal 2MB</small>
+                  <small class="form-text text-muted my-1">File maksimal 5MB</small>
                   <input type="file" class="form-control file" id="keg_foto" placeholder="Foto">
                   <input type="hidden" name="keg_foto">
                 </div>
@@ -184,6 +184,71 @@ $this->load->view('dist/_partials/header');
       </div>
       <div class="modal-footer">
         <button type="button" data-dismiss="modal" aria-label="Close" class="btn btn-outline-danger">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade text-left" id="modal-progres" tabindex="-1" role="dialog" aria-labelledby="modal-progres-data" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title"></h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body pb-0">
+        <form id="form-data" class="form form-horizontal">
+          <div class="form-body">
+            <input type="hidden" name="keg_id" id="keg_id">
+            <input type="hidden" name="keg_edit" id="keg_edit" value="0">
+            <div class="row">
+              <div class="col-12">
+                <h4 id="keg_nama"></h4>
+              </div>
+              <div class="col-12 col-md-12">
+                <div class="form-group">
+                  <label for="prog_tanggal">Tanggal Kegiatan</label>
+                  <input type="text" class="form-control datepicker" id="prog_tanggal" name="prog_tanggal">
+                </div>
+              </div>
+              <div class="col-12 col-md-12">
+                <div class="form-group">
+                  <label for="keg_progres">Progres Kegiatan</label>
+                  <input type="hidden" id="prog_persentase" name="prog_persentase">
+                  <div class="progress" id="keg_progres">
+                    <div class="progress-bar" role="progressbar" data-width="" aria-valuenow="" aria-valuemin="0" aria-valuemax="100"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-12 col-md-6">
+                <div class="form-group">
+                  <label for="prog_bukti">Bukti Kegiatan</label>
+                  <small class="form-text text-muted my-1">File maksimal 5MB</small>
+                  <input type="file" class="form-control file" id="prog_bukti" placeholder="Foto">
+                  <input type="hidden" name="prog_bukti">
+                </div>
+              </div>
+              <div class="col-12 col-md-6 konten_prog_bukti d-none">
+                <div class="form-group">
+                  <input type="hidden" name="prog_bukti_old">
+                  <img src="" class="img-fluid" id="prog_bukti_old" alt="">
+                </div>
+              </div>
+              <div class="col-12 col-md-12">
+                <div class="form-group">
+                  <label for="prog_keterangan">Keterangan</label>
+                  <textarea class="form-control prog-summernote" id="prog_keterangan" name="prog_keterangan"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" data-dismiss="modal" aria-label="Close" class="btn btn-outline-danger">Close</button>
+        <button type="button" class="btn btn-primary" id="save-form">Simpan</button>
       </div>
     </div>
   </div>
@@ -310,8 +375,8 @@ $this->load->view('dist/_partials/header');
               // Ketika proses baca file selesai
               reader.onload = function(e) {
                 // Menetapkan sumber gambar pada elemen img
-                $('#keg_foto_old').attr('src', e.target.result);
-                $('.konten_keg_foto').removeClass('d-none');
+                $('#' + id + '_old').attr('src', e.target.result);
+                $('.konten_' + id + '').removeClass('d-none');
               };
 
               // Membaca file gambar yang dipilih
@@ -384,7 +449,7 @@ $this->load->view('dist/_partials/header');
   $(document).off("click", "table#tb_data button.delete-data")
     .on("click", "table#tb_data button.delete-data", function(e) {
       e.preventDefault();
-      var _id_ = $(this).attr("data-id");
+      var id = $(this).attr("data-id");
       var _name_ = $(this).attr("data-name");
       swal({
         title: "Hapus Data ?",
@@ -415,7 +480,7 @@ $this->load->view('dist/_partials/header');
             type: "POST",
             url: base_url() + "admin/kegiatan/delete",
             data: {
-              id: _id_
+              id: id
             },
             dataType: "json",
             success: function(res) {
@@ -457,6 +522,16 @@ $this->load->view('dist/_partials/header');
       simpan()
     });
 
+  $(document).ready(function() {
+    $(document).off("click", "table#tb_data button.add-progres")
+      .on("click", "table#tb_data button.add-progres", function(e) {
+        e.preventDefault();
+        var id = $(this).attr("data-id");
+        var name = $(this).attr("data-name");
+        addProgres(id, name)
+      });
+  });
+
   $(document).off("change", "select#keg_jabatan")
     .on("change", "select#keg_jabatan", function(e) {
       e.preventDefault();
@@ -470,27 +545,33 @@ $this->load->view('dist/_partials/header');
       }
     });
 
-  $(document).off("hidden.bs.modal", "#modal-form")
-    .on("hidden.bs.modal", "#modal-form", function(e) {
-      $("#modal-form div.modal-header h4.modal-title").html(null);
-      $("#modal-form form#form-data input").val(null);
-      $("#modal-form form#form-data textarea").val(null);
-      $("#modal-form form#form-data select").val(null).trigger("change");
-      $("#modal-form form#form-data .summernote-simple").summernote('code', '');
-      $("#modal-form form#form-data .keg-summernote").summernote('code', '');
+  $(document).off("hidden.bs.modal", ".modal")
+    .on("hidden.bs.modal", ".modal", function(e) {
+      $("div.modal-header h4.modal-title").html(null);
+      $("form#form-data input").val(null);
+      $("form#form-data textarea").val(null);
+      $("form#form-data select").val(null).trigger("change");
+      $("form#form-data .summernote-simple").summernote('code', '');
+      $("form#form-data .keg-summernote").summernote('code', '');
       $("form#form-data input").removeClass("is-invalid");
       $("form#form-data textarea").removeClass("is-invalid");
       $("form#form-data select").removeClass("is-invalid");
       $('form span').removeClass('is-invalid');
       $('form .invalid-feedback').remove();
       $('form .valid-feedback').remove();
-      $("#modal-form form#form-data [name=keg_foto_old]").val(null);
-      $("#modal-form form#form-data img#keg_foto_old").attr('src', null);
-      $("#modal-form form#form-data .konten_keg_foto").addClass('d-none');
+      $("form#form-data [name=keg_foto_old]").val(null);
+      $("form#form-data img#keg_foto_old").attr('src', null);
+      $("form#form-data .konten_keg_foto").addClass('d-none');
+      $("form#form-data img#prog_bukti_old").attr('src', null);
+      $("form#form-data .konten_prog_bukti").addClass('d-none');
+      $('.datepicker').daterangepicker();
+      $('.datepicker').data('daterangepicker').setStartDate(null);
+      $('#modal-progres form#form-data #keg_progres').html('<div class="progress-bar" role="progressbar" data-width="" aria-valuenow="" aria-valuemin="0" aria-valuemax="100"></div>')
+      $(".prog-summernote").summernote('code', '');
     })
 
   function simpan() {
-    var datas = new FormData($("form#form-data")[0]);
+    var datas = new FormData($("#modal-form form#form-data")[0]);
     $.ajax({
       type: "POST",
       url: base_url() + "admin/kegiatan/addOrEdit",
@@ -657,6 +738,123 @@ $this->load->view('dist/_partials/header');
                     </tbody>
                   </table>`
         $('#modal-kegiatan #konten-kegiatan').html(acc)
+      }
+    });
+  }
+
+  function addProgres(keg_id, keg_nama) {
+    $("#modal-progres").modal({
+      backdrop: false
+    });
+
+    $('#modal-progres form#form-data #keg_id').val(keg_id)
+    $('#modal-progres form#form-data #keg_nama').html("Kegiatan : " + keg_nama)
+
+    var currentDate = moment().format('DD-MM-YYYY');
+
+    $("#modal-progres form#form-data #prog_tanggal").daterangepicker({
+      locale: {
+        format: "DD-MM-YYYY"
+      },
+      singleDatePicker: true,
+      startDate: currentDate,
+      endDate: currentDate
+    });
+
+    setTimeout(() => {
+      $("#modal-progres form#form-data #prog_tanggal").trigger('change');
+    }, 500);
+
+    $("#modal-progres form#form-data .prog-summernote").summernote({
+      dialogsInBody: true,
+      // airMode: true,
+      minHeight: 200,
+      toolbar: [
+        ["style", ["bold", "italic", "underline", "clear"]],
+        ["font", ["strikethrough"]],
+        ["para", ["paragraph"]],
+      ],
+    });
+  }
+
+  $(document).off("change", "#modal-progres form#form-data #prog_tanggal")
+    .on("change", "#modal-progres form#form-data #prog_tanggal", function(e) {
+      e.preventDefault();
+      var tgl = $(this).val();
+      var keg_id = $('#modal-progres form#form-data #keg_id').val()
+      getPersen(keg_id, tgl);
+    });
+
+  $(document).off("click", "#modal-progres button#save-form")
+    .on("click", "#modal-progres button#save-form", function(e) {
+      simpanProgres()
+    });
+
+  function getPersen(keg_id, tgl) {
+    $.ajax({
+      type: "POST",
+      url: base_url() + "admin/ProgresKegiatan/getPersen",
+      data: {
+        keg_id: keg_id,
+        tgl: tgl
+      },
+      dataType: "json",
+      success: function(res) {
+        var prog = `<div class="progress-bar" role="progressbar" data-width="` + res.persentase + `%" aria-valuenow="` + res.persentase + `" aria-valuemin="0" aria-valuemax="100" style="width: ` + res.persentase + `%;">` + res.persentase + `%</div>`
+        $('#modal-progres form#form-data #keg_progres').html(prog)
+        $('#modal-progres form#form-data #prog_persentase').val(res.persentase)
+      }
+    });
+  }
+
+  function simpanProgres() {
+    var datas = new FormData($("#modal-progres form#form-data")[0]);
+    $.ajax({
+      type: "POST",
+      url: base_url() + "admin/progresKegiatan/addOrEdit",
+      data: datas,
+      dataType: "json",
+      cache: false,
+      contentType: false,
+      processData: false,
+      success: function(res) {
+        if (res.ok == 200) {
+          swal({
+            title: "Sukses",
+            text: res.form,
+            icon: "success",
+            confirmButtonClass: "btn btn-main",
+            buttonsStyling: false,
+          }).then(function(_res_) {
+            $("#modal-progres").modal("hide");
+            tb_data.ajax.reload(null, true);
+          });
+        } else {
+          if (res.ok == 400) {
+            var frm = Object.keys(res.form);
+            var val = Object.values(res.form);
+            $('form#form-data .invalid-feedback').remove();
+            frm.forEach(function(el, ind) {
+              if (val[ind] != '') {
+                $('form#form-data #' + el).removeClass('is-invalid').addClass("is-invalid");
+                var app = '<div id="' + el + '-error" class="invalid-feedback" for="' + el + '">' + val[ind] + '</div>';
+                // if (el == 'prog_tanggal') {
+                //   $('form#form-data #' + el).closest('.form-group .input-group').append(app);
+                // } else {
+                // }
+                $('form#form-data #' + el).closest('.form-group').append(app);
+              }
+            });
+          } else {
+            swal({
+              title: "Error",
+              text: res.form,
+              icon: "error",
+              confirmButtonClass: "btn btn-danger",
+              buttonsStyling: false,
+            });
+          }
+        }
       }
     });
   }
