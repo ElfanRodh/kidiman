@@ -37,3 +37,21 @@ function hitungPersentase($tanggal_mulai, $tanggal_selesai, $tanggal_input, $keg
     'persentase' => number_format($persentase, 2),
   ];
 }
+
+function setColor($inputValue)
+{
+  $arrColor = [
+    25 => '#fc544b',
+    50 => '#ffa426',
+    75 => '#3abaf4',
+    100 => '#33d9b2',
+  ];
+
+  foreach ($arrColor as $value => $color) {
+    if ($inputValue <= $value) {
+      return $color;
+    }
+  }
+
+  return '#fc544b';
+}

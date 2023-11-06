@@ -501,14 +501,14 @@ class Kegiatan extends CI_Controller
         $list .= '
               <td class="text-center" style="width: 25%;">
                 <div class="progress">
-                  <div class="progress-bar" role="progressbar" data-width="' . $v->keg_progres . '%" aria-valuenow="' . $v->keg_progres . '" aria-valuemin="0" aria-valuemax="100" style="width: ' . $v->keg_progres . '%;">' . $v->keg_progres . '%</div>
+                  <div class="progress-bar" role="progressbar" data-width="' . $v->keg_progres . '%" aria-valuenow="' . $v->keg_progres . '" aria-valuemin="0" aria-valuemax="100" style="width: ' . $v->keg_progres . '%; background-color: ' . setColor(number_format($v->keg_progres, 0)) . ';">' . $v->keg_progres . '%</div>
                 </div>
                 ' . $add_btn . '
               </td>
               ';
         $list .= '<td class="text-center">
                     <div class="btn-group" role="group">
-                      <button class="btn btn-icon btn-info" onclick="detaiKegiatan(' . (string)$v->keg_id . ')">
+                      <button class="btn btn-icon btn-info" onclick="detailKegiatan(' . (string)$v->keg_id . ')">
                         <i class="fa fa-list"></i>
                       </button>
                       <button class="btn btn-icon btn-warning update-data" data-id="' . (string)$v->keg_id . '">
@@ -527,7 +527,7 @@ class Kegiatan extends CI_Controller
     return $list;
   }
 
-  function detaiKegiatan()
+  function detailKegiatan()
   {
     $wr['keg_id'] = $this->input->post('keg_id');
     $kegiatan = $this->db->get_where('kegiatan', $wr);

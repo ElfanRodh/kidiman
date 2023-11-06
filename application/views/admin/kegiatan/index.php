@@ -780,10 +780,10 @@ $this->load->view('dist/_partials/header');
     });
   }
 
-  function detaiKegiatan(keg_id) {
+  function detailKegiatan(keg_id) {
     $.ajax({
       type: "POST",
-      url: base_url() + "admin/kegiatan/detaiKegiatan",
+      url: base_url() + "admin/kegiatan/detailKegiatan",
       data: {
         keg_id: keg_id,
       },
@@ -808,7 +808,7 @@ $this->load->view('dist/_partials/header');
                       <td class="text-center py-2" style="width: 45%">
                         ` + bukti + `
                         <div class="progress">
-                          <div class="progress-bar" role="progressbar" data-width="` + val.prog_persentase + `%" aria-valuenow="` + val.prog_persentase + `" aria-valuemin="0" aria-valuemax="100" style="width: ` + val.prog_persentase + `%;">` + val.prog_persentase + `%</div>
+                          <div class="progress-bar" role="progressbar" data-width="` + val.prog_persentase + `%" aria-valuenow="` + val.prog_persentase + `" aria-valuemin="0" aria-valuemax="100" style="width: ` + val.prog_persentase + `%; background-color:` + setColor(val.prog_persentase) + `;">` + val.prog_persentase + `%</div>
                         </div>
                         <div>
                           <p>` + val.prog_tanggal + `</p>
@@ -958,7 +958,7 @@ $this->load->view('dist/_partials/header');
       dataType: "json",
       success: function(res) {
         if (res.ok) {
-          var prog = `<div class="progress-bar" role="progressbar" data-width="` + res.persentase + `%" aria-valuenow="` + res.persentase + `" aria-valuemin="0" aria-valuemax="100" style="width: ` + res.persentase + `%;">` + res.persentase + `%</div>`
+          var prog = `<div class="progress-bar" role="progressbar" data-width="` + res.persentase + `%" aria-valuenow="` + res.persentase + `" aria-valuemin="0" aria-valuemax="100" style="width: ` + res.persentase + `%; background-color:` + setColor(res.persentase) + `;">` + res.persentase + `%</div>`
           $('#modal-progres form#form-data #keg_progres').html(prog)
           $('#modal-progres form#form-data #prog_persentase').val(res.persentase)
         } else {

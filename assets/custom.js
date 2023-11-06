@@ -224,6 +224,23 @@ function maxLength(el, num) {
     });
 }
 
+function setColor(inputValue) {
+  const colorArray = {
+    25: "#fc544b",
+    50: "#ffa426",
+    75: "#3abaf4",
+    100: "#33d9b2",
+  };
+
+  for (const value in colorArray) {
+    if (inputValue <= parseInt(value)) {
+      return colorArray[value];
+    }
+  }
+
+  return "#fc544b";
+}
+
 $(document).ready(function () {
   $(document)
     .off("keyup, input", ".uppercase")
