@@ -433,10 +433,19 @@ $this->load->view('dist/_partials/header');
         fun_id: fun_id,
       },
       dataType: "json",
-      success: function(res) {
+      beforeSend: function() {
         $("#modal-kegiatan").modal({
           backdrop: false
         });
+        $('#modal-kegiatan #keg-text').html(null)
+        $('#modal-kegiatan #accordion-kegiatan').html(`
+          <div class="accordion text-center">
+            <div class="spinner-border" role="status"> 
+              <span class="sr-only" > Loading... </span> 
+            </div>
+          </div>`)
+      },
+      success: function(res) {
         $('#modal-kegiatan #keg-text').html('Fungsi : <br>' + res[0].fun_nama)
 
         var acc = ''

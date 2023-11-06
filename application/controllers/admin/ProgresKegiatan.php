@@ -28,10 +28,11 @@ class ProgresKegiatan extends CI_Controller
   function getPersen()
   {
     $keg_id = $this->input->post('keg_id');
+    $is_progres = $this->input->post('is_progres');
     $tgl = date('Y-m-d', strtotime($this->input->post('tgl')));
     $kegiatan = $this->db->get_where('kegiatan', ['keg_id' => $keg_id])->row();
 
-    $persen = hitungPersentase($kegiatan->keg_tanggal_mulai, $kegiatan->keg_tanggal_selesai, $tgl);
+    $persen = hitungPersentase($kegiatan->keg_tanggal_mulai, $kegiatan->keg_tanggal_selesai, $tgl, $keg_id, $is_progres);
 
     $persen['ok'] = true;
     $persen['message'] = 'OK';
@@ -39,8 +40,9 @@ class ProgresKegiatan extends CI_Controller
       $persen['ok'] = false;
       $persen['message'] = 'Persentase Tidak Boleh Kurang dari 0%';
     } else if ($persen['persentase'] > 100) {
-      $persen['ok'] = false;
-      $persen['message'] = 'Persentase Tidak Boleh Lebih dari 100%';
+      $persen['persentase'] = 100;
+      $persen['ok'] = true;
+      $persen['message'] = 'Persentase Tidak Boleh Lebih dari 100% (Persentase otomatis dikonversi menjadi 100%)';
     }
     echo json_encode($persen);
   }
@@ -97,7 +99,6 @@ class ProgresKegiatan extends CI_Controller
             $foto = str_replace(base_url() . 'public/progress/', '', $this->input->post('prog_bukti_old'));
           }
 
-
           $this->db->trans_begin(); // Memulai transaksi
 
           // Langkah 2: Input data
@@ -114,7 +115,24 @@ class ProgresKegiatan extends CI_Controller
             $this->db->trans_commit(); // Transaksi berhasil, commit
 
             $last_progres = $this->db->order_by('prog_tanggal DESC')->limit(1)->get_where('progres_kegiatan', ['prog_kegiatan' => $this->input->post('keg_id')])->row();
-            if ($this->db->update('kegiatan', ['keg_progres' => $last_progres->prog_persentase], ['keg_id' => $this->input->post('keg_id')])) {
+            $up = [];
+            $up['keg_progres'] = $last_progres->prog_persentase;
+            if ((int)$last_progres->prog_persentase >= 100) {
+              $up['keg_is_selesai'] = 1;
+            } else {
+              $up['keg_is_selesai'] = 0;
+            }
+
+            $this->db->trans_begin(); // Memulai transaksi
+
+            $this->db->update('kegiatan', $up, ['keg_id' => $this->input->post('keg_id')]);
+
+            if ($this->db->trans_status() === FALSE) {
+              $this->db->trans_rollback(); // Transaksi gagal, rollback
+              $ret['ok'] = 500;
+              $ret['form'] = 'Gagal Update Data';
+            } else {
+              $this->db->trans_commit(); // Transaksi berhasil, commit
               $ret['ok'] = 200;
               $ret['form'] = 'Sukses Update Data';
             }
@@ -145,8 +163,26 @@ class ProgresKegiatan extends CI_Controller
             $ret['form']  = 'Gagal Insert Data';
           } else {
             $this->db->trans_commit(); // Transaksi berhasil, commit
+
             $last_progres = $this->db->order_by('prog_tanggal DESC')->limit(1)->get_where('progres_kegiatan', ['prog_kegiatan' => $this->input->post('keg_id')])->row();
-            if ($this->db->update('kegiatan', ['keg_progres' => $last_progres->prog_persentase], ['keg_id' => $this->input->post('keg_id')])) {
+            $up = [];
+            $up['keg_progres'] = $last_progres->prog_persentase;
+            if ((int)$last_progres->prog_persentase >= 100) {
+              $up['keg_is_selesai'] = 1;
+            } else {
+              $up['keg_is_selesai'] = 0;
+            }
+
+            $this->db->trans_begin(); // Memulai transaksi
+
+            $this->db->update('kegiatan', $up, ['keg_id' => $this->input->post('keg_id')]);
+
+            if ($this->db->trans_status() === FALSE) {
+              $this->db->trans_rollback();
+              $ret['ok'] = 500;
+              $ret['form'] = 'Gagal Update Data';
+            } else {
+              $this->db->trans_commit(); // Transaksi berhasil, commit
               $ret['ok'] = 200;
               $ret['form'] = 'Sukses Update Data';
             }

@@ -1,3 +1,16 @@
+$(document).ready(function () {
+  $(".select2").select2({
+    allowClear: true,
+    // maximumSelectionLength: 1,
+    templateResult: templateSelect,
+    // language: {
+    //   maximumSelected: function() {
+    //     return 'Maksimal 1 Pilihan Cabor';
+    //   }
+    // }
+  });
+});
+
 function base_url() {
   var pathparts, url;
   if (location.host == "localhost" || location.host == "127.0.0.1" || location.host == "10.0.44.112") {
@@ -151,12 +164,12 @@ function onlyNumber(textbox, inputFilter) {
   });
 }
 
-function getSekolah(elem, id, orga = 0, val = null, fixElem = null) {
-  var link = base_url() + "web/getSekolah";
+function getJabatanFilter(elem, id = null, val = null, fixElem = null) {
+  var link = base_url() + "admin/home/getJabatan";
   if (id) {
-    param = { id: id, is_luar: orga };
+    param = { id: id };
   } else {
-    param = { is_luar: orga };
+    param = {};
   }
   if (fixElem) {
     var elemen = $(elem);
@@ -172,7 +185,7 @@ function getSekolah(elem, id, orga = 0, val = null, fixElem = null) {
     success: function (res) {
       var list = "";
       res.forEach(function (el, ind) {
-        list += '<option data-subtext="' + el.alamat + '" value="' + el.id + '">' + "(" + el.kategori + ") " + el.nama + "</option>";
+        list += '<option data-subtext="(' + el.prt_nama + ')" value="' + el.jbt_id + '">' + el.jbt_nama + "</option>";
       });
       $(elemen).html(list);
       $(elemen).val(val).trigger("change");

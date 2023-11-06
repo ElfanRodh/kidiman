@@ -90,8 +90,17 @@ class Kegiatan extends CI_Controller
     if ($where) {
       $this->db->where($where);
     }
-    if ($this->input->post("fil_nama")) {
-      $this->db->where(['jbt_nama' => $this->input->post("fil_nama")]);
+    if ($this->input->post("fil_jabatan")) {
+      $this->db->where(['jbt_id' => $this->input->post("fil_jabatan")]);
+    }
+    if ($this->input->post("fil_tanggal")) {
+      $tanggal = explode(' - ', $this->input->post('fil_tanggal'));
+      $keg_tanggal_mulai   = date('Y-m-d', strtotime($tanggal[0]));
+      $keg_tanggal_selesai = date('Y-m-d', strtotime($tanggal[1]));
+      $this->db->group_start();
+      $this->db->where("keg_tanggal_mulai BETWEEN '$keg_tanggal_mulai' AND '$keg_tanggal_selesai'");
+      $this->db->or_where("keg_tanggal_selesai BETWEEN '$keg_tanggal_mulai' AND '$keg_tanggal_selesai'");
+      $this->db->group_end();
     }
 
     $i = 0;
@@ -162,6 +171,14 @@ class Kegiatan extends CI_Controller
         $wr['keg_tanggal_mulai']   = date('Y-m-d', strtotime($tanggal[0]));
         $wr['keg_tanggal_selesai'] = date('Y-m-d', strtotime($tanggal[1]));
 
+        // $tgl_sekarang = date('Y-m-d');
+        // if ($wr['keg_tanggal_selesai'] < $tgl_sekarang) {
+        //   $ret['ok'] = 500;
+        //   $ret['form'] = 'Tangal Selesai Tidak Boleh Kurang dari Tanggal Sekarang';
+        //   echo json_encode($ret);
+        //   exit();
+        // }
+
         $cek = $this->db->where('keg_id !=', $this->input->post('keg_id'))->get_where('kegiatan', $wr);
         if ($cek->num_rows()) {
           $ret['ok'] = 500;
@@ -203,7 +220,22 @@ class Kegiatan extends CI_Controller
               $this->db->update('progres_kegiatan', ['prog_persentase' => $v['prog_persentase']], ['prog_id' => $v['prog_id']]);
             }
             $progres_end = end($data_program);
-            $this->db->update('kegiatan', ['keg_progres' => $progres_end['prog_persentase']], ['keg_id' => $this->input->post('keg_id')]);
+            if ((int) $progres_end['prog_persentase'] > 100) {
+              $this->db->trans_rollback();
+              $ret['ok'] = 500;
+              $ret['form'] = 'Update Data Gagal, Persentase Melebihi 100%';
+              echo json_encode($ret);
+              exit();
+            }
+
+            $up = [];
+            $up['keg_progres'] = $progres_end['prog_persentase'];
+            if ((int) $progres_end['prog_persentase'] >= 100) {
+              $up['keg_is_selesai'] = 1;
+            } else {
+              $up['keg_is_selesai'] = 0;
+            }
+            $this->db->update('kegiatan', $up, ['keg_id' => $this->input->post('keg_id')]);
           }
 
           // Cek jika transaksi berhasil atau gagal
@@ -457,7 +489,7 @@ class Kegiatan extends CI_Controller
                   </td>';
         $list .= '<td class="text-center">' . date('d-m-Y', strtotime($v->keg_tanggal_mulai)) . '<br> s/d <br>' . date('d-m-Y', strtotime($v->keg_tanggal_selesai)) . '</td>';
         $tgl_sekarang = date('Y-m-d');
-        if ($tgl_sekarang <= $v->keg_tanggal_selesai) {
+        if (($tgl_sekarang <= $v->keg_tanggal_selesai) && (int) number_format($v->keg_progres, 0) != 100) {
           $add_btn = '<div class="btn-group mt-2" role="group">
                         <button class="btn btn-sm btn-icon btn-success add-progres" data-id="' . (string)$v->keg_id . '" data-name="' . strip_tags($v->keg_nama) . '">
                           <i class="fa fa-plus mr-1"></i> Progres

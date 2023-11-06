@@ -310,7 +310,8 @@ class Fungsi extends CI_Controller
     $this->db->join('jabatan_fungsi', 'jabatan_fungsi.jf_jabatan = jabatan.jbt_id', 'left');
     $this->db->join('fungsi', 'fungsi.fun_id = jabatan_fungsi.jf_fungsi', 'left');
     $this->db->where(['jf_status' => 1]);
-    $this->db->where(['fun_status' => 1]);
+    $this->db->where(['jf_status' => 1]);
+    $this->db->where(['jbt_status' => 1]);
 
     $i = 0;
     foreach ($this->column_search_fungsi as $item) {
@@ -357,6 +358,7 @@ class Fungsi extends CI_Controller
     $ret = '-';
     $wr['keg_jabatan']  = $jbt_id;
     $wr['keg_fungsi']   = $fun_id;
+    $wr['keg_status']   = 1;
     $keg = $this->db->get_where('kegiatan', $wr);
     if ($keg->num_rows()) {
       // $ret = '<div class="btn-group" role="group">

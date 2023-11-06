@@ -43,6 +43,28 @@ $this->load->view('dist/_partials/header');
       </div>
     </div>
 
+    <div class="row">
+      <div class="col-12 col-md-4">
+        <div class="form-group">
+          <label for="fil_jabatan">Jabatan</label>
+          <select class="form-control select2" data-width="100%" data-allow-clear="true" data-placeholder="Pilih Jabatan" id="fil_jabatan" name="fil_jabatan"></select>
+        </div>
+      </div>
+      <div class="col-12 col-md-4">
+        <div class="form-group">
+          <label>Tanggal Kegiatan</label>
+          <div class="input-group">
+            <div class="input-group-prepend">
+              <div class="input-group-text">
+                <i class="fas fa-calendar"></i>
+              </div>
+            </div>
+            <input type="text" id="fil_tanggal" name="fil_tanggal" class="form-control daterange-kegiatan">
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="section-body">
       <div class="row">
         <div class="col-12">
@@ -122,7 +144,7 @@ $this->load->view('dist/_partials/header');
                 <div class="form-group">
                   <label for="keg_foto">Foto</label>
                   <small class="form-text text-muted my-1">File maksimal 5MB</small>
-                  <input type="file" class="form-control file" id="keg_foto" placeholder="Foto">
+                  <input type="file" accept="image/*" class="form-control file" id="keg_foto" placeholder="Foto">
                   <input type="hidden" name="keg_foto">
                 </div>
               </div>
@@ -227,7 +249,7 @@ $this->load->view('dist/_partials/header');
                 <div class="form-group">
                   <label for="prog_bukti">Bukti Kegiatan</label>
                   <small class="form-text text-muted my-1">File maksimal 5MB</small>
-                  <input type="file" class="form-control file" id="prog_bukti" placeholder="Foto">
+                  <input type="file" accept="image/*" class="form-control file" id="prog_bukti" placeholder="Foto">
                   <input type="hidden" name="prog_bukti">
                 </div>
               </div>
@@ -259,8 +281,9 @@ $this->load->view('dist/_partials/header');
 <script src="https://cdn.jsdelivr.net/gh/xcash/bootstrap-autocomplete@v2.3.7/dist/latest/bootstrap-autocomplete.min.js"></script>
 
 <script>
-  var fil_nama;
+  var fil_jabatan, fil_tanggal;
   var tb_data;
+  var id_kegiatan;
 
   $(document).ready(function() {
     tb_data = $("table#tb_data").DataTable({
@@ -275,7 +298,8 @@ $this->load->view('dist/_partials/header');
         type: "POST",
         url: base_url() + "admin/kegiatan/viewData",
         data: function(posts) {
-          posts.fil_nama = fil_nama ?? null;
+          posts.fil_jabatan = fil_jabatan ?? null;
+          posts.fil_tanggal = fil_tanggal ?? null;
         }
       },
       columns: [{
@@ -312,8 +336,9 @@ $this->load->view('dist/_partials/header');
         cancelLabel: 'Batal'
       },
       autoUpdateInput: true,
+      showDropdowns: true,
       drops: 'down',
-      opens: 'left'
+      opens: 'down'
     });
 
     $('input[type="file"]').change(function(e) {
@@ -387,6 +412,26 @@ $this->load->view('dist/_partials/header');
         }
       });
     });
+
+    getJabatanFilter('fil_jabatan');
+
+    $(document).off("change", "select#fil_jabatan")
+      .on("change", "select#fil_jabatan", function(e) {
+        e.preventDefault();
+        fil_jabatan = $(this).val()
+        tb_data.ajax.reload(null, true);
+      });
+
+    $(document).off("change", "input#fil_tanggal")
+      .on("change", "input#fil_tanggal", function(e) {
+        e.preventDefault();
+        fil_tanggal = $(this).val()
+        tb_data.ajax.reload(null, true);
+      });
+
+    $('input#fil_tanggal').on('cancel.daterangepicker', function(ev, picker) {
+      $('input#fil_tanggal').val(null).trigger('change');
+    });
   });
 
   $(document).off("click", "table#tb_data button.update-data")
@@ -399,6 +444,9 @@ $this->load->view('dist/_partials/header');
           id: $(this).attr("data-id")
         },
         dataType: "json",
+        beforeSend: () => {
+          id_kegiatan = null
+        },
         success: function(res) {
           if (res.ok == 200) {
             $("#modal-form").modal({
@@ -408,6 +456,7 @@ $this->load->view('dist/_partials/header');
             // $("#modal-form form#form-data #keg_jabatan").val(res.data.keg_jabatan);
             $("#modal-form form#form-data #keg_edit").val(1);
             $("#modal-form form#form-data #keg_id").val(res.data.keg_id);
+            id_kegiatan = res.data.keg_id;
             getJabatan('keg_jabatan', res.data.keg_jabatan, 1).done(function() {
               $("#modal-form form#form-data #keg_jabatan").val(res.data.keg_jabatan).trigger('change');
               getFungsiData('keg_fungsi', res.data.keg_jabatan).done(function() {
@@ -552,8 +601,8 @@ $this->load->view('dist/_partials/header');
       }
     });
 
-  $(document).off("hidden.bs.modal", ".modal")
-    .on("hidden.bs.modal", ".modal", function(e) {
+  $(document).off("hidden.bs.modal", "#modal-form")
+    .on("hidden.bs.modal", "#modal-form", function(e) {
       $("div.modal-header h4.modal-title").html(null);
       $("form#form-data input").val(null);
       $("form#form-data textarea").val(null);
@@ -568,13 +617,50 @@ $this->load->view('dist/_partials/header');
       $("form#form-data [name=keg_foto_old]").val(null);
       $("form#form-data img#keg_foto_old").attr('src', null);
       $("form#form-data .konten_keg_foto").addClass('d-none');
+      $('#keg_tanggal').daterangepicker({
+        locale: {
+          format: 'DD-MM-YYYY',
+          applyLabel: 'Pilih',
+          cancelLabel: 'Batal'
+        },
+        autoUpdateInput: true,
+        showDropdowns: true,
+        drops: 'down',
+        opens: 'down'
+      });
+      $("#keg_tanggal").data('daterangepicker').setStartDate(null);
+      $("#keg_tanggal").data('daterangepicker').setEndDate(null);
+    });
+
+  $(document).off("hidden.bs.modal", "#modal-progres")
+    .on("hidden.bs.modal", "#modal-progres", function(e) {
+      $("div.modal-header h4.modal-title").html(null);
+      $("form#form-data input").val(null);
+      $("form#form-data textarea").val(null);
+      $("form#form-data select").val(null).trigger("change");
+      $("form#form-data input").removeClass("is-invalid");
+      $("form#form-data textarea").removeClass("is-invalid");
+      $("form#form-data select").removeClass("is-invalid");
+      $("form span").removeClass("is-invalid");
+      $("form .invalid-feedback").remove();
+      $("form .valid-feedback").remove();
+      $("form#form-data .konten_keg_foto").addClass('d-none');
       $("form#form-data img#prog_bukti_old").attr('src', null);
       $("form#form-data .konten_prog_bukti").addClass('d-none');
-      $(".datepicker").daterangepicker();
-      $(".datepicker").data('daterangepicker').setStartDate(null);
+      // $("#prog_tanggal").daterangepicker();
+      $("#modal-progres form#form-data #prog_tanggal").daterangepicker({
+        locale: {
+          format: 'DD-MM-YYYY',
+          applyLabel: 'Pilih',
+          cancelLabel: 'Batal'
+        },
+        singleDatePicker: true,
+      });
+      // $("#prog_tanggal").data('daterangepicker').setStartDate(null);
+      // $("#prog_tanggal").data('daterangepicker').setEndDate(null);
       $('#modal-progres form#form-data #keg_progres').html('<div class="progress-bar" role="progressbar" data-width="" aria-valuenow="" aria-valuemin="0" aria-valuemax="100"></div>')
       $("#modal-progres .prog-summernote").summernote('code', '');
-    })
+    });
 
   function simpan() {
     var datas = new FormData($("#modal-form form#form-data")[0]);
@@ -763,6 +849,7 @@ $this->load->view('dist/_partials/header');
     });
 
     $('#modal-progres form#form-data #keg_id').val(keg_id)
+    id_kegiatan = keg_id;
     $('#modal-progres form#form-data #keg_nama').html("Kegiatan : " + keg_nama)
 
     var currentDate = moment().format('DD-MM-YYYY');
@@ -806,6 +893,7 @@ $this->load->view('dist/_partials/header');
 
         $('#modal-progres form#form-data #prog_id').val(prog_id)
         $('#modal-progres form#form-data #keg_id').val(res.data.keg_id)
+        id_kegiatan = res.data.keg_id;
         $('#modal-progres form#form-data #keg_nama').html("Kegiatan : " + res.data.keg_nama)
 
         var tanggalan = convertTanggal(new Date(res.data.prog_tanggal));
@@ -847,8 +935,10 @@ $this->load->view('dist/_partials/header');
     .on("change", "#modal-progres form#form-data #prog_tanggal", function(e) {
       e.preventDefault();
       var tgl = $(this).val();
-      var keg_id = $('#modal-progres form#form-data #keg_id').val()
-      getPersen(keg_id, tgl);
+      getPersen(id_kegiatan, tgl, 1);
+      // console.log(tgl);
+      // console.log(id_kegiatan);
+      // var keg_id = $('form#form-data #keg_id').val()
     });
 
   $(document).off("click", "#modal-progres button#save-form")
@@ -856,13 +946,14 @@ $this->load->view('dist/_partials/header');
       simpanProgres()
     });
 
-  function getPersen(keg_id, tgl) {
+  function getPersen(keg_id, tgl, is_progres = 0) {
     $.ajax({
       type: "POST",
       url: base_url() + "admin/ProgresKegiatan/getPersen",
       data: {
         keg_id: keg_id,
-        tgl: tgl
+        tgl: tgl,
+        is_progres: is_progres,
       },
       dataType: "json",
       success: function(res) {
