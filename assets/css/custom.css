@@ -334,7 +334,12 @@ span.is-invalid {
   height: 100%;
   background-color: #98a6ad !important;
 }
+
 .swal-button.swal-button--disabled {
   cursor: not-allowed !important;
   pointer-events: none !important;
+}
+
+.progress {
+  height: 2em !important;
 }

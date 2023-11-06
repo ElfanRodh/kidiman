@@ -73,7 +73,7 @@ $this->load->view('dist/_partials/header');
 </div>
 
 <div class="modal fade text-left" id="modal-form" tabindex="-1" role="dialog" aria-labelledby="modal-form-data" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title"></h4>
@@ -145,7 +145,7 @@ $this->load->view('dist/_partials/header');
 </div>
 
 <div class="modal fade text-left" id="modal-kegiatan" tabindex="-1" role="dialog" aria-labelledby="modal-kegiatan-data" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title"></h4>
@@ -190,7 +190,7 @@ $this->load->view('dist/_partials/header');
 </div>
 
 <div class="modal fade text-left" id="modal-progres" tabindex="-1" role="dialog" aria-labelledby="modal-progres-data" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
         <h4 class="modal-title"></h4>
@@ -201,6 +201,7 @@ $this->load->view('dist/_partials/header');
       <div class="modal-body pb-0">
         <form id="form-data" class="form form-horizontal">
           <div class="form-body">
+            <input type="hidden" name="prog_id" id="prog_id">
             <input type="hidden" name="keg_id" id="keg_id">
             <input type="hidden" name="keg_edit" id="keg_edit" value="0">
             <div class="row">
@@ -418,16 +419,19 @@ $this->load->view('dist/_partials/header');
             setTimeout(() => {
               $('#modal-form form#form-data #keg_tanggal').data('daterangepicker').setStartDate(res.data.tanggal_mulai);
               $('#modal-form form#form-data #keg_tanggal').data('daterangepicker').setEndDate(res.data.tanggal_selesai);
-              $("#modal-form form#form-data .keg-summernote").summernote({
-                dialogsInBody: true,
-                // airMode: true,
-                minHeight: 200,
-                toolbar: [
-                  ["style", ["bold", "italic", "underline", "clear"]],
-                  ["font", ["strikethrough"]],
-                  ["para", ["paragraph"]],
-                ],
-              });
+              $("#modal-form form#form-data .keg-summernote").summernote();
+              setTimeout(() => {
+                $("#modal-form form#form-data .keg-summernote").summernote({
+                  dialogsInBody: true,
+                  // airMode: true,
+                  minHeight: 200,
+                  toolbar: [
+                    ["style", ["bold", "italic", "underline", "clear"]],
+                    ["font", ["strikethrough"]],
+                    ["para", ["paragraph"]],
+                  ],
+                });
+              }, 200);
               $("#modal-form form#form-data #keg_nama").summernote('code', res.data.keg_nama);
               $("#modal-form form#form-data [name=keg_foto_old]").val(res.data.progres[0].prog_bukti);
               $("#modal-form form#form-data img#keg_foto_old").attr('src', res.data.progres[0].prog_bukti);
@@ -504,16 +508,19 @@ $this->load->view('dist/_partials/header');
       });
       $("#modal-form div.modal-header h4.modal-title").html("Tambah Data Kegiatan");
       $("#modal-form form#form-data input").val(null);
-      $("#modal-form form#form-data .keg-summernote").summernote({
-        dialogsInBody: true,
-        // airMode: true,
-        minHeight: 200,
-        toolbar: [
-          ["style", ["bold", "italic", "underline", "clear"]],
-          ["font", ["strikethrough"]],
-          ["para", ["paragraph"]],
-        ],
-      });
+      $("#modal-form form#form-data .keg-summernote").summernote();
+      setTimeout(() => {
+        $("#modal-form form#form-data .keg-summernote").summernote({
+          dialogsInBody: true,
+          // airMode: true,
+          minHeight: 200,
+          toolbar: [
+            ["style", ["bold", "italic", "underline", "clear"]],
+            ["font", ["strikethrough"]],
+            ["para", ["paragraph"]],
+          ],
+        });
+      }, 500);
       getJabatan('keg_jabatan');
     });
 
@@ -551,23 +558,22 @@ $this->load->view('dist/_partials/header');
       $("form#form-data input").val(null);
       $("form#form-data textarea").val(null);
       $("form#form-data select").val(null).trigger("change");
-      $("form#form-data .summernote-simple").summernote('code', '');
       $("form#form-data .keg-summernote").summernote('code', '');
       $("form#form-data input").removeClass("is-invalid");
       $("form#form-data textarea").removeClass("is-invalid");
       $("form#form-data select").removeClass("is-invalid");
-      $('form span').removeClass('is-invalid');
-      $('form .invalid-feedback').remove();
-      $('form .valid-feedback').remove();
+      $("form span").removeClass("is-invalid");
+      $("form .invalid-feedback").remove();
+      $("form .valid-feedback").remove();
       $("form#form-data [name=keg_foto_old]").val(null);
       $("form#form-data img#keg_foto_old").attr('src', null);
       $("form#form-data .konten_keg_foto").addClass('d-none');
       $("form#form-data img#prog_bukti_old").attr('src', null);
       $("form#form-data .konten_prog_bukti").addClass('d-none');
-      $('.datepicker').daterangepicker();
-      $('.datepicker').data('daterangepicker').setStartDate(null);
+      $(".datepicker").daterangepicker();
+      $(".datepicker").data('daterangepicker').setStartDate(null);
       $('#modal-progres form#form-data #keg_progres').html('<div class="progress-bar" role="progressbar" data-width="" aria-valuenow="" aria-valuemin="0" aria-valuemax="100"></div>')
-      $(".prog-summernote").summernote('code', '');
+      $("#modal-progres .prog-summernote").summernote('code', '');
     })
 
   function simpan() {
@@ -710,9 +716,10 @@ $this->load->view('dist/_partials/header');
           } else {
             var bukti = ``;
           }
+
           prog += `<tr>
-                      <td>` + (idx + 1) + `</td>
-                      <td class="py-2" style="width: 45%">
+                      <td class="text-center">` + (idx + 1) + `</td>
+                      <td class="text-center py-2" style="width: 45%">
                         ` + bukti + `
                         <div class="progress">
                           <div class="progress-bar" role="progressbar" data-width="` + val.prog_persentase + `%" aria-valuenow="` + val.prog_persentase + `" aria-valuemin="0" aria-valuemax="100" style="width: ` + val.prog_persentase + `%;">` + val.prog_persentase + `%</div>
@@ -722,15 +729,23 @@ $this->load->view('dist/_partials/header');
                         </div>
                       </td>
                       <td>` + val.prog_keterangan + `</td>
+                      <td class="text-center">
+                        <div class="btn-group" role="group">
+                          <button class="btn btn-icon btn-warning" onclick="editProgres(` + val.prog_id + `)">
+                            <i class="fa fa-edit"></i>
+                          </button>
+                        </div>
+                      </td>
                     </tr>`
         });
 
         acc += `<table class="table table-striped">
                     <thead>
                       <tr>
-                        <th>No</th>
-                        <th>Bukti / Progres / Tanggal</th>
-                        <th>Keterangan</th>
+                        <th class="text-center">No</th>
+                        <th class="text-center">Bukti / Progres / Tanggal</th>
+                        <th class="text-center">Keterangan</th>
+                        <th class="text-center">Aksi</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -763,18 +778,69 @@ $this->load->view('dist/_partials/header');
 
     setTimeout(() => {
       $("#modal-progres form#form-data #prog_tanggal").trigger('change');
+      $("#modal-progres form#form-data .prog-summernote").summernote({
+        dialogsInBody: true,
+        // airMode: true,
+        minHeight: 200,
+        toolbar: [
+          ["style", ["bold", "italic", "underline", "clear"]],
+          ["font", ["strikethrough"]],
+          ["para", ["paragraph"]],
+        ],
+      });
     }, 500);
+  }
 
-    $("#modal-progres form#form-data .prog-summernote").summernote({
-      dialogsInBody: true,
-      // airMode: true,
-      minHeight: 200,
-      toolbar: [
-        ["style", ["bold", "italic", "underline", "clear"]],
-        ["font", ["strikethrough"]],
-        ["para", ["paragraph"]],
-      ],
+  function editProgres(prog_id) {
+    $.ajax({
+      type: "POST",
+      url: base_url() + "admin/ProgresKegiatan/getData",
+      data: {
+        prog_id: prog_id
+      },
+      dataType: "json",
+      success: function(res) {
+        $("#modal-progres").modal({
+          backdrop: false
+        });
+
+        $('#modal-progres form#form-data #prog_id').val(prog_id)
+        $('#modal-progres form#form-data #keg_id').val(res.data.keg_id)
+        $('#modal-progres form#form-data #keg_nama').html("Kegiatan : " + res.data.keg_nama)
+
+        var tanggalan = convertTanggal(new Date(res.data.prog_tanggal));
+        $("#modal-progres form#form-data #prog_tanggal").daterangepicker({
+          locale: {
+            format: "DD-MM-YYYY"
+          },
+          singleDatePicker: true,
+          startDate: tanggalan,
+          endDate: tanggalan
+        });
+
+        setTimeout(() => {
+          $("#modal-progres form#form-data #prog_tanggal").trigger('change');
+
+          $("#modal-progres form#form-data .prog-summernote").summernote({
+            dialogsInBody: true,
+            // airMode: true,
+            minHeight: 200,
+            toolbar: [
+              ["style", ["bold", "italic", "underline", "clear"]],
+              ["font", ["strikethrough"]],
+              ["para", ["paragraph"]],
+            ],
+          });
+        }, 500);
+
+        $("#modal-progres form#form-data [name=prog_bukti_old]").val(res.data.prog_bukti);
+        $("#modal-progres form#form-data img#prog_bukti_old").attr('src', res.data.prog_bukti);
+        $("#modal-progres form#form-data .konten_prog_bukti").removeClass('d-none');
+        $("#modal-progres form#form-data #prog_keterangan").summernote('code', res.data.prog_keterangan);
+
+      }
     });
+
   }
 
   $(document).off("change", "#modal-progres form#form-data #prog_tanggal")
@@ -800,9 +866,30 @@ $this->load->view('dist/_partials/header');
       },
       dataType: "json",
       success: function(res) {
-        var prog = `<div class="progress-bar" role="progressbar" data-width="` + res.persentase + `%" aria-valuenow="` + res.persentase + `" aria-valuemin="0" aria-valuemax="100" style="width: ` + res.persentase + `%;">` + res.persentase + `%</div>`
-        $('#modal-progres form#form-data #keg_progres').html(prog)
-        $('#modal-progres form#form-data #prog_persentase').val(res.persentase)
+        if (res.ok) {
+          var prog = `<div class="progress-bar" role="progressbar" data-width="` + res.persentase + `%" aria-valuenow="` + res.persentase + `" aria-valuemin="0" aria-valuemax="100" style="width: ` + res.persentase + `%;">` + res.persentase + `%</div>`
+          $('#modal-progres form#form-data #keg_progres').html(prog)
+          $('#modal-progres form#form-data #prog_persentase').val(res.persentase)
+        } else {
+          swal({
+            title: "Error",
+            text: res.message,
+            icon: "error",
+            confirmButtonClass: "btn btn-main",
+            buttonsStyling: false,
+          });
+
+          var currentDate = moment().format('DD-MM-YYYY');
+
+          $("#modal-progres form#form-data #prog_tanggal").daterangepicker({
+            locale: {
+              format: "DD-MM-YYYY"
+            },
+            singleDatePicker: true,
+            startDate: currentDate,
+            endDate: currentDate
+          });
+        }
       }
     });
   }
@@ -827,6 +914,7 @@ $this->load->view('dist/_partials/header');
             buttonsStyling: false,
           }).then(function(_res_) {
             $("#modal-progres").modal("hide");
+            $("#modal-kegiatan").modal("hide");
             tb_data.ajax.reload(null, true);
           });
         } else {
@@ -857,5 +945,13 @@ $this->load->view('dist/_partials/header');
         }
       }
     });
+  }
+
+  function convertTanggal(date) {
+    var formattedDate = String(date.getDate()).padStart(2, '0') + "-" +
+      String(date.getMonth() + 1).padStart(2, '0') + "-" +
+      date.getFullYear();
+
+    return formattedDate;
   }
 </script>

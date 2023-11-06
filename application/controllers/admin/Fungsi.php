@@ -7,6 +7,7 @@ class Fungsi extends CI_Controller
 
   var $column_order   = array(null, 'jbt_nama');
   var $column_search   = array('jbt_nama');
+  var $column_search_fungsi   = array('jabatan.jbt_nama', 'fungsi.fun_nama');
   var $order = array('jbt_id' => 'asc', 'jbt_nama' => 'asc');
 
   public function index()
@@ -310,6 +311,22 @@ class Fungsi extends CI_Controller
     $this->db->join('fungsi', 'fungsi.fun_id = jabatan_fungsi.jf_fungsi', 'left');
     $this->db->where(['jf_status' => 1]);
     $this->db->where(['fun_status' => 1]);
+
+    $i = 0;
+    foreach ($this->column_search_fungsi as $item) {
+      if ($this->input->post('search')['value']) {
+        if ($i === 0) {
+          $this->db->group_start();
+          $this->db->like($item, $this->input->post('search')['value']);
+        } else {
+          $this->db->or_like($item, $this->input->post('search')['value']);
+        }
+        if (count($this->column_search_fungsi) - 1 == $i)
+          $this->db->group_end();
+      }
+      $i++;
+    }
+
     $data = $this->db->get_where('jabatan', ['jbt_id' => $jbt_id]);
 
     $list = '';

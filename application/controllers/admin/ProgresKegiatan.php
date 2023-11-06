@@ -33,22 +33,52 @@ class ProgresKegiatan extends CI_Controller
 
     $persen = hitungPersentase($kegiatan->keg_tanggal_mulai, $kegiatan->keg_tanggal_selesai, $tgl);
 
+    $persen['ok'] = true;
+    $persen['message'] = 'OK';
+    if ($persen['persentase'] < 0) {
+      $persen['ok'] = false;
+      $persen['message'] = 'Persentase Tidak Boleh Kurang dari 0%';
+    } else if ($persen['persentase'] > 100) {
+      $persen['ok'] = false;
+      $persen['message'] = 'Persentase Tidak Boleh Lebih dari 100%';
+    }
     echo json_encode($persen);
+  }
+
+  function getData()
+  {
+    $id = $this->input->post('prog_id');
+    $this->db->join('kegiatan', 'kegiatan.keg_id = progres_kegiatan.prog_kegiatan', 'left');
+    $progres = $this->db->get_where('progres_kegiatan', ['prog_id' => $id]);
+
+    $data['ok'] = 500;
+    $data['data'] = 'Data Tidak Ada';
+    if ($progres->num_rows() > 0) {
+      $data['ok']   = 200;
+      $data['data'] = $dt = $progres->row_array();
+      if ($dt['prog_bukti'] && file_exists(FCPATH . 'public/progress/' . $dt['prog_bukti'])) {
+        $file = base_url() . 'public/progress/' . $dt['prog_bukti'];
+      } else {
+        $file = 0;
+      }
+      $data['data']['prog_bukti'] = $file;
+      // $data['data']['prog_tanggal'] = date('d-m-Y H:i:s', strtotime($dt['prog_tanggal']));
+      $data['data']['prog_tanggal'] = $dt['prog_tanggal'];
+    }
+
+    echo json_encode($data);
   }
 
   public function addOrEdit()
   {
     $cek = $this->validateData();
     if ($cek) {
-      if ($this->input->post('keg_edit')) {
-        $wr['keg_jabatan'] = $this->input->post('keg_jabatan');
-        $wr['keg_fungsi'] = $this->input->post('keg_fungsi');
-        $wr['keg_nama'] = $this->input->post('keg_nama');
-        $tanggal = explode(' - ', $this->input->post('keg_tanggal'));
-        $wr['keg_tanggal_mulai']   = date('Y-m-d', strtotime($tanggal[0]));
-        $wr['keg_tanggal_selesai'] = date('Y-m-d', strtotime($tanggal[1]));
+      if ($this->input->post('prog_id')) {
+        $wr['prog_kegiatan']     = $this->input->post('keg_id');
+        $wr['prog_persentase']   = $this->input->post('prog_persentase');
+        $wr['prog_tanggal']      = date('Y-m-d', strtotime($this->input->post('prog_tanggal'))) . ' ' . date('H:i:s');
 
-        $cek = $this->db->where('keg_id !=', $this->input->post('keg_id'))->get_where('kegiatan', $wr);
+        $cek = $this->db->where('prog_id !=', $this->input->post('prog_id'))->get_where('progres_kegiatan', $wr);
         if ($cek->num_rows()) {
           $ret['ok'] = 500;
           $ret['form'] = 'Data Sudah Ada Sebelumnya';
@@ -56,25 +86,24 @@ class ProgresKegiatan extends CI_Controller
           $data = [];
           $data = $wr;
 
-          $program_id = $this->db->get_where('progres_kegiatan', ['prog_kegiatan' => $this->input->post('keg_id'), 'prog_persentase' => 0])->row()->prog_id;
-
-          if ($this->input->post('keg_foto')) {
-            $foto = $this->input->post('keg_foto');
-            $nama_file = FCPATH . 'public/progress/' . str_replace(base_url() . 'public/progress/', '', $this->input->post('keg_foto_old'));
+          if ($this->input->post('prog_bukti')) {
+            $foto = $this->input->post('prog_bukti');
+            $nama_file = FCPATH . 'public/progress/' . str_replace(base_url() . 'public/progress/', '', $this->input->post('prog_bukti_old'));
 
             if (file_exists($nama_file)) {
               unlink($nama_file);
             }
           } else {
-            $foto = str_replace(base_url() . 'public/progress/', '', $this->input->post('keg_foto_old'));
+            $foto = str_replace(base_url() . 'public/progress/', '', $this->input->post('prog_bukti_old'));
           }
 
 
           $this->db->trans_begin(); // Memulai transaksi
 
-          // Langkah 2: Input batch data
-          $this->db->update('kegiatan', $data, ['keg_id' => $this->input->post('keg_id')]);
-          $this->db->update('progres_kegiatan', ['prog_keterangan' => 'Mulai Kegiatan <br>' . $this->input->post('keg_nama'), 'prog_bukti' => $foto], ['prog_id' => $program_id]);
+          // Langkah 2: Input data
+          $data['prog_bukti'] = $foto;
+          $data['prog_keterangan'] = $this->input->post('prog_keterangan');
+          $this->db->update('progres_kegiatan', $data, ['prog_id' => $this->input->post('prog_id')]);
 
           // Cek jika transaksi berhasil atau gagal
           if ($this->db->trans_status() === FALSE) {
@@ -83,14 +112,18 @@ class ProgresKegiatan extends CI_Controller
             $ret['form'] = 'Gagal Update Data';
           } else {
             $this->db->trans_commit(); // Transaksi berhasil, commit
-            $ret['ok'] = 200;
-            $ret['form'] = 'Sukses Update Data';
+
+            $last_progres = $this->db->order_by('prog_tanggal DESC')->limit(1)->get_where('progres_kegiatan', ['prog_kegiatan' => $this->input->post('keg_id')])->row();
+            if ($this->db->update('kegiatan', ['keg_progres' => $last_progres->prog_persentase], ['keg_id' => $this->input->post('keg_id')])) {
+              $ret['ok'] = 200;
+              $ret['form'] = 'Sukses Update Data';
+            }
           }
         }
       } else {
         $wr1['prog_kegiatan']     = $this->input->post('keg_id');
         $wr1['prog_persentase']   = $this->input->post('prog_persentase');
-        $wr1['prog_tanggal']      = date('Y-m-d H:i:s', strtotime($this->input->post('prog_tanggal')));
+        $wr1['prog_tanggal']      = date('Y-m-d', strtotime($this->input->post('prog_tanggal'))) . ' ' . date('H:i:s');
         $kegiatan = $this->db->get_where('progres_kegiatan', $wr1);
         if ($kegiatan->num_rows() > 0) {
           $ret['ok']    = 500;
@@ -112,18 +145,20 @@ class ProgresKegiatan extends CI_Controller
             $ret['form']  = 'Gagal Insert Data';
           } else {
             $this->db->trans_commit(); // Transaksi berhasil, commit
-            $ret['ok']    = 200;
-            $ret['form']  = 'Sukses Insert Data';
+            $last_progres = $this->db->order_by('prog_tanggal DESC')->limit(1)->get_where('progres_kegiatan', ['prog_kegiatan' => $this->input->post('keg_id')])->row();
+            if ($this->db->update('kegiatan', ['keg_progres' => $last_progres->prog_persentase], ['keg_id' => $this->input->post('keg_id')])) {
+              $ret['ok'] = 200;
+              $ret['form'] = 'Sukses Update Data';
+            }
           }
         }
       }
     } else {
       $ret['form']['keg_id'] = form_error('keg_id');
       $ret['form']['prog_persentase']  = form_error('prog_persentase');
-      $ret['form']['prog_bukti'] = form_error('prog_bukti');
       $ret['form']['prog_keterangan'] = form_error('prog_keterangan');
       $ret['form']['prog_tanggal'] = form_error('prog_tanggal');
-      if ($this->input->post('keg_edit')) {
+      if ($this->input->post('prog_id')) {
         $ret['form']['prog_bukti_old'] = form_error('prog_bukti_old');
       } else {
         $ret['form']['prog_bukti'] = form_error('prog_bukti');
@@ -154,14 +189,6 @@ class ProgresKegiatan extends CI_Controller
         ],
       ],
       [
-        'field' => 'prog_bukti',
-        'label' => 'Bukti Kegiatan',
-        'rules' => 'required',
-        'errors' => [
-          'required' => '{field} harus diisi',
-        ],
-      ],
-      [
         'field' => 'prog_keterangan',
         'label' => 'Keterangan',
         'rules' => 'required',
@@ -179,7 +206,7 @@ class ProgresKegiatan extends CI_Controller
       ]
     ];
 
-    if ($this->input->post('keg_edit')) {
+    if ($this->input->post('prog_id')) {
       $config[] = [
         'field' => 'prog_bukti_old',
         'label' => 'Foto Kegiatan',

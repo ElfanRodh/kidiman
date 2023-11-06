@@ -10,6 +10,12 @@ class Kegiatan extends CI_Controller
   var $column_search_kegiatan   = array('jbt_nama', 'keg_nama');
   var $order = array('jbt_id' => 'asc', 'jbt_nama' => 'asc', 'keg_nama' => 'asc');
 
+  public function __construct()
+  {
+    parent::__construct();
+    $this->load->helper('app');
+  }
+
   public function index()
   {
     $data = array(
@@ -164,7 +170,16 @@ class Kegiatan extends CI_Controller
           $data = [];
           $data = $wr;
 
-          $program_id = $this->db->get_where('progres_kegiatan', ['prog_kegiatan' => $this->input->post('keg_id'), 'prog_persentase' => 0])->row()->prog_id;
+          $kegiatan = $this->db->get_where('kegiatan', ['keg_id' => $this->input->post('keg_id')])->row();
+          $data_program = [];
+          if ($kegiatan->keg_tanggal_mulai != $wr['keg_tanggal_mulai'] || $kegiatan->keg_tanggal_selesai != $wr['keg_tanggal_selesai']) {
+            $program = $this->db->order_by('prog_tanggal')->get_where('progres_kegiatan', ['prog_kegiatan' => $this->input->post('keg_id')]);
+            foreach ($program->result() as $k => $v) {
+              $persen = hitungPersentase($wr['keg_tanggal_mulai'], $wr['keg_tanggal_selesai'], $v->prog_tanggal);
+              $data_program[$k]['prog_id']          = $v->prog_id;
+              $data_program[$k]['prog_persentase']  = $persen['persentase'];
+            }
+          }
 
           if ($this->input->post('keg_foto')) {
             $foto = $this->input->post('keg_foto');
@@ -177,12 +192,19 @@ class Kegiatan extends CI_Controller
             $foto = str_replace(base_url() . 'public/progress/', '', $this->input->post('keg_foto_old'));
           }
 
-
           $this->db->trans_begin(); // Memulai transaksi
 
           // Langkah 2: Input batch data
           $this->db->update('kegiatan', $data, ['keg_id' => $this->input->post('keg_id')]);
-          $this->db->update('progres_kegiatan', ['prog_keterangan' => 'Mulai Kegiatan <br>' . $this->input->post('keg_nama'), 'prog_bukti' => $foto], ['prog_id' => $program_id]);
+          $this->db->update('progres_kegiatan', ['prog_keterangan' => 'Mulai Kegiatan <br>' . $this->input->post('keg_nama'), 'prog_bukti' => $foto], ['prog_kegiatan' => $this->input->post('keg_id'), 'prog_persentase' => 0]);
+
+          if ($data_program) {
+            foreach ($data_program as $k => $v) {
+              $this->db->update('progres_kegiatan', ['prog_persentase' => $v['prog_persentase']], ['prog_id' => $v['prog_id']]);
+            }
+            $progres_end = end($data_program);
+            $this->db->update('kegiatan', ['keg_progres' => $progres_end['prog_persentase']], ['keg_id' => $this->input->post('keg_id')]);
+          }
 
           // Cek jika transaksi berhasil atau gagal
           if ($this->db->trans_status() === FALSE) {
@@ -434,16 +456,22 @@ class Kegiatan extends CI_Controller
                     Fungsi : ' . $v->fun_nama . '
                   </td>';
         $list .= '<td class="text-center">' . date('d-m-Y', strtotime($v->keg_tanggal_mulai)) . '<br> s/d <br>' . date('d-m-Y', strtotime($v->keg_tanggal_selesai)) . '</td>';
+        $tgl_sekarang = date('Y-m-d');
+        if ($tgl_sekarang <= $v->keg_tanggal_selesai) {
+          $add_btn = '<div class="btn-group mt-2" role="group">
+                        <button class="btn btn-sm btn-icon btn-success add-progres" data-id="' . (string)$v->keg_id . '" data-name="' . strip_tags($v->keg_nama) . '">
+                          <i class="fa fa-plus mr-1"></i> Progres
+                        </button>
+                      </div>';
+        } else {
+          $add_btn = '';
+        }
         $list .= '
               <td class="text-center" style="width: 25%;">
                 <div class="progress">
                   <div class="progress-bar" role="progressbar" data-width="' . $v->keg_progres . '%" aria-valuenow="' . $v->keg_progres . '" aria-valuemin="0" aria-valuemax="100" style="width: ' . $v->keg_progres . '%;">' . $v->keg_progres . '%</div>
                 </div>
-                <div class="btn-group mt-2" role="group">
-                  <button class="btn btn-sm btn-icon btn-success add-progres" data-id="' . (string)$v->keg_id . '" data-name="' . strip_tags($v->keg_nama) . '">
-                    <i class="fa fa-plus mr-1"></i> Progres
-                  </button>
-                </div>  
+                ' . $add_btn . '
               </td>
               ';
         $list .= '<td class="text-center">
@@ -484,9 +512,10 @@ class Kegiatan extends CI_Controller
 
   function getProgresKegiatan($prog_kegiatan)
   {
-    $progres = $this->db->order_by('prog_persentase')->get_where('progres_kegiatan', ['prog_kegiatan' => $prog_kegiatan]);
+    $progres = $this->db->order_by('prog_tanggal')->get_where('progres_kegiatan', ['prog_kegiatan' => $prog_kegiatan]);
     $data = [];
     foreach ($progres->result() as $k => $v) {
+      $data[$k]['prog_id'] = $v->prog_id;
       $data[$k]['prog_persentase'] = $v->prog_persentase;
       if ($v->prog_bukti && file_exists(FCPATH . 'public/progress/' . $v->prog_bukti)) {
         $file = base_url() . 'public/progress/' . $v->prog_bukti;
