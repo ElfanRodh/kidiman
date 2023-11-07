@@ -1,8 +1,7 @@
 <?php
-defined('BASEPATH') or exit('No direct script access allowed');
+defined('BASEPATH') OR exit('No direct script access allowed');
 $this->load->view('dist/_partials/header');
 ?>
-
 <body>
   <div id="app">
     <section class="section">
@@ -14,35 +13,28 @@ $this->load->view('dist/_partials/header');
             </div>
 
             <div class="card card-primary">
-              <div class="card-header">
-                <h3>Login KIDIMAN</h3>
-              </div>
+              <div class="card-header"><h4>Login</h4></div>
 
               <div class="card-body">
                 <form method="POST" action="#" class="needs-validation" novalidate="">
                   <div class="form-group">
-                    <label for="username">Username</label>
-                    <input id="username" type="text" class="form-control" name="username" tabindex="1" required autofocus>
+                    <label for="email">Email</label>
+                    <input id="email" type="email" class="form-control" name="email" tabindex="1" required autofocus>
                     <div class="invalid-feedback">
-                      Please fill in your username
+                      Please fill in your email
                     </div>
                   </div>
 
                   <div class="form-group">
                     <div class="d-block">
-                      <label for="password" class="control-label">Password</label>
+                    	<label for="password" class="control-label">Password</label>
                       <div class="float-right">
                         <a href="<?php echo base_url(); ?>dist/auth_forgot_password" class="text-small">
                           Forgot Password?
                         </a>
                       </div>
                     </div>
-                    <div class="input-group">
-                      <input id="password" type="password" class="form-control" name="password" tabindex="2" required>
-                      <span class="input-group-text" id="showHide">
-                        <i class="fa fa-eye"></i>
-                      </span>
-                    </div>
+                    <input id="password" type="password" class="form-control" name="password" tabindex="2" required>
                     <div class="invalid-feedback">
                       please fill in your password
                     </div>
@@ -61,8 +53,26 @@ $this->load->view('dist/_partials/header');
                     </button>
                   </div>
                 </form>
+                <div class="text-center mt-4 mb-3">
+                  <div class="text-job text-muted">Login With Social</div>
+                </div>
+                <div class="row sm-gutters">
+                  <div class="col-6">
+                    <a class="btn btn-block btn-social btn-facebook">
+                      <span class="fab fa-facebook"></span> Facebook
+                    </a>
+                  </div>
+                  <div class="col-6">
+                    <a class="btn btn-block btn-social btn-twitter">
+                      <span class="fab fa-twitter"></span> Twitter
+                    </a>                                
+                  </div>
+                </div>
 
               </div>
+            </div>
+            <div class="mt-5 text-muted text-center">
+              Don't have an account? <a href="<?php echo base_url(); ?>dist/auth_register">Create One</a>
             </div>
             <div class="simple-footer">
               Copyright &copy; Stisla 2018
@@ -73,26 +83,4 @@ $this->load->view('dist/_partials/header');
     </section>
   </div>
 
-  <?php $this->load->view('dist/_partials/js'); ?>
-
-  <script>
-    const password = document.getElementById('password'); // id dari input password
-    const showHide = document.getElementById('showHide'); // id span showHide dalam input group password
-
-    password.type = 'password'; // set type input password menjadi password\
-    showHide.innerHTML = '<i class="fa fa-eye"></i>'; // masukan icon eye dalam icon bootstrap 5
-    showHide.style.cursor = 'pointer'; // ubah cursor menjadi pointer
-
-    showHide.addEventListener('click', () => {
-      // ketika span diclick
-      if (password.type === 'password') {
-        // jika type inputnya password
-        password.type = 'text'; // ubah type menjadi text
-        showHide.innerHTML = '<i class="fa fa-eye-slash"></i>'; // ubah icon menjadi eye slash
-      } else {
-        // jika type bukan password (text)
-        showHide.innerHTML = '<i class="fa fa-eye"></i>'; // ubah icon menjadi eye
-        password.type = 'password'; // ubah type menjadi password
-      }
-    });
-  </script>
+<?php $this->load->view('dist/_partials/js'); ?>

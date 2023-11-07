@@ -290,7 +290,7 @@ class User extends CI_Controller
                 'rules' => 'required|min_length[8]|callback_is_password_strong',
                 'errors' => [
                     'required' => '{field} harus diisi',
-                    'min_length[8]' => '{field} harus minimal 8 karakter',
+                    'min_length' => '{field} harus minimal 8 karakter',
                     'is_password_strong' => '{field} harus berisi angka, huruf kapital, huruf kecil dan karakter khusus',
                 ],
             ],
@@ -342,5 +342,42 @@ class User extends CI_Controller
         }
         $data = $this->db->get_where('perangkat', ['prt_status' => 1]);
         echo json_encode($data->result());
+    }
+
+    function login()
+    {
+        $data = array(
+            'title' => "Login"
+        );
+        $this->load->view('dist/auth-login-2', $data);
+    }
+
+    function auth_login()
+    {
+        // Validate the user input
+        $this->form_validation->set_rules('username', 'Username', 'required');
+        $this->form_validation->set_rules('password', 'Password', 'required');
+
+        if ($this->form_validation->run() == FALSE) {
+            // If validation fails, load the login form again
+            $this->load->view('dist/auth-login-2');
+        } else {
+            // If validation succeeds, check the login credentials
+            $username = $this->input->post('username');
+            $password = $this->input->post('password');
+            $this->db->where('username', $username);
+            $this->db->where('password', $password);
+            $query = $this->db->get('users'); // Replace 'users' with your table name
+
+            if ($query->num_rows() == 1) {
+                // Set session
+                $this->session->set_userdata('logged_in', true);
+                redirect('Home'); // Change 'dashboard' to your desired redirect page
+            } else {
+                // If login fails, reload the login form with an error message
+                $data['error'] = 'Invalid username or password!';
+                $this->load->view('dist/auth-login-2', $data);
+            }
+        }
     }
 }
