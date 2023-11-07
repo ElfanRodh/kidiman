@@ -9,11 +9,75 @@ class Kegiatan extends CI_Controller
   var $column_search   = array('prt_nama', 'jbt_nama', 'keg_nama');
   var $column_search_kegiatan   = array('jbt_nama', 'keg_nama');
   var $order = array('jbt_id' => 'asc', 'jbt_nama' => 'asc', 'keg_nama' => 'asc');
+  var $is_admin = null;
+  var $user = null;
 
   public function __construct()
   {
     parent::__construct();
+    if (!$this->ion_auth->logged_in()) {
+      redirect('auth/login');
+    } else {
+      $this->is_admin = $this->ion_auth->is_admin();
+      $this->user = $this->ion_auth->user()->row();
+    }
     $this->load->helper('app');
+  }
+
+  function cekLogin()
+  {
+    // $ret = getUser();
+    // echo json_encode($ret);
+    $menu = [
+      [
+        'header' => 'Dashboard',
+        'menus' => [
+          [
+            'active'  => 'index',
+            'link'    => 'index',
+            'text'    => '<i class="fa fa-fire"></i> <span>Dashboard</span>',
+          ],
+        ]
+      ],
+      [
+        'header' => 'Master Data',
+        'menus' => [
+          [
+            'active'  => 'perangkat',
+            'link'    => 'admin/perangkat',
+            'text'    => '<i class="fa fa-users"></i> <span>Perangkat Desa</span>',
+          ],
+          [
+            'active'  => 'user',
+            'link'    => 'admin/user',
+            'text'    => '<i class="fa fa-user-shield"></i> <span>Data User</span>',
+          ],
+        ]
+      ],
+      [
+        'header' => 'Perangkat',
+        'menus' => [
+          [
+            'active'  => 'tugas',
+            'link'    => 'admin/tugas',
+            'text'    => '<i class="fa fa-box"></i> <span>Tugas Pokok</span>',
+          ],
+          [
+            'active'  => 'fungsi',
+            'link'    => 'admin/fungsi',
+            'text'    => '<i class="fa fa-hands"></i> <span>Fungsi</span>',
+          ],
+          [
+            'active'  => 'kegiatan',
+            'link'    => 'admin/kegiatan',
+            'text'    => '<i class="fa fa-tasks"></i> <span>Kegiatan</span>',
+          ],
+        ]
+      ]
+    ];
+
+    header('Content-Type: application/json');
+    echo json_encode($menu);
   }
 
   public function index()
@@ -75,6 +139,12 @@ class Kegiatan extends CI_Controller
 
   private function getList($where = null)
   {
+    if ($this->is_admin) {
+      $wr_admin = [];
+    } else {
+      $wr_admin['jbt_id'] = $this->user->jabatan_id;
+    }
+
     $this->db->select('*');
     $this->db->from('kegiatan');
     $this->db->join('jabatan', 'jabatan.jbt_id = kegiatan.keg_jabatan', 'left');
@@ -86,6 +156,7 @@ class Kegiatan extends CI_Controller
     // $this->db->where(['fun_status' => 1]);
     $this->db->where(['prj_status' => 1]);
     $this->db->where(['prt_status' => 1]);
+    $this->db->where($wr_admin);
     $this->db->group_by('jbt_id');
     if ($where) {
       $this->db->where($where);
@@ -413,6 +484,13 @@ class Kegiatan extends CI_Controller
       // }
     }
 
+    if ($this->is_admin) {
+      $wr_admin = [];
+    } else {
+      $wr_admin['jbt_id'] = $this->user->jabatan_id;
+    }
+
+    $this->db->where($wr_admin);
     $data = $this->db->get_where('jabatan', ['jbt_status' => 1]);
     echo json_encode($data->result());
   }
@@ -489,7 +567,7 @@ class Kegiatan extends CI_Controller
                   </td>';
         $list .= '<td class="text-center">' . date('d-m-Y', strtotime($v->keg_tanggal_mulai)) . '<br> s/d <br>' . date('d-m-Y', strtotime($v->keg_tanggal_selesai)) . '</td>';
         $tgl_sekarang = date('Y-m-d');
-        if (($tgl_sekarang <= $v->keg_tanggal_selesai) && (int) number_format($v->keg_progres, 0) != 100) {
+        if (($tgl_sekarang <= $v->keg_tanggal_selesai) && (int) number_format($v->keg_progres, 0) != 100 && (!$this->is_admin || $this->user->jabatan_id == $jbt_id)) {
           $add_btn = '<div class="btn-group mt-2" role="group">
                         <button class="btn btn-sm btn-icon btn-success add-progres" data-id="' . (string)$v->keg_id . '" data-name="' . strip_tags($v->keg_nama) . '">
                           <i class="fa fa-plus mr-1"></i> Progres
