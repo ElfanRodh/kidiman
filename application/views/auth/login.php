@@ -14,6 +14,7 @@ $this->load->view('dist/_partials/header');
 				<span class="login100-form-title">
 					KIDIMAN
 				</span>
+				<div id="infoMessage"><?php echo $message; ?></div>
 
 				<div class="wrap-input100 validate-input" data-validate="Username is required">
 					<input class="input100" type="text" name="identity" placeholder="Username">

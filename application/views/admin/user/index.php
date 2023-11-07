@@ -38,7 +38,7 @@ $this->load->view('dist/_partials/header');
                       <th class="text-center">No</th>
                       <th>Username</th>
                       <th>Nama</th>
-                      <th>Nama Perangkat</th>
+                      <th>Jabatan</th>
                       <th>Level</th>
                       <th>Action</th>
                     </tr>
@@ -159,19 +159,19 @@ $this->load->view('dist/_partials/header');
           orderable: false
         },
         {
-          data: "usr_username",
+          data: "username",
           className: "text-left align-top"
         },
         {
-          data: "usr_nama",
+          data: "first_name",
           className: "text-left align-top"
         },
         {
-          data: "prt_nama",
+          data: "jbt_nama",
           className: "text-left align-top"
         },
         {
-          data: "usr_level",
+          data: "group_name",
           className: "text-left align-top"
         },
         {

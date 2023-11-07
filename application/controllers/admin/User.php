@@ -3,9 +3,9 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class User extends CI_Controller
 {
-    var $column_order   = array(null, 'usr_nama', 'usr_level', 'prt_nama', 'usr_username');
-    var $column_search   = array('usr_nama', 'usr_level', 'prt_nama', 'usr_username');
-    var $order = array('usr_id' => 'asc', 'usr_nama' => 'asc', 'usr_level' => 'asc', 'prt_nama' => 'asc', 'usr_username' => 'asc');
+    var $column_order   = array(null, 'username', 'jabatan.jbt_nama', 'groups.name', 'first_name');
+    var $column_search   = array('username', 'jabatan.jbt_nama', 'first_name');
+    var $order = array('users.id' => 'asc', 'username' => 'asc', 'first_name' => 'asc', 'jabatan.jbt_nama' => 'asc', 'groups.name' => 'asc');
 
     public function index()
     {
@@ -25,15 +25,15 @@ class User extends CI_Controller
             $no++;
             $row                    = array();
             $row['no']              = $no;
-            $row['usr_username']    = $usr->usr_username;
-            $row['usr_level']       = $usr->usr_level;
-            $row['prt_nama']        = $usr->prt_nama;
-            $row['usr_nama']        = $usr->usr_nama;
+            $row['username']        = $usr->username;
+            $row['first_name']      = $usr->first_name;
+            $row['jbt_nama']        = $usr->jbt_nama;
+            $row['group_name']      = $usr->group_name;
             $row['opsi']            = '<div class="btn-group" role="group">
-                                            <button class="btn btn-icon btn-warning update-data" data-id="' . (string)$usr->up_id . '">
+                                            <button class="btn btn-icon btn-warning update-data" data-id="' . (string)$usr->user_id . '">
                                                 <i class="fa fa-edit"></i>
                                             </button>
-                                            <button class="btn btn-icon btn-danger delete-data" data-id="' . (string)$usr->up_id . '" data-name="' . (string)$usr->usr_nama . '" data-idusr="' . (string)$usr->usr_id . '">
+                                            <button class="btn btn-icon btn-danger delete-data" data-id="' . (string)$usr->user_id . '" data-name="' . (string)$usr->username . '" data-idusr="' . (string)$usr->user_id . '">
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         </div>';
@@ -61,18 +61,14 @@ class User extends CI_Controller
 
     private function getList($where = null)
     {
-        $this->db->select('*');
-        $this->db->from('user_perangkat');
-        $this->db->join('user', 'user.usr_id = up_user', 'left');
-        $this->db->join('perangkat', 'perangkat.prt_id = up_perangkat', 'left');
-        $this->db->where(['prt_status' => 1]);
-        $this->db->where(['usr_status' => 1]);
-        $this->db->where(['up_status' => 1]);
+        $this->db->select('users.id AS user_id, username, first_name, groups.name AS group_name, jbt_nama');
+        $this->db->from('users');
+        $this->db->join('users_groups', 'users_groups.user_id = users.id', 'left');
+        $this->db->join('groups', 'users_groups.group_id = groups.id', 'left');
+        $this->db->join('jabatan', 'jabatan.jbt_id = users.jabatan_id', 'left');
+        $this->db->where(['active' => 1]);
         if ($where) {
             $this->db->where($where);
-        }
-        if ($this->input->post("fil_nama")) {
-            $this->db->where(['prt_nama' => $this->input->post("fil_nama")]);
         }
 
         $i = 0;
