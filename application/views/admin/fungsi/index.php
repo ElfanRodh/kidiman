@@ -23,6 +23,15 @@ $this->load->view('dist/_partials/header');
       </div> -->
     </div>
 
+    <div class="row">
+      <div class="col-12 col-md-4">
+        <div class="form-group">
+          <label for="fil_jabatan">Jabatan</label>
+          <select class="form-control select2" data-width="100%" data-allow-clear="true" data-placeholder="Pilih Jabatan" id="fil_jabatan" name="fil_jabatan"></select>
+        </div>
+      </div>
+    </div>
+
     <div class="section-body">
       <div class="row">
         <div class="col-12">
@@ -147,7 +156,7 @@ $this->load->view('dist/_partials/header');
 <script src="https://cdn.jsdelivr.net/gh/xcash/bootstrap-autocomplete@v2.3.7/dist/latest/bootstrap-autocomplete.min.js"></script>
 
 <script>
-  var fil_nama;
+  var fil_jabatan;
   var tb_data;
 
   $(document).ready(function() {
@@ -163,7 +172,7 @@ $this->load->view('dist/_partials/header');
         type: "POST",
         url: base_url() + "admin/fungsi/viewData",
         data: function(posts) {
-          posts.fil_nama = fil_nama ?? null;
+          posts.fil_jabatan = fil_jabatan ?? null;
         }
       },
       columns: [{
@@ -192,6 +201,15 @@ $this->load->view('dist/_partials/header');
         [10, 25, 50, 100, "All"]
       ],
     });
+
+    getJabatanFilter('fil_jabatan');
+
+    $(document).off("change", "select#fil_jabatan")
+      .on("change", "select#fil_jabatan", function(e) {
+        e.preventDefault();
+        fil_jabatan = $(this).val()
+        tb_data.ajax.reload(null, true);
+      });
   });
 
   $(document).off("click", "table#tb_data button.update-data")
@@ -462,7 +480,7 @@ $this->load->view('dist/_partials/header');
                       <td class="text-center py-2" style="width: 45%">
                         ` + bukti + `
                         <div class="progress">
-                          <div class="progress-bar" role="progressbar" data-width="` + val.prog_persentase + `%" aria-valuenow="` + val.prog_persentase + `" aria-valuemin="0" aria-valuemax="100" style="width: ` + val.prog_persentase + `%;">` + val.prog_persentase + `%</div>
+                          <div class="progress-bar" role="progressbar" data-width="` + val.prog_persentase + `%" aria-valuenow="` + val.prog_persentase + `" aria-valuemin="0" aria-valuemax="100" style="width: ` + val.prog_persentase + `%; background-color:` + setColor(val.prog_persentase) + `;">` + val.prog_persentase + `%</div>
                         </div>
                         <div>
                           <p>` + val.prog_tanggal + `</p>

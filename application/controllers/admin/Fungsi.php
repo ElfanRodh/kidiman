@@ -79,8 +79,8 @@ class Fungsi extends CI_Controller
     if ($where) {
       $this->db->where($where);
     }
-    if ($this->input->post("fil_nama")) {
-      $this->db->where(['jbt_nama' => $this->input->post("fil_nama")]);
+    if ($this->input->post("fil_jabatan")) {
+      $this->db->where(['jbt_id' => $this->input->post("fil_jabatan")]);
     }
 
     $i = 0;

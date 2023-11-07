@@ -43,7 +43,7 @@
 }
 
 .bg-main {
-  background-color: #33d9b2 !important;
+  background: linear-gradient(270deg, #39bdc4 -17.47%, #47da96 98.16%) !important;
 }
 
 .shadow-main {
@@ -190,11 +190,11 @@
 }
 
 .navbar-bg {
-  background-color: #33d9b2 !important;
+  background: linear-gradient(270deg, #39bdc4 -17.47%, #47da96 98.16%) !important;
 }
 
 .btn-success {
-  background-color: #33d9b2 !important;
+  background: linear-gradient(270deg, #39bdc4 -17.47%, #47da96 98.16%) !important;
 }
 
 .btn-success:hover {
@@ -203,7 +203,7 @@
 
 .page-item.active .page-link {
   color: #ffffff !important;
-  background-color: #33d9b2 !important;
+  background: linear-gradient(270deg, #39bdc4 -17.47%, #47da96 98.16%) !important;
   border-color: #00d992 !important;
   border-radius: 1rem;
 }
@@ -228,7 +228,7 @@
 .main-sidebar .sidebar-menu li.dropdown.active a.has-dropdown {
   color: #ffffff !important;
   font-weight: 600;
-  background-color: #33d9b2 !important;
+  background: linear-gradient(270deg, #39bdc4 -17.47%, #47da96 98.16%) !important;
   border-radius: 8px;
 }
 
@@ -270,11 +270,11 @@ body:not(.sidebar-mini) .sidebar-style-2 .sidebar-menu > li.active > a:before {
 }
 
 .alert.alert-success {
-  background-color: #33d9b2 !important;
+  background: linear-gradient(270deg, #39bdc4 -17.47%, #47da96 98.16%) !important;
 }
 
 .page-item .page-link:hover {
-  background-color: #33d9b2 !important;
+  background: linear-gradient(270deg, #39bdc4 -17.47%, #47da96 98.16%) !important;
   border-color: #00d992 !important;
   color: #ffffff !important;
   border-radius: 1rem !important;
@@ -296,7 +296,7 @@ body:not(.sidebar-mini) .sidebar-style-2 .sidebar-menu li.active ul.dropdown-men
 li.active a.nav-link.self {
   color: #ffffff !important;
   font-weight: 600;
-  background-color: #33d9b2 !important;
+  background: linear-gradient(270deg, #39bdc4 -17.47%, #47da96 98.16%) !important;
   border-radius: 8px;
 }
 
