@@ -33,7 +33,7 @@ class User extends CI_Controller
                                             <button class="btn btn-icon btn-warning update-data" data-id="' . (string)$usr->user_id . '">
                                                 <i class="fa fa-edit"></i>
                                             </button>
-                                            <button class="btn btn-icon btn-danger delete-data" data-id="' . (string)$usr->user_id . '" data-name="' . (string)$usr->username . '" data-idusr="' . (string)$usr->user_id . '">
+                                            <button class="btn btn-icon btn-danger delete-data" data-id="' . (string)$usr->user_id . '" data-name="' . (string)$usr->username . '">
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         </div>';
@@ -109,12 +109,14 @@ class User extends CI_Controller
     public function getData()
     {
         if ($this->input->post('id')) {
-            $this->db->where(['up_id' => $this->input->post('id')]);
+            $this->db->where(['users.id' => $this->input->post('id')]);
         }
-        $this->db->join('perangkat', 'perangkat.prt_id = user_perangkat.up_perangkat', 'left');
-        $this->db->join('user', 'user.usr_id = user_perangkat.up_user', 'left');
+        $this->db->join('users_groups', 'users_groups.user_id = users.id', 'left');
+        $this->db->join('groups', 'users_groups.group_id = groups.id', 'left');
 
-        $dt = $this->db->get_where('user_perangkat', ['up_status' => '1']);
+        $this->db->select('users.id AS user_id, username, first_name, groups.id AS group_id, jabatan_id');
+
+        $dt = $this->db->get_where('users', ['active' => '1']);
 
         $data['ok'] = 500;
         $data['data'] = 'Data Tidak Ada';
@@ -130,87 +132,94 @@ class User extends CI_Controller
     {
         $cek = $this->validateData();
         if ($cek) {
-            if ($this->input->post('up_id')) {
-                $wr['up_id'] = $this->input->post('up_id');
+            if ($this->input->post('id')) {
+                $wr['users.id'] = $this->input->post('id');
 
-                $data = [
-                    'usr_perangkat' => $this->input->post('usr_perangkat'),
-                    'usr_nama'      => $this->input->post('usr_nama'),
-                    'usr_level'     => strtolower($this->input->post('usr_level')),
-                    'usr_username'  => strtolower($this->input->post('usr_username'))
+                $data_user = [
+                    'username' => $this->input->post('usr_username'),
+                    // 'first_name'      => $this->input->post('usr_nama'),
+                    'jabatan_id'  => strtolower($this->input->post('usr_jabatan')),
+                    // 'password'  => password_hash($this->input->post('usr_password'), PASSWORD_BCRYPT)
                 ];
-                // $pass = ['up_id'];
-                // foreach ($_POST as $k => $v) {
-                //     if (!in_array($k, $pass)) {
-                //         $data[$k] = $v;
-                //     }
-                // }
-                $ex = $this->db
-                    ->where(['up_id !=' => $this->input->post('up_id')])
-                    ->join('user', 'user.usr_id = user_perangkat.up_user', 'left')
-                    ->get_where('user_perangkat', $data);
-                if ($ex->num_rows() > 0) {
+
+                $data_group = [
+                    'user_id' => $this->input->post('id'),
+                    'group_id'      => $this->input->post('usr_level')
+                ];
+
+                $ex_user = $this->db
+                    ->where(['users.id !=' => $this->input->post('id')])
+                    ->join('users_groups', 'users_groups.user_id = users.id', 'left')
+                    ->get_where('users', $data_user);
+
+                $ex_group = $this->db
+                    ->get_where('users_groups', ['user_id' => $this->input->post('id')]);
+
+                if ($ex_user->num_rows() > 0) {
                     $ret['ok'] = 500;
                     $ret['form'] = 'Data Sudah Ada Sebelumnya';
                 } else {
-                    $update_up = $this->db->update('user_perangkat', [
-                        'up_perangkat' => $this->input->post('usr_perangkat')
-                    ], $wr);
 
-                    $wr2['usr_id'] = $this->db->get_where('user_perangkat', $wr)->row()->up_user;
-                    $update_usr = $this->db->update('user', [
-                        'usr_nama'      => $this->input->post('usr_nama'),
-                        'usr_level'     => strtolower($this->input->post('usr_level')),
-                        'usr_username'  => strtolower($this->input->post('usr_username')),
-                        'usr_password'  => $this->input->post('usr_password')
-                    ], $wr2);
-                    if ($update_up && $update_usr) {
-                        $ret['ok'] = 200;
-                        $ret['form'] = 'Sukses Update Data';
-                    } else {
+                    $this->db->trans_begin(); // Memulai transaksi
+
+                    $data_user['first_name'] = $this->input->post('usr_nama');
+                    $data_user['password'] = password_hash($this->input->post('usr_password'), PASSWORD_BCRYPT);
+
+                    $this->db->update('users', $data_user, $wr);
+                    if ($ex_group->num_rows() > 0) {
+                        $this->db->delete('users_groups', ['id' => $ex_group->row()->id]);
+                    }
+                    $this->db->insert('users_groups', $data_group);
+
+                    // Cek jika transaksi berhasil atau gagal
+                    if ($this->db->trans_status() === FALSE) {
+                        $this->db->trans_rollback(); // Transaksi gagal, rollback
                         $ret['ok'] = 500;
                         $ret['form'] = 'Gagal Update Data';
+                    } else {
+                        $this->db->trans_commit(); // Transaksi berhasil, commit
+                        $ret['ok'] = 200;
+                        $ret['form'] = 'Sukses Update Data';
                     }
                 }
             } else {
-                $wr1['usr_nama']     = $this->input->post('usr_nama');
-                $user = $this->db->get_where('user', $wr1);
+                $wr1['username']   = $this->input->post('usr_username');
+                $wr1['active']     = 1;
+                $user = $this->db->get_where('users', $wr1);
                 if ($user->num_rows() > 0) {
-                    $wr['up_user']      = $user->row()->usr_id;
-                    $wr['up_perangkat'] = $this->input->post('usr_perangkat');
-                    $wr['up_status']    = 1;
-                    $row = $this->db->get_where('user_perangkat', $wr);
-
-                    if ($row->num_rows() < 1) {
-                        $data = [];
-                        $data = $wr;
-                        if ($this->db->insert('user_perangkat', $data)) {
-                            $ret['ok']    = 200;
-                            $ret['form']  = 'Sukses Insert Data';
-                        } else {
-                            $ret['ok']    = 500;
-                            $ret['form']  = 'Gagal Insert Data';
-                        }
-                    }
+                    $ret['ok'] = 500;
+                    $ret['form'] = 'Data Sudah Ada Sebelumnya';
                 } else {
-                    $data_usr = [
-                        'usr_perangkat' => strtoupper($this->input->post('usr_perangkat')),
-                        'usr_nama'      => $this->input->post('usr_nama'),
-                        'usr_level'     => strtolower($this->input->post('usr_level')),
-                        'usr_username'  => strtolower($this->input->post('usr_username')),
-                        'usr_password'  => $this->input->post('usr_password')
+                    $data_user = [
+                        'username'     => $this->input->post('usr_username'),
+                        'first_name'   => $this->input->post('usr_nama'),
+                        'jabatan_id'  => strtolower($this->input->post('usr_jabatan')),
+                        'password'  => password_hash($this->input->post('usr_password'), PASSWORD_BCRYPT)
                     ];
-                    $user = $this->db->insert('user', $data_usr);
+
+                    $user = $this->db->insert('users', $data_user);
+
                     if ($user) {
-                        $data['up_user']         = $this->db->insert_id();
-                        $data['up_perangkat']    = $this->input->post('usr_perangkat');
-                        $data['up_status']       = 1;
-                        if ($this->db->insert('user_perangkat', $data)) {
-                            $ret['ok']    = 200;
-                            $ret['form']  = 'Sukses Insert Data';
+                        $user_id = $this->db->insert_id();
+                        $data_group = [
+                            'user_id'       => $user_id,
+                            'group_id'      => $this->input->post('usr_level')
+                        ];
+
+                        $this->db->trans_begin(); // Memulai transaksi
+
+                        $user = $this->db->insert('users_groups', $data_group);
+
+                        $this->db->trans_complete(); // End transaksi
+                        // Cek jika transaksi berhasil atau gagal
+                        if ($this->db->trans_status() === FALSE) {
+                            $this->db->trans_rollback(); // Transaksi gagal, rollback
+                            $ret['ok'] = 500;
+                            $ret['form'] = 'Gagal Tambah Data';
                         } else {
-                            $ret['ok']    = 500;
-                            $ret['form']  = 'Gagal Insert Data';
+                            $this->db->trans_commit();
+                            $ret['ok'] = 200;
+                            $ret['form'] = 'Sukses Tambah Data';
                         }
                     }
                 }
@@ -221,7 +230,7 @@ class User extends CI_Controller
             $ret['form']['usr_level']       = form_error('usr_level');
             $ret['form']['usr_password']    = form_error('usr_password');
             $ret['form']['usr_password2']   = form_error('usr_password2');
-            $ret['form']['usr_perangkat']   = form_error('usr_perangkat');
+            $ret['form']['usr_jabatan']     = form_error('usr_jabatan');
             $ret['ok']                      = 400;
         }
         echo json_encode($ret);
@@ -230,10 +239,11 @@ class User extends CI_Controller
     public function delete()
     {
         if ($this->input->post('id')) {
-            $wr['up_id']    = $this->input->post('id');
-            $wr2['usr_id']  = $this->input->post('idusr');
-            if ($this->db->update('user_perangkat', ['up_status' => 0], $wr)) {
-                $this->db->update('user', ['usr_status' => 0], $wr2);
+            $wr['id']    = $this->input->post('id');
+            $ex_group = $this->db
+                ->get_where('users_groups', ['user_id' => $this->input->post('id')]);
+            if ($this->db->update('users', ['active' => 0], $wr)) {
+                $this->db->delete('users_groups', ['id' => $ex_group->row()->id]);
                 $out["ok"]    = 200;
                 $out["data"]  = "Berhasil Menghapus Data";
             } else {
@@ -273,14 +283,17 @@ class User extends CI_Controller
                 ],
             ],
             [
-                'field' => 'usr_perangkat',
-                'label' => 'Perangkat',
+                'field' => 'usr_jabatan',
+                'label' => 'Jabatan',
                 'rules' => 'required',
                 'errors' => [
                     'required' => '{field} harus diisi',
                 ],
             ],
-            [
+        ];
+
+        if (!$this->input->post('id')) {
+            $config[] = [
                 'field' => 'usr_password',
                 'label' => 'Password',
                 'rules' => 'required|min_length[8]|callback_is_password_strong',
@@ -289,8 +302,8 @@ class User extends CI_Controller
                     'min_length' => '{field} harus minimal 8 karakter',
                     'is_password_strong' => '{field} harus berisi angka, huruf kapital, huruf kecil dan karakter khusus',
                 ],
-            ],
-            [
+            ];
+            $config[] = [
                 'field' => 'usr_password2',
                 'label' => 'Kofirmasi Password',
                 'rules' => 'required|matches[usr_password]',
@@ -298,8 +311,8 @@ class User extends CI_Controller
                     'required' => '{field} harus diisi',
                     'matches' => '{field} tidak sesuai dengan password awal',
                 ],
-            ],
-        ];
+            ];
+        }
 
         $this->form_validation->set_rules($config);
         return $this->form_validation->run();
@@ -315,28 +328,9 @@ class User extends CI_Controller
         }
     }
 
-    function getPerangkat()
+    function getJabatan()
     {
-        $ids = $this->db->select('up_perangkat')->from('user_perangkat')->where('up_status', 1)->get();
-        if ($ids->num_rows() > 0) {
-            $this->db->where_not_in(
-                'prt_id',
-                array_column(
-                    $ids->result_array(),
-                    'up_perangkat'
-                )
-            );
-        }
-
-        if ($this->input->post('id')) {
-            if ($this->input->post('is_edit')) {
-                $this->db->or_where(
-                    'prt_id',
-                    $this->input->post('id')
-                );
-            }
-        }
-        $data = $this->db->get_where('perangkat', ['prt_status' => 1]);
+        $data = $this->db->get_where('jabatan', ['jbt_status' => 1]);
         echo json_encode($data->result());
     }
 
@@ -346,34 +340,5 @@ class User extends CI_Controller
             'title' => "Login"
         );
         $this->load->view('dist/auth-login-2', $data);
-    }
-
-    function auth_login()
-    {
-        // Validate the user input
-        $this->form_validation->set_rules('username', 'Username', 'required');
-        $this->form_validation->set_rules('password', 'Password', 'required');
-
-        if ($this->form_validation->run() == FALSE) {
-            // If validation fails, load the login form again
-            $this->load->view('dist/auth-login-2');
-        } else {
-            // If validation succeeds, check the login credentials
-            $username = $this->input->post('username');
-            $password = $this->input->post('password');
-            $this->db->where('username', $username);
-            $this->db->where('password', $password);
-            $query = $this->db->get('users'); // Replace 'users' with your table name
-
-            if ($query->num_rows() == 1) {
-                // Set session
-                $this->session->set_userdata('logged_in', true);
-                redirect('Home'); // Change 'dashboard' to your desired redirect page
-            } else {
-                // If login fails, reload the login form with an error message
-                $data['error'] = 'Invalid username or password!';
-                $this->load->view('dist/auth-login-2', $data);
-            }
-        }
     }
 }

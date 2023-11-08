@@ -65,7 +65,7 @@ $this->load->view('dist/_partials/header');
       <div class="modal-body pb-0">
         <form id="form-data" class="form form-horizontal">
           <div class="form-body">
-            <input type="hidden" name="up_id" id="up_id">
+            <input type="hidden" name="id" id="id">
             <div class="row">
               <div class="col-12 col-md-12">
                 <div class="form-group">
@@ -75,8 +75,8 @@ $this->load->view('dist/_partials/header');
               </div>
               <div class="col-12 col-md-12">
                 <div class="form-group">
-                  <label for="usr_perangkat">Nama Perangkat</label>
-                  <select class="form-control select2" data-width="100%" data-allow-clear="true" data-placeholder="Pilih Perangkat" id="usr_perangkat" name="usr_perangkat"></select>
+                  <label for="usr_jabatan">Pilih Jabatan</label>
+                  <select class="form-control select2" data-width="100%" data-allow-clear="true" data-placeholder="Pilih Jabatan" id="usr_jabatan" name="usr_jabatan"></select>
                 </div>
               </div>
               <div class="col-12 col-md-6">
@@ -85,8 +85,8 @@ $this->load->view('dist/_partials/header');
 
                   <select class="form-control select2" data-width="100%" data-allow-clear="true" data-placeholder="Pilih Level" id="usr_level" name="usr_level">
                     <option value="" selected></option>
-                    <option value="admin">Admin</option>
-                    <option value="user">User</option>
+                    <option value="1">Admin</option>
+                    <option value="2">User</option>
                   </select>
 
                 </div>
@@ -204,19 +204,13 @@ $this->load->view('dist/_partials/header');
               backdrop: false
             });
             $("#modal-form div.modal-header h4.modal-title").html("Ubah Data User");
-            $("#modal-form form#form-data #up_id").val(res.data.up_id);
-            getPerangkat('usr_perangkat', res.data.up_perangkat, 1).done(function() {
-              $("#modal-form form#form-data #usr_perangkat").val(res.data.up_perangkat);
+            $("#modal-form form#form-data #id").val(res.data.user_id);
+            getJabatan('usr_jabatan', res.data.jabatan_id, 1).done(function() {
+              $("#modal-form form#form-data #usr_jabatan").val(res.data.jabatan_id);
             });
-            $("#modal-form form#form-data #usr_nama").val(res.data.usr_nama);
-            if (res.data.usr_level == "admin") {
-              $("#modal-form form#form-data #usr_level").val("admin").trigger('change');
-            } else if (res.data.usr_level == "user") {
-              $("#modal-form form#form-data #usr_level").val("user").trigger('change');
-            }
-            $("#modal-form form#form-data #usr_username").val(res.data.usr_username);
-            $("#modal-form form#form-data #usr_password").val(res.data.usr_password);
-            $("#modal-form form#form-data #usr_password2").val(res.data.usr_password);
+            $("#modal-form form#form-data #usr_nama").val(res.data.first_name);
+            $("#modal-form form#form-data #usr_level").val(res.data.group_id).trigger('change');
+            $("#modal-form form#form-data #usr_username").val(res.data.username);
           } else {
             swal({
               title: "Error",
@@ -234,7 +228,6 @@ $this->load->view('dist/_partials/header');
     .on("click", "table#tb_data button.delete-data", function(e) {
       e.preventDefault();
       var _id_ = $(this).attr("data-id");
-      var _idusr_ = $(this).attr("data-idusr");
       var _name_ = $(this).attr("data-name");
       swal({
         title: "Hapus Data ?",
@@ -265,8 +258,7 @@ $this->load->view('dist/_partials/header');
             type: "POST",
             url: base_url() + "admin/user/delete",
             data: {
-              id: _id_,
-              idusr: _idusr_
+              id: _id_
             },
             dataType: "json",
             success: function(res) {
@@ -290,7 +282,7 @@ $this->load->view('dist/_partials/header');
       });
       $("#modal-form div.modal-header h4.modal-title").html("Tambah Data User");
       $("#modal-form form#form-data input").val(null);
-      getPerangkat('usr_perangkat');
+      getJabatan('usr_jabatan');
     });
 
   $(document).off("click", "#modal-form button#save-form")
@@ -334,6 +326,7 @@ $this->load->view('dist/_partials/header');
       processData: false,
       beforeSend: function() {
         $('form#form-data .invalid-feedback').remove();
+        $('form#form-data .form-control').removeClass('is-invalid');
       },
       success: function(res) {
         if (res.ok == 200) {
@@ -376,8 +369,8 @@ $this->load->view('dist/_partials/header');
     });
   }
 
-  function getPerangkat(elem, id, isEdit = 0) {
-    var link = base_url() + "admin/user/getPerangkat";
+  function getJabatan(elem, id, isEdit = 0) {
+    var link = base_url() + "admin/user/getJabatan";
     var param = null;
     if (id) {
       param = {
@@ -398,7 +391,7 @@ $this->load->view('dist/_partials/header');
       success: function(res) {
         var list = "";
         res.forEach(function(el, ind) {
-          list += '<option value="' + el.prt_id + '">' + el.prt_nama + "</option>";
+          list += '<option value="' + el.jbt_id + '">' + el.jbt_nama + "</option>";
         });
 
         $("select#" + elem).html(list);
