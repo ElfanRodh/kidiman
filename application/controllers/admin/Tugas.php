@@ -9,6 +9,19 @@ class Tugas extends CI_Controller
   var $column_search   = array('jbt_nama', 'tgs_nama');
   var $order = array('jbt_id' => 'asc', 'jbt_nama' => 'asc', 'tgs_nama' => 'asc');
 
+
+  public function __construct()
+  {
+    parent::__construct();
+    if (!$this->ion_auth->logged_in()) {
+      redirect('auth/login');
+    } else {
+      $this->is_admin = $this->ion_auth->is_admin();
+      $this->user = $this->ion_auth->user()->row();
+    }
+  }
+
+
   public function index()
   {
     $data = array(

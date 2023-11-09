@@ -1,27 +1,4 @@
 /*//////////////////////////////////////////////////////////////////
-[ FONT ]*/
-
-@font-face {
-  font-family: Poppins-Regular;
-  src: url("../fonts/poppins/Poppins-Regular.ttf");
-}
-
-@font-face {
-  font-family: Poppins-Bold;
-  src: url("../fonts/poppins/Poppins-Bold.ttf");
-}
-
-@font-face {
-  font-family: Poppins-Medium;
-  src: url("../fonts/poppins/Poppins-Medium.ttf");
-}
-
-@font-face {
-  font-family: Montserrat-Bold;
-  src: url("../fonts/montserrat/Montserrat-Bold.ttf");
-}
-
-/*//////////////////////////////////////////////////////////////////
 [ RESTYLE TAG ]*/
 
 * {
@@ -33,12 +10,12 @@
 body,
 html {
   height: 100%;
-  font-family: Poppins-Regular, sans-serif;
+  font-family: Lato, sans-serif;
 }
 
 /*---------------------------------------------*/
 a {
-  font-family: Poppins-Regular;
+  font-family: Lato;
   font-size: 14px;
   line-height: 1.7;
   color: #666666;
@@ -69,7 +46,7 @@ h6 {
 }
 
 p {
-  font-family: Poppins-Regular;
+  font-family: Lato;
   font-size: 14px;
   line-height: 1.7;
   color: #666666;
@@ -168,17 +145,28 @@ iframe {
 /*//////////////////////////////////////////////////////////////////
 [ Utility ]*/
 .txt1 {
-  font-family: Poppins-Regular;
+  font-family: Lato;
   font-size: 13px;
   line-height: 1.5;
   color: #999999;
 }
 
 .txt2 {
-  font-family: Poppins-Regular;
+  font-family: Lato;
   font-size: 13px;
   line-height: 1.5;
   color: #666666;
+}
+
+.text-app {
+  background: linear-gradient(270deg, #39bdc4 -17.47%, #47da96 98.16%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-style: normal;
+  font-weight: 800;
+  line-height: normal;
+  letter-spacing: 12.8px;
 }
 
 /*//////////////////////////////////////////////////////////////////
@@ -202,10 +190,10 @@ iframe {
   align-items: center;
   padding: 15px;
   background: #9053c7;
-  background: -webkit-linear-gradient(90deg, #39bdc4 49.6%, #47da96 105.1%);
-  background: -o-linear-gradient(90deg, #39bdc4 49.6%, #47da96 105.1%);
-  background: -moz-linear-gradient(90deg, #39bdc4 49.6%, #47da96 105.1%);
-  background: linear-gradient(90deg, #39bdc4 49.6%, #47da96 105.1%);
+  background: -webkit-linear-gradient(270deg, #39bdc4 -17.47%, #47da96 98.16%);
+  background: -o-linear-gradient(270deg, #39bdc4 -17.47%, #47da96 98.16%);
+  background: -moz-linear-gradient(270deg, #39bdc4 -17.47%, #47da96 98.16%);
+  background: linear-gradient(270deg, #39bdc4 -17.47%, #47da96 98.16%);
 }
 
 .wrap-login100 {
@@ -241,7 +229,7 @@ iframe {
 }
 
 .login100-form-title {
-  font-family: Poppins-Bold;
+  font-family: Lato;
   font-size: 40px;
   color: #333333;
   line-height: 1.2;
@@ -261,16 +249,15 @@ iframe {
 }
 
 .input100 {
-  font-family: Poppins-Medium;
+  font-family: Lato;
   font-size: 15px;
   line-height: 1.5;
   color: #666666;
-
   display: block;
   width: 100%;
   background: #e6e6e6;
   height: 50px;
-  border-radius: 25px;
+  border-radius: 15px;
   padding: 0 30px 0 68px;
 }
 
@@ -279,7 +266,7 @@ iframe {
 .focus-input100 {
   display: block;
   position: absolute;
-  border-radius: 25px;
+  border-radius: 15px;
   bottom: 0;
   left: 0;
   z-index: -1;
@@ -318,7 +305,7 @@ iframe {
   display: flex;
   align-items: center;
   position: absolute;
-  border-radius: 25px;
+  border-radius: 15px;
   bottom: 0;
   left: 0;
   width: 100%;
@@ -343,7 +330,7 @@ iframe {
   display: flex;
   align-items: center;
   position: absolute;
-  border-radius: 25px;
+  border-radius: 15px;
   bottom: 0;
   left: 0;
   width: 100%;
@@ -378,7 +365,7 @@ iframe {
 }
 
 .login100-form-btn {
-  font-family: Montserrat-Bold;
+  font-family: Lato;
   font-size: 15px;
   line-height: 1.5;
   color: #fff;
@@ -386,8 +373,11 @@ iframe {
 
   width: 100%;
   height: 50px;
-  border-radius: 25px;
-  background: #57b846;
+  border-radius: 15px;
+  background: -webkit-linear-gradient(270deg, #39bdc4 -17.47%, #47da96 98.16%);
+  background: -o-linear-gradient(270deg, #39bdc4 -17.47%, #47da96 98.16%);
+  background: -moz-linear-gradient(270deg, #39bdc4 -17.47%, #47da96 98.16%);
+  background: linear-gradient(270deg, #39bdc4 -17.47%, #47da96 98.16%);
   display: -webkit-box;
   display: -webkit-flex;
   display: -moz-box;
@@ -468,7 +458,7 @@ iframe {
   right: 8px;
   pointer-events: none;
 
-  font-family: Poppins-Medium;
+  font-family: Lato;
   color: #c80000;
   font-size: 13px;
   line-height: 1.4;

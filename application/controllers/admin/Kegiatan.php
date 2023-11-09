@@ -21,7 +21,6 @@ class Kegiatan extends CI_Controller
       $this->is_admin = $this->ion_auth->is_admin();
       $this->user = $this->ion_auth->user()->row();
     }
-    $this->load->helper('app');
   }
 
   function cekLogin()

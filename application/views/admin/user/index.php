@@ -308,14 +308,14 @@ $this->load->view('dist/_partials/header');
       $("#modal-form form#form-data input").val(null);
       $("#modal-form form#form-data textarea").val(null);
       $("#modal-form form#form-data select").val(null).trigger("change");
-      $("form#form-data input").removeClass("is-invalid");
-      $("form#form-data textarea").removeClass("is-invalid");
-      $("form#form-data select").removeClass("is-invalid");
-      $("#modal-form form#form-data #showHide").class("fa fa-eye");
+      $("#modal-form form#form-data input").removeClass("is-invalid");
+      $("#modal-form form#form-data textarea").removeClass("is-invalid");
+      $("#modal-form form#form-data select").removeClass("is-invalid");
+      // $("#modal-form form#form-data #showHide").addClass("fa fa-eye");
     })
 
   function simpan() {
-    var datas = new FormData($("form#form-data")[0]);
+    var datas = new FormData($("#modal-form form#form-data")[0]);
     $.ajax({
       type: "POST",
       url: base_url() + "admin/user/addOrEdit",
@@ -325,8 +325,8 @@ $this->load->view('dist/_partials/header');
       contentType: false,
       processData: false,
       beforeSend: function() {
-        $('form#form-data .invalid-feedback').remove();
-        $('form#form-data .form-control').removeClass('is-invalid');
+        $('#modal-form form#form-data .invalid-feedback').remove();
+        $('#modal-form form#form-data .form-control').removeClass('is-invalid');
       },
       success: function(res) {
         if (res.ok == 200) {
@@ -346,12 +346,12 @@ $this->load->view('dist/_partials/header');
             var val = Object.values(res.form);
             frm.forEach(function(el, ind) {
               if (val[ind] != '') {
-                $('form#form-data #' + el).removeClass('is-invalid').addClass("is-invalid");
+                $('#modal-form form#form-data #' + el).removeClass('is-invalid').addClass("is-invalid");
                 var app = '<div id="' + el + '-error" class="invalid-feedback" for="' + el + '">' + val[ind] + '</div>';
                 if (el == 'usr_password' || el == 'usr_password2') {
-                  $('form#form-data #' + el).closest('.input-group').append(app);
+                  $('#modal-form form#form-data #' + el).closest('.input-group').append(app);
                 } else {
-                  $('form#form-data #' + el).closest('.form-group').append(app);
+                  $('#modal-form form#form-data #' + el).closest('.form-group').append(app);
                 }
               }
             });
@@ -402,42 +402,43 @@ $this->load->view('dist/_partials/header');
     });
   }
 </script>
+
 <script>
-  const password = document.getElementById('usr_password'); // id dari input password
-  const password2 = document.getElementById('usr_password2'); // id dari input password2
-  const showHide = document.getElementById('showHide'); // id span showHide dalam input group password
-  const showHide2 = document.getElementById('showHide2'); // id span showHide2 dalam input group password
+  const password = $('#modal-form form#form-data #usr_password'); // id dari input password
+  const password2 = $('#modal-form form#form-data #usr_password2'); // id dari input password2
+  const showHide = $('#modal-form form#form-data #showHide'); // id span showHide dalam input group password
+  const showHide2 = $('#modal-form form#form-data #showHide2'); // id span showHide2 dalam input group password
 
-  password.type = 'password'; // set type input password menjadi password
-  password2.type = 'password'; // set type input password menjadi password2
-  showHide.innerHTML = '<i class="fa fa-eye"></i>'; // masukan icon eye dalam icon bootstrap 5
-  showHide.style.cursor = 'pointer'; // ubah cursor menjadi pointer
-  showHide2.innerHTML = '<i class="fa fa-eye"></i>'; // masukan icon eye dalam icon bootstrap 5
-  showHide2.style.cursor = 'pointer'; // ubah cursor menjadi pointer
+  password.attr('type', 'password'); // set type input password menjadi password
+  password2.attr('type', 'password'); // set type input password menjadi password2
+  showHide.html('<i class="fa fa-eye"></i>'); // masukkan icon eye dalam icon bootstrap 5
+  showHide.css('cursor', 'pointer'); // ubah cursor menjadi pointer
+  showHide2.html('<i class="fa fa-eye"></i>'); // masukkan icon eye dalam icon bootstrap 5
+  showHide2.css('cursor', 'pointer'); // ubah cursor menjadi pointer
 
-  showHide.addEventListener('click', () => {
+  showHide.on('click', function() {
     // ketika span diclick
-    if (password.type === 'password') {
+    if (password.attr('type') === 'password') {
       // jika type inputnya password
-      password.type = 'text'; // ubah type menjadi text
-      showHide.innerHTML = '<i class="fa fa-eye-slash"></i>'; // ubah icon menjadi eye slash
+      password.attr('type', 'text'); // ubah type menjadi text
+      showHide.html('<i class="fa fa-eye-slash"></i>'); // ubah icon menjadi eye slash
     } else {
       // jika type bukan password (text)
-      showHide.innerHTML = '<i class="fa fa-eye"></i>'; // ubah icon menjadi eye
-      password.type = 'password'; // ubah type menjadi password
+      showHide.html('<i class="fa fa-eye"></i>'); // ubah icon menjadi eye
+      password.attr('type', 'password'); // ubah type menjadi password
     }
   });
 
-  showHide2.addEventListener('click', () => {
+  showHide2.on('click', function() {
     // ketika span diclick
-    if (password2.type === 'password') {
+    if (password2.attr('type') === 'password') {
       // jika type inputnya password2
-      password2.type = 'text'; // ubah type menjadi text
-      showHide2.innerHTML = '<i class="fa fa-eye-slash"></i>'; // ubah icon menjadi eye slash
+      password2.attr('type', 'text'); // ubah type menjadi text
+      showHide2.html('<i class="fa fa-eye-slash"></i>'); // ubah icon menjadi eye slash
     } else {
       // jika type bukan password (text)
-      showHide2.innerHTML = '<i class="fa fa-eye"></i>'; // ubah icon menjadi eye
-      password2.type = 'password'; // ubah type menjadi password
+      showHide2.html('<i class="fa fa-eye"></i>'); // ubah icon menjadi eye
+      password2.attr('type', 'password'); // ubah type menjadi password
     }
   });
 </script>

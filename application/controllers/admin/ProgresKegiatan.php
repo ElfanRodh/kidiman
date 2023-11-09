@@ -8,7 +8,12 @@ class ProgresKegiatan extends CI_Controller
   public function __construct()
   {
     parent::__construct();
-    $this->load->helper('app');
+    if (!$this->ion_auth->logged_in()) {
+      redirect('auth/login');
+    } else {
+      $this->is_admin = $this->ion_auth->is_admin();
+      $this->user = $this->ion_auth->user()->row();
+    }
   }
 
 

@@ -10,6 +10,19 @@ class Fungsi extends CI_Controller
   var $column_search_fungsi   = array('jabatan.jbt_nama', 'fungsi.fun_nama');
   var $order = array('jbt_id' => 'asc', 'jbt_nama' => 'asc');
 
+
+  public function __construct()
+  {
+    parent::__construct();
+    if (!$this->ion_auth->logged_in()) {
+      redirect('auth/login');
+    } else {
+      $this->is_admin = $this->ion_auth->is_admin();
+      $this->user = $this->ion_auth->user()->row();
+    }
+  }
+
+
   public function index()
   {
     $data = array(

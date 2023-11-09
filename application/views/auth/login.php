@@ -11,9 +11,9 @@ $this->load->view('dist/_partials/header');
 			</div>
 
 			<form class="login100-form validate-form" method="POST" action="<?= site_url("auth/login"); ?>">
-				<span class="login100-form-title">
+				<h1 class="text-app text-center mb-4">
 					KIDIMAN
-				</span>
+				</h1>
 				<div id="infoMessage"><?php echo $message; ?></div>
 
 				<div class="wrap-input100 validate-input" data-validate="Username is required">
@@ -34,7 +34,7 @@ $this->load->view('dist/_partials/header');
 				</div>
 
 				<div class="container-login100-form-btn">
-					<button class="login100-form-btn" type="submit">
+					<button class="login100-form-btn font-weight-bold" type="submit">
 						Login
 					</button>
 				</div>
@@ -45,11 +45,13 @@ $this->load->view('dist/_partials/header');
 </div>
 
 <?php $this->load->view('dist/_partials/js'); ?>
-<script src="<?php echo base_url(); ?>assets/login/vendor/tilt/tilt.jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tilt.js/1.2.1/tilt.jquery.min.js"></script>
 <script>
-	$('.js-tilt').tilt({
-		scale: 1.1
-	})
+	$(document).ready(function() {
+		$('.js-tilt').tilt({
+			scale: 1.1
+		})
+	});
 </script>
 <!--===============================================================================================-->
 <script src="<?php echo base_url(); ?>assets/login/js/main.js"></script>

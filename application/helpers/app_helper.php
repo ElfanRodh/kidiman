@@ -82,3 +82,15 @@ if (!function_exists("getUser")) {
     return $return;
   }
 }
+
+if (!function_exists("hitungSelisihWaktu")) {
+  function hitungSelisihWaktu($datetime1, $datetime2, $format = '%h jam, %i menit, %s detik')
+  {
+    $datetime1 = new DateTime($datetime1);
+    $datetime2 = new DateTime($datetime2);
+
+    $interval = $datetime1->diff($datetime2);
+
+    return $interval->format($format);
+  }
+}

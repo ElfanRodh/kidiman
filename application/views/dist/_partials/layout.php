@@ -1,8 +1,118 @@
 <?php
 defined('BASEPATH') or exit('No direct script access allowed');
+
+$user   = $_SESSION['usr'];
+$waktu  = date('Y-m-d H:i:s');
+$selisihWaktu = hitungSelisihWaktu($user['last_login'], $waktu);
+
 ?>
 
+<style>
+  #modal-profil .input-group-text:hover {
+    cursor: pointer;
+  }
+</style>
+
+<script>
+  function editProfil(id) {
+    $("#modal-profil").modal({
+      backdrop: false
+    });
+    var user = JSON.parse('<?= json_encode($user) ?>');
+    console.log(user);
+    $("#modal-profil form#form-profil #usr_nama_profil").val(user.first_name)
+    $("#modal-profil form#form-profil #usr_username_profil").val(user.username)
+  }
+</script>
+
+<script>
+  function showHide(elem) {
+    const password = $('#modal-profil form#form-profil #' + elem);
+    const showHide = $('#modal-form form#form-data #showHide-' + elem); // id dari input password
+    if (password.attr('type') === 'password') {
+      // jika type inputnya password
+      password.attr('type', 'text'); // ubah type menjadi text
+      showHide.html('<i class="fa fa-eye-slash"></i>'); // ubah icon menjadi eye slash
+    } else {
+      // jika type bukan password (text)
+      showHide.html('<i class="fa fa-eye"></i>'); // ubah icon menjadi eye
+      password.attr('type', 'password'); // ubah type menjadi password
+    }
+  }
+</script>
+
 <body>
+
+  <div class="modal fade text-left" id="modal-profil" tabindex="-1" role="dialog" aria-labelledby="modal-profil-data" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title"></h4>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body pb-0">
+          <form id="form-profil" class="form form-horizontal">
+            <div class="form-body">
+              <div class="row">
+                <div class="col-12 col-md-12">
+                  <div class="form-group">
+                    <label for="usr_nama_profil">Nama</label>
+                    <input type="text" class="form-control" name="usr_nama_profil" id="usr_nama_profil" placeholder="Nama User" />
+                  </div>
+                </div>
+                <div class="col-12 col-md-12">
+                  <div class="form-group">
+                    <label for="usr_username_profil">Username</label>
+                    <input type="text" class="form-control" name="usr_username_profil" id="usr_username_profil" placeholder="Username" />
+                  </div>
+                </div>
+                <div class="col-12 col-md-12">
+                  <div class="form-group">
+                    <label for="usr_password_lama">Password Lama</label>
+                    <div class="input-group">
+                      <input type="password" class="form-control" name="usr_password_lama" id="usr_password_lama" placeholder="Masukkan Password Lama" />
+                      <span class="input-group-text" id="showHide-usr_password_lama" onclick="showHide('usr_password_lama')">
+                        <i class="fa fa-eye"></i>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 col-md-12">
+                  <div class="form-group">
+                    <label for="usr_password_baru">Password Baru</label>
+                    <div class="input-group">
+                      <input type="password" class="form-control" name="usr_password_baru" id="usr_password_baru" placeholder="Masukkan Password Baru" />
+                      <span class="input-group-text" id="showHide-usr_password_baru" onclick="showHide('usr_password_baru')">
+                        <i class="fa fa-eye"></i>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12 col-md-12">
+                  <div class="form-group">
+                    <label for="usr_password_baru2">Ulangi Password Baru</label>
+                    <div class="input-group">
+                      <input type="password" class="form-control" name="usr_password_baru2" id="usr_password_baru2" placeholder="Ulangi Password Baru" />
+                      <span class="input-group-text" id="showHide-usr_password_baru2" onclick="showHide('usr_password_baru2')">
+                        <i class="fa fa-eye"></i>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" data-dismiss="modal" aria-label="Close" class="btn btn-outline-danger">Close</button>
+          <button type="button" class="btn btn-primary" id="save-form">Simpan</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="app">
     <div class="main-wrapper main-wrapper-1">
       <div class="navbar-bg"></div>
@@ -15,18 +125,12 @@ defined('BASEPATH') or exit('No direct script access allowed');
         <ul class="navbar-nav navbar-right">
           <li class="dropdown"><a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
               <img alt="image" src="<?= base_url(); ?>assets/img/avatar/avatar-1.png" class="rounded-circle mr-1">
-              <div class="d-sm-none d-lg-inline-block">Hi, <?= $_SESSION['usr']['prt_nama'] ?></div>
+              <div class="d-sm-none d-lg-inline-block">Halo, <?= $_SESSION['usr']['first_name'] . ' (' . $_SESSION['usr']['prt_nama'] . ')' ?></div>
             </a>
             <div class="dropdown-menu dropdown-menu-right">
-              <div class="dropdown-title">Logged in 5 min ago</div>
-              <a href="<?= base_url(); ?>dist/features_profile" class="dropdown-item has-icon">
-                <i class="far fa-user"></i> Profile
-              </a>
-              <a href="<?= base_url(); ?>dist/features_activities" class="dropdown-item has-icon">
-                <i class="fas fa-bolt"></i> Activities
-              </a>
-              <a href="<?= base_url(); ?>dist/features_settings" class="dropdown-item has-icon">
-                <i class="fas fa-cog"></i> Settings
+              <div class="dropdown-title">Log In <br> <?= $selisihWaktu ?> <br> yang lalu</div>
+              <a href="javascript:void(0)" class="dropdown-item has-icon" onclick="editProfil('<?= $user['id'] ?>')">
+                <i class="far fa-user"></i> Edit Profil
               </a>
               <div class="dropdown-divider"></div>
               <a href="<?= site_url('auth/logout'); ?>" class="dropdown-item has-icon text-danger">

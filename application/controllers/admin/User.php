@@ -7,6 +7,19 @@ class User extends CI_Controller
     var $column_search   = array('username', 'jabatan.jbt_nama', 'first_name');
     var $order = array('users.id' => 'asc', 'username' => 'asc', 'first_name' => 'asc', 'jabatan.jbt_nama' => 'asc', 'groups.name' => 'asc');
 
+
+    public function __construct()
+    {
+        parent::__construct();
+        if (!$this->ion_auth->logged_in()) {
+            redirect('auth/login');
+        } else {
+            $this->is_admin = $this->ion_auth->is_admin();
+            $this->user = $this->ion_auth->user()->row();
+        }
+    }
+
+
     public function index()
     {
         $data = array(
@@ -292,15 +305,37 @@ class User extends CI_Controller
             ],
         ];
 
-        if (!$this->input->post('id')) {
+        if ($this->input->post('id')) {
+            if ($this->input->post('usr_password')) {
+                $config[] = [
+                    'field' => 'usr_password',
+                    'label' => 'Password',
+                    'rules' => 'required|min_length[8]|regex_match[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&*!])[A-Za-z\d@#$%^&*!]{8,}$/]',
+                    'errors' => [
+                        'required' => '{field} harus diisi',
+                        'min_length' => '{field} harus minimal 8 karakter',
+                        'regex_match' => '{field} harus berisi angka, huruf kapital, huruf kecil dan karakter khusus',
+                    ],
+                ];
+                $config[] = [
+                    'field' => 'usr_password2',
+                    'label' => 'Kofirmasi Password',
+                    'rules' => 'required|matches[usr_password]',
+                    'errors' => [
+                        'required' => '{field} harus diisi',
+                        'matches' => '{field} tidak sesuai dengan password awal',
+                    ],
+                ];
+            }
+        } else {
             $config[] = [
                 'field' => 'usr_password',
                 'label' => 'Password',
-                'rules' => 'required|min_length[8]|callback_is_password_strong',
+                'rules' => 'required|min_length[8]|regex_match[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&*!])[A-Za-z\d@#$%^&*!]{8,}$/]',
                 'errors' => [
                     'required' => '{field} harus diisi',
                     'min_length' => '{field} harus minimal 8 karakter',
-                    'is_password_strong' => '{field} harus berisi angka, huruf kapital, huruf kecil dan karakter khusus',
+                    'regex_match' => '{field} harus berisi angka, huruf kapital, huruf kecil dan karakter khusus',
                 ],
             ];
             $config[] = [
@@ -320,6 +355,8 @@ class User extends CI_Controller
 
     public function is_password_strong($usr_password)
     {
+        // $this->form_validation->set_rules('password', 'Password', 'required|', array('regex_match' => 'Password harus mengandung setidaknya satu huruf kecil, satu huruf kapital, satu angka, dan satu karakter khusus.'));
+
         if ($usr_password) {
             if (preg_match('#[0-9]#', $usr_password) && preg_match('#[a-zA-Z]#', $usr_password)) {
                 return TRUE;
