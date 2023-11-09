@@ -7,7 +7,7 @@ class Dist extends CI_Controller
 	public function index()
 	{
 		$data = array(
-			'title' => "Ecommerce Dashboard"
+			'title' => "Dashboard"
 		);
 		$this->load->view('dist/index', $data);
 	}
