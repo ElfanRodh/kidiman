@@ -8,8 +8,8 @@ if ($is_admin) {
       'header' => 'Dashboard',
       'menus' => [
         [
-          'active'  => '',
-          'link'    => '/',
+          'active'  => 'home',
+          'link'    => 'admin/home',
           'text'    => '<i class="fa fa-fire"></i> <span>Dashboard</span>',
         ],
       ]
@@ -56,8 +56,8 @@ if ($is_admin) {
       'header' => 'Dashboard',
       'menus' => [
         [
-          'active'  => '',
-          'link'    => '/',
+          'active'  => 'home',
+          'link'    => 'admin/home',
           'text'    => '<i class="fa fa-fire"></i> <span>Dashboard</span>',
         ],
       ]

@@ -5,10 +5,23 @@ defined('BASEPATH') or exit('No direct script access allowed');
 class Home extends CI_Controller
 {
 
+  public function __construct()
+  {
+    parent::__construct();
+    if (!$this->ion_auth->logged_in()) {
+      redirect('auth/login');
+    } else {
+      $this->is_admin = $this->ion_auth->is_admin();
+      $this->user = $this->ion_auth->user()->row();
+    }
+  }
+
   public function index()
   {
-    // $data['kegTotal'] = $this->kegTotal();
-    // $data['kegProses'] = $this->kegProses();
+    $data = array(
+      'title' => "Dashboard"
+    );
+    $this->load->view('admin/home/index', $data);
   }
 
   function getJabatan()
@@ -22,11 +35,42 @@ class Home extends CI_Controller
     echo json_encode($data->result());
   }
 
-  function kegTotal()
+  function getKegiatan($jn = '')
   {
+    if ($this->is_admin) {
+      $wr = [];
+    } else {
+      $user = $_SESSION['usr'];
+      $wr['keg_jabatan'] = $user['jabatan_id'];
+    }
+
+    if ($jn) {
+      if ($jn == 'proses') {
+        $wr['keg_is_selesai'] = 0;
+      } else if ($jn == 'selesai') {
+        $wr['keg_is_selesai'] = 1;
+      }
+    }
+
     $this->db->select('COUNT(*) as total');
     $this->db->where('keg_status = 1');
-    $query = $this->db->get('kegiatan')->row();
+    $query = $this->db->get_where('kegiatan', $wr)->row();
+    $data = $query->total;
+
+    echo json_encode($data);
+  }
+
+  function kegTotal()
+  {
+    if ($this->is_admin) {
+      $wr = [];
+    } else {
+      $user = $_SESSION['usr'];
+      $wr['keg_jabatan'] = $user['jabatan_id'];
+    }
+    $this->db->select('COUNT(*) as total');
+    $this->db->where('keg_status = 1');
+    $query = $this->db->get_where('kegiatan', $wr)->row();
     $data = $query->total;
 
     echo json_encode($data);
