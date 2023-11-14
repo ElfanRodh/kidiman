@@ -573,7 +573,13 @@ class Kegiatan extends CI_Controller
                         </button>
                       </div>';
         } else {
-          $add_btn = '';
+          if ($tgl_sekarang > $v->keg_tanggal_selesai && (int) number_format($v->keg_progres, 0) != 100) {
+            $add_btn = '<span class="mt-2 badge badge-danger">melebihi batas tanggal</span>';
+          } else if ((int) number_format($v->keg_progres, 0) == 100) {
+            $add_btn = '<span class="mt-2 badge badge-primary">kegiatan selesai</span>';
+          } else {
+            $add_btn = '';
+          }
         }
         $list .= '
               <td class="text-center" style="width: 25%;">

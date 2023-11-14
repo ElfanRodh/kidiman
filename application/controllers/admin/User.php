@@ -176,7 +176,9 @@ class User extends CI_Controller
                     $this->db->trans_begin(); // Memulai transaksi
 
                     $data_user['first_name'] = $this->input->post('usr_nama');
-                    $data_user['password'] = password_hash($this->input->post('usr_password'), PASSWORD_BCRYPT);
+                    if ($this->input->post('usr_password_baru')) {
+                        $data_user['password'] = password_hash($this->input->post('usr_password'), PASSWORD_BCRYPT);
+                    }
 
                     $this->db->update('users', $data_user, $wr);
                     if ($ex_group->num_rows() > 0) {
@@ -249,6 +251,76 @@ class User extends CI_Controller
         echo json_encode($ret);
     }
 
+    public function editProfil()
+    {
+        $cek = $this->validateDataProfil();
+        if ($cek) {
+            if ($this->input->post('usr_id_profil')) {
+                $wr['users.id'] = $this->input->post('usr_id_profil');
+
+                $data_user = [
+                    'username' => $this->input->post('usr_username_profil'),
+                    // 'first_name'      => $this->input->post('usr_nama_profil'),
+                    // 'jabatan_id'  => strtolower($this->input->post('usr_jabatan')),
+                    // 'password'  => password_hash($this->input->post('usr_password'), PASSWORD_BCRYPT)
+                ];
+
+                $data_group = [
+                    'user_id' => $this->input->post('usr_id_profil'),
+                    'group_id' => $this->input->post('usr_level_profil'),
+                ];
+
+                $ex_user = $this->db
+                    ->where(['users.id !=' => $this->input->post('usr_id_profil')])
+                    ->join('users_groups', 'users_groups.user_id = users.id', 'left')
+                    ->get_where('users', $data_user);
+
+                $ex_group = $this->db
+                    ->get_where('users_groups', ['user_id' => $this->input->post('usr_id_profil')]);
+
+                if ($ex_user->num_rows() > 0) {
+                    $ret['ok'] = 500;
+                    $ret['form'] = 'Data Sudah Ada Sebelumnya';
+                } else {
+
+                    $this->db->trans_begin(); // Memulai transaksi
+
+                    $data_user['first_name'] = $this->input->post('usr_nama_profil');
+                    if ($this->input->post('usr_password_baru')) {
+                        $data_user['password'] = password_hash($this->input->post('usr_password_baru'), PASSWORD_BCRYPT);
+                    }
+
+                    $this->db->update('users', $data_user, $wr);
+                    if ($ex_group->num_rows() > 0) {
+                        $this->db->delete('users_groups', ['id' => $ex_group->row()->id]);
+                    }
+                    $this->db->insert('users_groups', $data_group);
+
+                    // Cek jika transaksi berhasil atau gagal
+                    if ($this->db->trans_status() === FALSE) {
+                        $this->db->trans_rollback(); // Transaksi gagal, rollback
+                        $ret['ok'] = 500;
+                        $ret['form'] = 'Gagal Update Data';
+                    } else {
+                        $this->db->trans_commit(); // Transaksi berhasil, commit
+                        $ret['ok'] = 200;
+                        $ret['form'] = 'Sukses Update Data';
+                    }
+                }
+            } else {
+                $ret['ok'] = 500;
+                $ret['form'] = 'Gagal Edit Data';
+            }
+        } else {
+            $ret['form']['usr_nama_profil']      = form_error('usr_nama_profil');
+            $ret['form']['usr_username_profil']  = form_error('usr_username_profil');
+            $ret['form']['usr_password_baru']    = form_error('usr_password_baru');
+            $ret['form']['usr_password_baru2']   = form_error('usr_password_baru2');
+            $ret['ok']                           = 400;
+        }
+        echo json_encode($ret);
+    }
+
     public function delete()
     {
         if ($this->input->post('id')) {
@@ -310,7 +382,7 @@ class User extends CI_Controller
                 $config[] = [
                     'field' => 'usr_password',
                     'label' => 'Password',
-                    'rules' => 'required|min_length[8]|regex_match[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&*!])[A-Za-z\d@#$%^&*!]{8,}$/]',
+                    'rules' => 'required|min_length[8]|regex_match[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\d\s])[^\s]{8,}$/]',
                     'errors' => [
                         'required' => '{field} harus diisi',
                         'min_length' => '{field} harus minimal 8 karakter',
@@ -331,7 +403,7 @@ class User extends CI_Controller
             $config[] = [
                 'field' => 'usr_password',
                 'label' => 'Password',
-                'rules' => 'required|min_length[8]|regex_match[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&*!])[A-Za-z\d@#$%^&*!]{8,}$/]',
+                'rules' => 'required|min_length[8]|regex_match[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\d\s])[^\s]{8,}$/]',
                 'errors' => [
                     'required' => '{field} harus diisi',
                     'min_length' => '{field} harus minimal 8 karakter',
@@ -347,6 +419,78 @@ class User extends CI_Controller
                     'matches' => '{field} tidak sesuai dengan password awal',
                 ],
             ];
+        }
+
+        $this->form_validation->set_rules($config);
+        return $this->form_validation->run();
+    }
+
+    private function validateDataProfil()
+    {
+        $this->load->library('form_validation');
+        $config = [
+            [
+                'field' => 'usr_username_profil',
+                'label' => 'Username',
+                'rules' => 'required',
+                'errors' => [
+                    'required' => '{field} harus diisi',
+                ],
+            ],
+            [
+                'field' => 'usr_nama_profil',
+                'label' => 'Nama User',
+                'rules' => 'required',
+                'errors' => [
+                    'required' => '{field} harus diisi',
+                ],
+            ],
+        ];
+
+        if ($this->input->post('usr_id_profil')) {
+            if ($this->input->post('usr_password_baru')) {
+                $config[] = [
+                    'field' => 'usr_password_baru',
+                    'label' => 'Password',
+                    'rules' => 'required|min_length[8]|regex_match[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\d\s])[^\s]{8,}$/]',
+                    'errors' => [
+                        'required' => '{field} harus diisi',
+                        'min_length' => '{field} harus minimal 8 karakter',
+                        'regex_match' => '{field} harus berisi angka, huruf kapital, huruf kecil dan karakter khusus',
+                    ],
+                ];
+                $config[] = [
+                    'field' => 'usr_password_baru2',
+                    'label' => 'Kofirmasi Password',
+                    'rules' => 'required|matches[usr_password_baru]',
+                    'errors' => [
+                        'required' => '{field} harus diisi',
+                        'matches' => '{field} tidak sesuai dengan password awal',
+                    ],
+                ];
+            }
+        } else {
+            if ($this->input->post('usr_password_baru')) {
+                $config[] = [
+                    'field' => 'usr_password_baru',
+                    'label' => 'Password',
+                    'rules' => 'required|min_length[8]|regex_match[/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\w\d\s])[^\s]{8,}$/]',
+                    'errors' => [
+                        'required' => '{field} harus diisi',
+                        'min_length' => '{field} harus minimal 8 karakter',
+                        'regex_match' => '{field} harus berisi angka, huruf kapital, huruf kecil dan karakter khusus',
+                    ],
+                ];
+                $config[] = [
+                    'field' => 'usr_password_baru2',
+                    'label' => 'Kofirmasi Password',
+                    'rules' => 'required|matches[usr_password]',
+                    'errors' => [
+                        'required' => '{field} harus diisi',
+                        'matches' => '{field} tidak sesuai dengan password awal',
+                    ],
+                ];
+            }
         }
 
         $this->form_validation->set_rules($config);
