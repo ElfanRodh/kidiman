@@ -14,21 +14,26 @@ $selisihWaktu = hitungSelisihWaktu($user['last_login'], $waktu);
 </style>
 
 <script>
+  $(document).off("click", "#modal-profil button#save-form")
+    .on("click", "#modal-profil button#save-form", function(e) {
+      simpanProfil()
+    });
+
   function editProfil(id) {
     $("#modal-profil").modal({
       backdrop: false
     });
     var user = JSON.parse('<?= json_encode($user) ?>');
     console.log(user);
+    $("#modal-profil form#form-profil #usr_id_profil").val(user.users_id)
+    $("#modal-profil form#form-profil #usr_level_profil").val(user.groups_id)
     $("#modal-profil form#form-profil #usr_nama_profil").val(user.first_name)
     $("#modal-profil form#form-profil #usr_username_profil").val(user.username)
   }
-</script>
 
-<script>
   function showHide(elem) {
     const password = $('#modal-profil form#form-profil #' + elem);
-    const showHide = $('#modal-form form#form-data #showHide-' + elem); // id dari input password
+    const showHide = $('#modal-profil form#form-profil #showHide-' + elem); // id dari input password
     if (password.attr('type') === 'password') {
       // jika type inputnya password
       password.attr('type', 'text'); // ubah type menjadi text
@@ -38,6 +43,71 @@ $selisihWaktu = hitungSelisihWaktu($user['last_login'], $waktu);
       showHide.html('<i class="fa fa-eye"></i>'); // ubah icon menjadi eye
       password.attr('type', 'password'); // ubah type menjadi password
     }
+  }
+
+  function simpanProfil() {
+    var datas = new FormData($("#modal-profil form#form-profil")[0]);
+    $.ajax({
+      type: "POST",
+      url: base_url() + "admin/user/editProfil",
+      data: datas,
+      dataType: "json",
+      cache: false,
+      contentType: false,
+      processData: false,
+      beforeSend: function() {
+        $('#modal-profil form#form-profil .invalid-feedback').remove();
+        $('#modal-profil form#form-profil .form-control').removeClass('is-invalid');
+      },
+      success: function(res) {
+        if (res.ok == 200) {
+          swal({
+            title: "Sukses",
+            text: res.form,
+            icon: "success",
+            confirmButtonClass: "btn btn-main",
+            buttonsStyling: false,
+          }).then(function(_res_) {
+            $("#modal-profil").modal("hide");
+            setTimeout(() => {
+              swal({
+                title: "Anda Harus Login Lagi",
+                text: 'Anda harus login kembali setelah mengganti profil',
+                icon: "info",
+                confirmButtonClass: "btn btn-main",
+                buttonsStyling: false,
+              }).then(function(_res_) {
+                window.location.href = '/auth/logout';
+              });
+            }, 200);
+          });
+        } else {
+          if (res.ok == 400) {
+            var frm = Object.keys(res.form);
+            var val = Object.values(res.form);
+            frm.forEach(function(el, ind) {
+              if (val[ind] != '') {
+                $('#modal-profil form#form-profil #' + el).removeClass('is-invalid').addClass("is-invalid");
+                var app = '<div id="' + el + '-error" class="invalid-feedback" for="' + el + '">' + val[ind] + '</div>';
+                if (el == 'usr_password_lama' || el == 'usr_password_baru' || el == 'usr_password_baru2') {
+                  $('#modal-profil form#form-profil #' + el).closest('.input-group').append(app);
+                } else {
+                  $('#modal-profil form#form-profil #' + el).closest('.form-group').append(app);
+                }
+              }
+            });
+          } else {
+            swal({
+              title: "Error",
+              text: res.form,
+              icon: "error",
+              confirmButtonClass: "btn btn-danger",
+              buttonsStyling: false,
+            });
+          }
+        }
+      }
+    });
   }
 </script>
 
@@ -59,6 +129,8 @@ $selisihWaktu = hitungSelisihWaktu($user['last_login'], $waktu);
                 <div class="col-12 col-md-12">
                   <div class="form-group">
                     <label for="usr_nama_profil">Nama</label>
+                    <input type="hidden" id="usr_id_profil" name="usr_id_profil">
+                    <input type="hidden" id="usr_level_profil" name="usr_level_profil">
                     <input type="text" class="form-control" name="usr_nama_profil" id="usr_nama_profil" placeholder="Nama User" />
                   </div>
                 </div>
@@ -68,7 +140,7 @@ $selisihWaktu = hitungSelisihWaktu($user['last_login'], $waktu);
                     <input type="text" class="form-control" name="usr_username_profil" id="usr_username_profil" placeholder="Username" />
                   </div>
                 </div>
-                <div class="col-12 col-md-12">
+                <!-- <div class="col-12 col-md-12">
                   <div class="form-group">
                     <label for="usr_password_lama">Password Lama</label>
                     <div class="input-group">
@@ -78,10 +150,11 @@ $selisihWaktu = hitungSelisihWaktu($user['last_login'], $waktu);
                       </span>
                     </div>
                   </div>
-                </div>
+                </div> -->
                 <div class="col-12 col-md-12">
                   <div class="form-group">
                     <label for="usr_password_baru">Password Baru</label>
+                    <p class="text-sm p-0 m-0"><small>(Kosongi jika tidak ingin dirubah)</small></p>
                     <div class="input-group">
                       <input type="password" class="form-control" name="usr_password_baru" id="usr_password_baru" placeholder="Masukkan Password Baru" />
                       <span class="input-group-text" id="showHide-usr_password_baru" onclick="showHide('usr_password_baru')">
