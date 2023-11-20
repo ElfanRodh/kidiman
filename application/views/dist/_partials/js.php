@@ -9,6 +9,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 <script src="<?= base_url("assets/modules/nicescroll/jquery.nicescroll.min.js"); ?>"></script>
 <script src="<?= base_url("assets/modules/moment.min.js"); ?>"></script>
 <script src="<?= base_url("assets/js/stisla.js"); ?>"></script>
+<script src="<?= base_url("assets/modules/chart.min.js"); ?>"></script>
 
 <script src="<?= base_url("assets/modules/sweetalert/sweetalert.min.js"); ?>"></script>
 <script src="<?= base_url("assets/js/page/modules-sweetalert.js"); ?>"></script>

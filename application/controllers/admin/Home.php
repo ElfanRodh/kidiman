@@ -18,9 +18,8 @@ class Home extends CI_Controller
 
   public function index()
   {
-    $data = array(
-      'title' => "Dashboard"
-    );
+    $data['title'] = "Dashboard";
+    $data['chartKegiatan'] = $this->getChartKegiatan();
     $this->load->view('admin/home/index', $data);
   }
 
@@ -104,6 +103,61 @@ class Home extends CI_Controller
     $data = $query->total;
 
     echo json_encode($data);
+  }
+
+  function getChartKegiatan()
+  {
+    // List Bulan
+    $bulanArr = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+    // Data Kegiatan Selesai
+    $this->db->select("DATE_FORMAT(STR_TO_DATE(keg_tanggal_mulai, '%Y-%m-%d'), '%Y-%m') AS bulan_tahun, DATE_FORMAT(STR_TO_DATE(keg_tanggal_mulai, '%Y-%m-%d'), '%m') AS bulan, COUNT(*) AS jumlah");
+    $this->db->where('keg_status', 1);
+    $this->db->where('keg_is_selesai', 1);
+    $this->db->group_by('bulan');
+    $query = $this->db->get('kegiatan');
+    $selesai = $query->result();
+
+    // Data Kegiatan Progress
+    $this->db->select("DATE_FORMAT(STR_TO_DATE(keg_tanggal_mulai, '%Y-%m-%d'), '%Y-%m') AS bulan_tahun, DATE_FORMAT(STR_TO_DATE(keg_tanggal_mulai, '%Y-%m-%d'), '%m') AS bulan, COUNT(*) AS jumlah");
+    $this->db->where('keg_status', 1);
+    $this->db->where('keg_is_selesai', 0);
+    $this->db->group_by('bulan');
+    $query1 = $this->db->get('kegiatan');
+    $progres = $query1->result();
+
+    $arrSelesai = [];
+    $arrProgres = [];
+
+    // Cek Ulang Jumlah Per Bulan
+    foreach ($bulanArr as $key => $val) {
+      // Definisi Label dan Jumlah Data Default
+      $arrSelesai[$key]['label']     = $val;
+      $arrSelesai[$key]['jumlah']    = 0;
+      // Cek Jika Ada Bulan yang ada Jumlah Data nya
+      foreach ($selesai as $k => $v) {
+        if ((int) ($key + 1) == (int) $v->bulan) {
+          $arrSelesai[$key]['jumlah'] = $v->jumlah;
+        }
+      }
+
+      $arrProgres[$key]['label']     = $val;
+      $arrProgres[$key]['jumlah']    = 0;
+      foreach ($progres as $k => $v) {
+        if ((int) ($key + 1) == (int) $v->bulan) {
+          $arrProgres[$key]['jumlah'] = $v->jumlah;
+        }
+      }
+    }
+
+    $data = [
+      'selesai' => $arrSelesai,
+      'progres' => $arrProgres,
+    ];
+
+    // header('Content-Type: application/json; charset=utf-8');
+    // echo json_encode($data);
+    return $data;
   }
 }
 

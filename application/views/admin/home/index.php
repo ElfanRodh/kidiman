@@ -71,137 +71,11 @@ $this->load->view('dist/_partials/header');
       <div class="col-lg-12">
         <div class="card">
           <div class="card-header">
-            <h4>Grafik</h4>
+            <h4>Data Kegiatan Tahun 2023</h4>
           </div>
           <div class="card-body">
-            <canvas id="myChart" height="158"></canvas>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-md-8">
-        <div class="card">
-          <div class="card-header">
-            <h4>Invoices</h4>
-            <div class="card-header-action">
-              <a href="#" class="btn btn-danger">View More <i class="fas fa-chevron-right"></i></a>
-            </div>
-          </div>
-          <div class="card-body p-0">
-            <div class="table-responsive table-invoice">
-              <table class="table table-striped">
-                <tr>
-                  <th>Invoice ID</th>
-                  <th>Customer</th>
-                  <th>Status</th>
-                  <th>Due Date</th>
-                  <th>Action</th>
-                </tr>
-                <tr>
-                  <td><a href="#">INV-87239</a></td>
-                  <td class="font-weight-600">Kusnadi</td>
-                  <td>
-                    <div class="badge badge-warning">Unpaid</div>
-                  </td>
-                  <td>July 19, 2018</td>
-                  <td>
-                    <a href="#" class="btn btn-primary">Detail</a>
-                  </td>
-                </tr>
-                <tr>
-                  <td><a href="#">INV-48574</a></td>
-                  <td class="font-weight-600">Hasan Basri</td>
-                  <td>
-                    <div class="badge badge-success">Paid</div>
-                  </td>
-                  <td>July 21, 2018</td>
-                  <td>
-                    <a href="#" class="btn btn-primary">Detail</a>
-                  </td>
-                </tr>
-                <tr>
-                  <td><a href="#">INV-76824</a></td>
-                  <td class="font-weight-600">Muhamad Nuruzzaki</td>
-                  <td>
-                    <div class="badge badge-warning">Unpaid</div>
-                  </td>
-                  <td>July 22, 2018</td>
-                  <td>
-                    <a href="#" class="btn btn-primary">Detail</a>
-                  </td>
-                </tr>
-                <tr>
-                  <td><a href="#">INV-84990</a></td>
-                  <td class="font-weight-600">Agung Ardiansyah</td>
-                  <td>
-                    <div class="badge badge-warning">Unpaid</div>
-                  </td>
-                  <td>July 22, 2018</td>
-                  <td>
-                    <a href="#" class="btn btn-primary">Detail</a>
-                  </td>
-                </tr>
-                <tr>
-                  <td><a href="#">INV-87320</a></td>
-                  <td class="font-weight-600">Ardian Rahardiansyah</td>
-                  <td>
-                    <div class="badge badge-success">Paid</div>
-                  </td>
-                  <td>July 28, 2018</td>
-                  <td>
-                    <a href="#" class="btn btn-primary">Detail</a>
-                  </td>
-                </tr>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card card-hero">
-          <div class="card-header">
-            <div class="card-icon">
-              <i class="far fa-question-circle"></i>
-            </div>
-            <h4>14</h4>
-            <div class="card-description">Customers need help</div>
-          </div>
-          <div class="card-body p-0">
-            <div class="tickets-list">
-              <a href="#" class="ticket-item">
-                <div class="ticket-title">
-                  <h4>My order hasn't arrived yet</h4>
-                </div>
-                <div class="ticket-info">
-                  <div>Laila Tazkiah</div>
-                  <div class="bullet"></div>
-                  <div class="text-primary">1 min ago</div>
-                </div>
-              </a>
-              <a href="#" class="ticket-item">
-                <div class="ticket-title">
-                  <h4>Please cancel my order</h4>
-                </div>
-                <div class="ticket-info">
-                  <div>Rizal Fakhri</div>
-                  <div class="bullet"></div>
-                  <div>2 hours ago</div>
-                </div>
-              </a>
-              <a href="#" class="ticket-item">
-                <div class="ticket-title">
-                  <h4>Do you see my mother?</h4>
-                </div>
-                <div class="ticket-info">
-                  <div>Syahdan Ubaidillah</div>
-                  <div class="bullet"></div>
-                  <div>6 hours ago</div>
-                </div>
-              </a>
-              <a href="<?= base_url(); ?>dist/features_tickets" class="ticket-item ticket-more">
-                View All <i class="fas fa-chevron-right"></i>
-              </a>
+            <div class="chart">
+              <canvas id="kegiatanChart" style="min-height: 250px; height: 320px; max-height: 400px; max-width: 100%;"></canvas>
             </div>
           </div>
         </div>
@@ -240,4 +114,73 @@ $this->load->view('dist/_partials/header');
       }
     });
   }
+
+  //-------------
+  //- KEGIATAN BAR CHART -
+  //-------------
+  var kegiatanChartCanvas = $('#kegiatanChart').get(0).getContext('2d')
+  var kegiatanChartData = {
+    // label untuk bulan
+    labels: [
+      <?php foreach ($chartKegiatan['selesai'] as $k => $v) : ?> "<?= $v['label'] ?>",
+      <?php endforeach; ?>
+    ],
+    datasets: [{
+        label: 'Kegiatan Progres',
+        backgroundColor: '#f39c12',
+        borderColor: 'rgba(210, 214, 222, 1)',
+        pointRadius: false,
+        pointColor: 'rgba(210, 214, 222, 1)',
+        pointStrokeColor: '#c1c7d1',
+        pointHighlightFill: '#fff',
+        pointHighlightStroke: 'rgba(220,220,220,1)',
+        // data: [65, 59, 80, 81, 56, 55, 40]
+        data: [
+          <?php foreach ($chartKegiatan['progres'] as $k => $v) : ?> '<?= $v['jumlah'] ?>',
+          <?php endforeach; ?>
+        ]
+      },
+      {
+        label: 'Kegiatan Selesai',
+        backgroundColor: '#00a65a',
+        borderColor: 'rgba(60,141,188,0.8)',
+        pointRadius: false,
+        pointColor: '#3b8bba',
+        pointStrokeColor: 'rgba(60,141,188,1)',
+        pointHighlightFill: '#fff',
+        pointHighlightStroke: 'rgba(60,141,188,1)',
+        // data: [28, 48, 40, 19, 86, 27, 90]
+        data: [
+          <?php foreach ($chartKegiatan['selesai'] as $k => $v) : ?> '<?= $v['jumlah'] ?>',
+          <?php endforeach; ?>
+        ]
+      }
+    ]
+  }
+
+  var kegiatanChartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    datasetFill: false,
+    scales: {
+      yAxes: [{
+        ticks: {
+          beginAtZero: true,
+          userCallback: function(label, index, labels) {
+            // when the floored value is the same as the value we have a whole number
+            if (Math.floor(label) === label) {
+              return label;
+            }
+
+          },
+        }
+      }],
+    },
+  }
+
+  new Chart(kegiatanChartCanvas, {
+    type: 'bar',
+    data: kegiatanChartData,
+    options: kegiatanChartOptions
+  })
 </script>
