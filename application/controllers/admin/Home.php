@@ -19,7 +19,6 @@ class Home extends CI_Controller
   public function index()
   {
     $data['title'] = "Dashboard";
-    $data['chartKegiatan'] = $this->getChartKegiatan();
     $this->load->view('admin/home/index', $data);
   }
 
@@ -132,20 +131,20 @@ class Home extends CI_Controller
     // Cek Ulang Jumlah Per Bulan
     foreach ($bulanArr as $key => $val) {
       // Definisi Label dan Jumlah Data Default
-      $arrSelesai[$key]['label']     = $val;
-      $arrSelesai[$key]['jumlah']    = 0;
+      $arrSelesai['label'][$key]     = $val;
+      $arrSelesai['jumlah'][$key]    = 0;
       // Cek Jika Ada Bulan yang ada Jumlah Data nya
       foreach ($selesai as $k => $v) {
         if ((int) ($key + 1) == (int) $v->bulan) {
-          $arrSelesai[$key]['jumlah'] = $v->jumlah;
+          $arrSelesai['jumlah'][$key] = $v->jumlah;
         }
       }
 
-      $arrProgres[$key]['label']     = $val;
-      $arrProgres[$key]['jumlah']    = 0;
+      $arrProgres['label'][$key]     = $val;
+      $arrProgres['jumlah'][$key]    = 0;
       foreach ($progres as $k => $v) {
         if ((int) ($key + 1) == (int) $v->bulan) {
-          $arrProgres[$key]['jumlah'] = $v->jumlah;
+          $arrProgres['jumlah'][$key] = $v->jumlah;
         }
       }
     }
@@ -156,8 +155,8 @@ class Home extends CI_Controller
     ];
 
     // header('Content-Type: application/json; charset=utf-8');
-    // echo json_encode($data);
-    return $data;
+    echo json_encode($data);
+    // return $data;
   }
 }
 

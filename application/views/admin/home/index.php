@@ -91,6 +91,7 @@ $this->load->view('dist/_partials/header');
     getKegiatan('proses', 'kegProses');
     getKegiatan('selesai', 'kegSelesai');
     getPerangkat();
+    getChart();
   });
 
   function getKegiatan(jn, elem) {
@@ -115,72 +116,76 @@ $this->load->view('dist/_partials/header');
     });
   }
 
-  //-------------
-  //- KEGIATAN BAR CHART -
-  //-------------
-  var kegiatanChartCanvas = $('#kegiatanChart').get(0).getContext('2d')
-  var kegiatanChartData = {
-    // label untuk bulan
-    labels: [
-      <?php foreach ($chartKegiatan['selesai'] as $k => $v) : ?> "<?= $v['label'] ?>",
-      <?php endforeach; ?>
-    ],
-    datasets: [{
-        label: 'Kegiatan Progres',
-        backgroundColor: '#f39c12',
-        borderColor: 'rgba(210, 214, 222, 1)',
-        pointRadius: false,
-        pointColor: 'rgba(210, 214, 222, 1)',
-        pointStrokeColor: '#c1c7d1',
-        pointHighlightFill: '#fff',
-        pointHighlightStroke: 'rgba(220,220,220,1)',
-        // data: [65, 59, 80, 81, 56, 55, 40]
-        data: [
-          <?php foreach ($chartKegiatan['progres'] as $k => $v) : ?> '<?= $v['jumlah'] ?>',
-          <?php endforeach; ?>
-        ]
+  function getChart() {
+    $.ajax({
+      type: "POST",
+      url: base_url() + 'admin/home/getChartKegiatan',
+      dataType: "json",
+      beforeSend: function() {
+        $('#kegiatanChart').html(null)
       },
-      {
-        label: 'Kegiatan Selesai',
-        backgroundColor: '#00a65a',
-        borderColor: 'rgba(60,141,188,0.8)',
-        pointRadius: false,
-        pointColor: '#3b8bba',
-        pointStrokeColor: 'rgba(60,141,188,1)',
-        pointHighlightFill: '#fff',
-        pointHighlightStroke: 'rgba(60,141,188,1)',
-        // data: [28, 48, 40, 19, 86, 27, 90]
-        data: [
-          <?php foreach ($chartKegiatan['selesai'] as $k => $v) : ?> '<?= $v['jumlah'] ?>',
-          <?php endforeach; ?>
-        ]
-      }
-    ]
-  }
+      success: function(res) {
+        var selesai = []
+        var progres = []
+        selesai.label = res.selesai.label
+        selesai.data = res.selesai.jumlah
 
-  var kegiatanChartOptions = {
-    responsive: true,
-    maintainAspectRatio: false,
-    datasetFill: false,
-    scales: {
-      yAxes: [{
-        ticks: {
-          beginAtZero: true,
-          userCallback: function(label, index, labels) {
-            // when the floored value is the same as the value we have a whole number
-            if (Math.floor(label) === label) {
-              return label;
+        progres.label = res.progres.label
+        progres.data = res.progres.jumlah
+
+        var kegiatanChartCanvas = $('#kegiatanChart').get(0).getContext('2d')
+        var kegiatanChartData = {
+          labels: selesai.label,
+          datasets: [{
+              label: 'Kegiatan Progres',
+              backgroundColor: '#f39c12',
+              borderColor: 'rgba(210, 214, 222, 1)',
+              pointRadius: false,
+              pointColor: 'rgba(210, 214, 222, 1)',
+              pointStrokeColor: '#c1c7d1',
+              pointHighlightFill: '#fff',
+              pointHighlightStroke: 'rgba(220,220,220,1)',
+              data: progres.data
+            },
+            {
+              label: 'Kegiatan Selesai',
+              backgroundColor: '#00a65a',
+              borderColor: 'rgba(60,141,188,0.8)',
+              pointRadius: false,
+              pointColor: '#3b8bba',
+              pointStrokeColor: 'rgba(60,141,188,1)',
+              pointHighlightFill: '#fff',
+              pointHighlightStroke: 'rgba(60,141,188,1)',
+              data: selesai.data
             }
+          ]
+        }
 
+        var kegiatanChartOptions = {
+          responsive: true,
+          maintainAspectRatio: false,
+          datasetFill: false,
+          scales: {
+            yAxes: [{
+              ticks: {
+                beginAtZero: true,
+                userCallback: function(label, index, labels) {
+                  if (Math.floor(label) === label) {
+                    return label;
+                  }
+
+                },
+              }
+            }],
           },
         }
-      }],
-    },
-  }
 
-  new Chart(kegiatanChartCanvas, {
-    type: 'bar',
-    data: kegiatanChartData,
-    options: kegiatanChartOptions
-  })
+        new Chart(kegiatanChartCanvas, {
+          type: 'bar',
+          data: kegiatanChartData,
+          options: kegiatanChartOptions
+        })
+      }
+    });
+  }
 </script>
