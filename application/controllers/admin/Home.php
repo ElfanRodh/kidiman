@@ -50,45 +50,31 @@ class Home extends CI_Controller
       }
     }
 
-    $this->db->select('COUNT(*) as total');
-    $this->db->where('keg_status = 1');
-    $query = $this->db->get_where('kegiatan', $wr)->row();
-    $data = $query->total;
-
-    echo json_encode($data);
-  }
-
-  function kegTotal()
-  {
-    if ($this->is_admin) {
-      $wr = [];
-    } else {
-      $user = $_SESSION['usr'];
-      $wr['keg_jabatan'] = $user['jabatan_id'];
+    $wr = [];
+    if ($this->input->post('fil_jabatan')) {
+      $wr['keg_jabatan'] = $this->input->post('fil_jabatan');
     }
+
+    if ($this->input->post("fil_tanggal")) {
+      $tanggal = explode(' - ', $this->input->post('fil_tanggal'));
+      $keg_tanggal_mulai   = date('Y-m-d', strtotime($tanggal[0]));
+      $keg_tanggal_selesai = date('Y-m-d', strtotime($tanggal[1]));
+      $this->db->group_start();
+      $this->db->where("keg_tanggal_mulai BETWEEN '$keg_tanggal_mulai' AND '$keg_tanggal_selesai'");
+      $this->db->or_where("keg_tanggal_selesai BETWEEN '$keg_tanggal_mulai' AND '$keg_tanggal_selesai'");
+      $this->db->group_end();
+
+      $keg_tahun_mulai   = date('Y', strtotime($tanggal[0]));
+      $keg_tahun_selesai = date('Y', strtotime($tanggal[1]));
+      $this->db->group_start();
+      $this->db->where("YEAR(keg_tanggal_mulai) BETWEEN '$keg_tahun_mulai' AND '$keg_tahun_selesai'");
+      $this->db->or_where("YEAR(keg_tanggal_selesai) BETWEEN '$keg_tahun_mulai' AND '$keg_tahun_selesai'");
+      $this->db->group_end();
+    }
+
     $this->db->select('COUNT(*) as total');
     $this->db->where('keg_status = 1');
     $query = $this->db->get_where('kegiatan', $wr)->row();
-    $data = $query->total;
-
-    echo json_encode($data);
-  }
-
-  function kegProses()
-  {
-    $this->db->select('COUNT(*) as total');
-    $this->db->where('keg_is_selesai = 0 AND keg_status = 1');
-    $query = $this->db->get('kegiatan')->row();
-    $data = $query->total;
-
-    echo json_encode($data);
-  }
-
-  function kegSelesai()
-  {
-    $this->db->select('COUNT(*) as total');
-    $this->db->where('keg_is_selesai = 1 AND keg_status = 1');
-    $query = $this->db->get('kegiatan')->row();
     $data = $query->total;
 
     echo json_encode($data);
@@ -106,23 +92,60 @@ class Home extends CI_Controller
 
   function getChartKegiatan()
   {
+    $wr = [];
+    if ($this->input->post('fil_jabatan')) {
+      $wr['keg_jabatan'] = $this->input->post('fil_jabatan');
+    }
+
     // List Bulan
     $bulanArr = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
     // Data Kegiatan Selesai
+    if ($this->input->post("fil_tanggal")) {
+      $tanggal = explode(' - ', $this->input->post('fil_tanggal'));
+      $keg_tanggal_mulai   = date('Y-m-d', strtotime($tanggal[0]));
+      $keg_tanggal_selesai = date('Y-m-d', strtotime($tanggal[1]));
+      $this->db->group_start();
+      $this->db->where("keg_tanggal_mulai BETWEEN '$keg_tanggal_mulai' AND '$keg_tanggal_selesai'");
+      $this->db->or_where("keg_tanggal_selesai BETWEEN '$keg_tanggal_mulai' AND '$keg_tanggal_selesai'");
+      $this->db->group_end();
+
+      $keg_tahun_mulai   = date('Y', strtotime($tanggal[0]));
+      $keg_tahun_selesai = date('Y', strtotime($tanggal[1]));
+      $this->db->group_start();
+      $this->db->where("YEAR(keg_tanggal_mulai) BETWEEN '$keg_tahun_mulai' AND '$keg_tahun_selesai'");
+      $this->db->or_where("YEAR(keg_tanggal_selesai) BETWEEN '$keg_tahun_mulai' AND '$keg_tahun_selesai'");
+      $this->db->group_end();
+    }
     $this->db->select("DATE_FORMAT(STR_TO_DATE(keg_tanggal_mulai, '%Y-%m-%d'), '%Y-%m') AS bulan_tahun, DATE_FORMAT(STR_TO_DATE(keg_tanggal_mulai, '%Y-%m-%d'), '%m') AS bulan, COUNT(*) AS jumlah");
     $this->db->where('keg_status', 1);
     $this->db->where('keg_is_selesai', 1);
     $this->db->group_by('bulan');
-    $query = $this->db->get('kegiatan');
+    $query = $this->db->get_where('kegiatan', $wr);
     $selesai = $query->result();
 
     // Data Kegiatan Progress
+    if ($this->input->post("fil_tanggal")) {
+      $tanggal = explode(' - ', $this->input->post('fil_tanggal'));
+      $keg_tanggal_mulai   = date('Y-m-d', strtotime($tanggal[0]));
+      $keg_tanggal_selesai = date('Y-m-d', strtotime($tanggal[1]));
+      $this->db->group_start();
+      $this->db->where("keg_tanggal_mulai BETWEEN '$keg_tanggal_mulai' AND '$keg_tanggal_selesai'");
+      $this->db->or_where("keg_tanggal_selesai BETWEEN '$keg_tanggal_mulai' AND '$keg_tanggal_selesai'");
+      $this->db->group_end();
+
+      $keg_tahun_mulai   = date('Y', strtotime($tanggal[0]));
+      $keg_tahun_selesai = date('Y', strtotime($tanggal[1]));
+      $this->db->group_start();
+      $this->db->where("YEAR(keg_tanggal_mulai) BETWEEN '$keg_tahun_mulai' AND '$keg_tahun_selesai'");
+      $this->db->or_where("YEAR(keg_tanggal_selesai) BETWEEN '$keg_tahun_mulai' AND '$keg_tahun_selesai'");
+      $this->db->group_end();
+    }
     $this->db->select("DATE_FORMAT(STR_TO_DATE(keg_tanggal_mulai, '%Y-%m-%d'), '%Y-%m') AS bulan_tahun, DATE_FORMAT(STR_TO_DATE(keg_tanggal_mulai, '%Y-%m-%d'), '%m') AS bulan, COUNT(*) AS jumlah");
     $this->db->where('keg_status', 1);
     $this->db->where('keg_is_selesai', 0);
     $this->db->group_by('bulan');
-    $query1 = $this->db->get('kegiatan');
+    $query1 = $this->db->get_where('kegiatan', $wr);
     $progres = $query1->result();
 
     $arrSelesai = [];
