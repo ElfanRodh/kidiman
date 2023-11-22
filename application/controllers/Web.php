@@ -6,6 +6,6 @@ class Web extends CI_Controller
 {
     public function index()
     {
-        redirect('admin/home');
+        $this->load->view('admin/landing/index');
     }
 }

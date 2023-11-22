@@ -18,7 +18,11 @@ class Home extends CI_Controller
 
   public function index()
   {
+    date_default_timezone_set('Asia/Jakarta');
+    $tahun = date('Y');
+
     $data['title'] = "Dashboard";
+    $data['tahun'] = $tahun;
     $this->load->view('admin/home/index', $data);
   }
 

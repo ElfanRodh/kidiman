@@ -112,7 +112,7 @@ $this->load->view('dist/_partials/header');
       <div class="col-lg-12">
         <div class="card">
           <div class="card-header">
-            <h4>Data Kegiatan Tahun 2023</h4>
+            <h4>Data Kegiatan Tahun <?php echo $tahun ?></h4>
           </div>
           <div class="card-body">
             <div class="chart">
