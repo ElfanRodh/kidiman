@@ -116,50 +116,23 @@
         <div class="section-title">
           <h2>Kegiatan</h2>
           <p>
-            Kegiatan Perangkat Desa
+            Kegiatan Perangkat Desa Terbaru
           </p>
         </div>
 
         <div class="row">
-          <div class="col-xl-3 col-md-6 align-items-stretch" data-aos="zoom-in" data-aos-delay="100">
-            <div class="icon-box">
-              <div class="icon"><i class="bx bx-list-check"></i></div>
-              <h4><a href="">Kegiatan A</a></h4>
-              <p>
-                Fungsi Kegiatan A
-              </p>
+          <?php foreach ($keg as $x) : ?>
+            <div class="col-xl-3 col-md-6 align-items-stretch" data-aos="zoom-in" data-aos-delay="100">
+              <div class="icon-box">
+                <div class="icon"><i class="bx bx-list-check"></i></div>
+                <h4><a href=""><?php echo strip_tags($x['keg_nama']); ?></a></h4>
+                <hr>
+                <p>
+                  <?php echo $x['fun_nama']; ?>
+                </p>
+              </div>
             </div>
-          </div>
-
-          <div class="col-xl-3 col-md-6 align-items-stretch mt-4 mt-md-0" data-aos="zoom-in" data-aos-delay="200">
-            <div class="icon-box">
-              <div class="icon"><i class="bx bx-list-check"></i></div>
-              <h4><a href="">Kegiatan B</a></h4>
-              <p>
-                Fungsi Kegiatan B
-              </p>
-            </div>
-          </div>
-
-          <div class="col-xl-3 col-md-6 align-items-stretch mt-4 mt-xl-0" data-aos="zoom-in" data-aos-delay="300">
-            <div class="icon-box">
-              <div class="icon"><i class="bx bx-list-check"></i></div>
-              <h4><a href="">Kegiatan C</a></h4>
-              <p>
-                Fungsi Kegiatan C
-              </p>
-            </div>
-          </div>
-
-          <div class="col-xl-3 col-md-6 align-items-stretch mt-4 mt-xl-0" data-aos="zoom-in" data-aos-delay="400">
-            <div class="icon-box">
-              <div class="icon"><i class="bx bx-list-check"></i></div>
-              <h4><a href="">Kegiatan D</a></h4>
-              <p>
-                Fungsi Kegiatan D
-              </p>
-            </div>
-          </div>
+          <?php endforeach; ?>
         </div>
       </div>
     </section>
@@ -176,91 +149,51 @@
         </div>
 
         <div class="row">
-          <div class="col-lg-6" data-aos="zoom-in" data-aos-delay="100">
-            <div class="member d-flex align-items-start">
-              <div class="pic">
-                <img src="<?php echo base_url(); ?>assets/img/avatar/team-a.png" class="img-fluid" alt="" />
-              </div>
-              <div class="member-info">
-                <h4>Perangkat A</h4>
-                <span>Chief Executive Officer</span>
-                <p>
-                  Explicabo voluptatem mollitia et repellat qui dolorum quasi
-                </p>
-                <div class="social">
-                  <a href=""><i class="ri-twitter-fill"></i></a>
-                  <a href=""><i class="ri-facebook-fill"></i></a>
-                  <a href=""><i class="ri-instagram-fill"></i></a>
-                  <a href=""> <i class="ri-linkedin-box-fill"></i> </a>
+          <?php foreach ($prt as $x) : ?>
+            <div class="col-lg-6 mb-4" data-aos="zoom-in" data-aos-delay="100">
+              <!-- <div class="member d-flex align-items-start">
+                <div class="pic" style="height: 100px; width:auto;">
+                  <img src="<?php echo base_url(); ?>assets/img/avatar/team-a.png" class="img-fluid" alt="" />
                 </div>
-              </div>
-            </div>
-          </div>
+                <div class="member-info">
+                  <h4><?php echo $x['jabatan']; ?></h4>
+                  <span><?php echo $x['nama']; ?></span>
+                  <p>
+                    <?php echo $x['tugas']; ?>
+                  </p>
+                  <div class="social">
+                    <a href=""><i class="ri-twitter-fill"></i></a>
+                    <a href=""><i class="ri-facebook-fill"></i></a>
+                    <a href=""><i class="ri-instagram-fill"></i></a>
+                    <a href=""> <i class="ri-linkedin-box-fill"></i> </a>
+                  </div>
+                </div>
+              </div> -->
 
-          <div class="col-lg-6 mt-4 mt-lg-0" data-aos="zoom-in" data-aos-delay="200">
-            <div class="member d-flex align-items-start">
-              <div class="pic">
-                <img src="<?php echo base_url(); ?>assets/img/avatar/team-b.png" class="img-fluid" alt="" />
-              </div>
-              <div class="member-info">
-                <h4>Perangkat B</h4>
-                <span>Product Manager</span>
-                <p>
-                  Aut maiores voluptates amet et quis praesentium qui senda
-                  para
-                </p>
-                <div class="social">
-                  <a href=""><i class="ri-twitter-fill"></i></a>
-                  <a href=""><i class="ri-facebook-fill"></i></a>
-                  <a href=""><i class="ri-instagram-fill"></i></a>
-                  <a href=""> <i class="ri-linkedin-box-fill"></i> </a>
+              <div class="card member border-0">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-3 p-2">
+                      <img src="<?php echo $x['foto'] ?>" class="img-fluid" alt="" />
+                    </div>
+                    <div class="col-9 p-2">
+                      <h4><?php echo $x['jabatan']; ?></h4>
+                      <span><?php echo $x['nama']; ?></span>
+                      <p>
+                        <?php echo $x['tugas']; ?>
+                      </p>
+                      <div class="social">
+                        <a href=""><i class="ri-twitter-fill"></i></a>
+                        <a href=""><i class="ri-facebook-fill"></i></a>
+                        <a href=""><i class="ri-instagram-fill"></i></a>
+                        <a href=""> <i class="ri-linkedin-box-fill"></i> </a>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-
-          <div class="col-lg-6 mt-4" data-aos="zoom-in" data-aos-delay="300">
-            <div class="member d-flex align-items-start">
-              <div class="pic">
-                <img src="<?php echo base_url(); ?>assets/img/avatar/team-a.png" class="img-fluid" alt="" />
-              </div>
-              <div class="member-info">
-                <h4>Perangkat C</h4>
-                <span>CTO</span>
-                <p>
-                  Quisquam facilis cum velit laborum corrupti fuga rerum quia
-                </p>
-                <div class="social">
-                  <a href=""><i class="ri-twitter-fill"></i></a>
-                  <a href=""><i class="ri-facebook-fill"></i></a>
-                  <a href=""><i class="ri-instagram-fill"></i></a>
-                  <a href=""> <i class="ri-linkedin-box-fill"></i> </a>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="col-lg-6 mt-4" data-aos="zoom-in" data-aos-delay="400">
-            <div class="member d-flex align-items-start">
-              <div class="pic">
-                <img src="<?php echo base_url(); ?>assets/img/avatar/team-b.png" class="img-fluid" alt="" />
-              </div>
-              <div class="member-info">
-                <h4>Perangkat D</h4>
-                <span>Accountant</span>
-                <p>
-                  Dolorum tempora officiis odit laborum officiis et et
-                  accusamus
-                </p>
-                <div class="social">
-                  <a href=""><i class="ri-twitter-fill"></i></a>
-                  <a href=""><i class="ri-facebook-fill"></i></a>
-                  <a href=""><i class="ri-instagram-fill"></i></a>
-                  <a href=""> <i class="ri-linkedin-box-fill"></i> </a>
-                </div>
-              </div>
-            </div>
-          </div>
+          <?php endforeach; ?>
         </div>
       </div>
     </section>
