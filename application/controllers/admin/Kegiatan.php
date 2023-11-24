@@ -272,7 +272,7 @@ class Kegiatan extends CI_Controller
             $foto = $this->input->post('keg_foto');
             $nama_file = FCPATH . 'public/progress/' . str_replace(base_url() . 'public/progress/', '', $this->input->post('keg_foto_old'));
 
-            if (file_exists($nama_file)) {
+            if ($this->input->post('keg_foto_old') && file_exists($nama_file)) {
               unlink($nama_file);
             }
           } else {
@@ -668,7 +668,7 @@ class Kegiatan extends CI_Controller
         // Cek tipe file
         if (in_array($f_type, ['jpg', 'jpeg', 'png'])) {
           // File adalah gambar, lakukan kompresi
-          $this->compressImage('./public/progress/' . $file, 80); // Nilai 80 adalah tingkat kualitas kompresi gambar, sesuaikan dengan kebutuhan Anda
+          compressImage('./public/progress/' . $file, 80); // Nilai 80 adalah tingkat kualitas kompresi gambar, sesuaikan dengan kebutuhan Anda
         }
       }
     } else {
@@ -690,25 +690,6 @@ class Kegiatan extends CI_Controller
       $ret["form"][$_POST['id']] = 'Upload Sukses';
     }
     echo json_encode($ret);
-  }
-
-  function compressImage($source_path, $quality)
-  {
-    $config['image_library'] = 'gd2';
-    $config['source_image'] = $source_path;
-    $config['create_thumb'] = FALSE;
-    $config['maintain_ratio'] = TRUE;
-    $config['quality'] = $quality;
-    $config['width'] = 800;
-    $config['height'] = 600;
-
-    $this->load->library('image_lib');
-    $this->image_lib->initialize($config);
-
-    if (!$this->image_lib->resize()) {
-      // Jika gagal melakukan kompresi, Anda dapat menangani kesalahan di sini
-      log_message('error', 'Gagal melakukan kompresi gambar: ' . $this->image_lib->display_errors());
-    }
   }
 }
 

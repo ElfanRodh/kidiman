@@ -97,7 +97,7 @@ class ProgresKegiatan extends CI_Controller
             $foto = $this->input->post('prog_bukti');
             $nama_file = FCPATH . 'public/progress/' . str_replace(base_url() . 'public/progress/', '', $this->input->post('prog_bukti_old'));
 
-            if (file_exists($nama_file)) {
+            if ($this->input->post('prog_bukti_old') && file_exists($nama_file)) {
               unlink($nama_file);
             }
           } else {

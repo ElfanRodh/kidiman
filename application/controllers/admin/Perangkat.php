@@ -36,17 +36,32 @@ class Perangkat extends CI_Controller
     $data = array();
     $no   = $this->input->post('start');
     $v    = 0;
-    foreach ($list as $jbt) {
+    foreach ($list as $prt) {
       $no++;
       $row                = array();
       $row['no']          = $no;
-      $row['prt_nama'] = $jbt->prt_nama;
-      $row['jbt_nama']    = $jbt->jbt_nama;
+      $row['prt_nama']    = $prt->prt_nama;
+      $row['prt_jk']      = $prt->prt_jk == 1 ? 'L' : 'P';
+
+      $nama_file = FCPATH . 'public/perangkat/' . str_replace(base_url() . 'public/perangkat/', '', $prt->prt_foto);
+
+      if ($prt->prt_foto && file_exists($nama_file)) {
+        $foto = '<img class="img rounded" style="height: 125px; width: auto;" src="' . base_url('public/perangkat/' . $prt->prt_foto) . '"/>';
+      } else {
+        if ($prt->prt_jk == 1) {
+          $foto = '<img class="img rounded" style="height: 125px; width: auto;" src="' . base_url('public/perangkat/man.PNG') . '"/>';
+        } else {
+          $foto = '<img class="img rounded" style="height: 125px; width: auto;" src="' . base_url('public/perangkat/woman.PNG') . '"/>';
+        }
+      }
+
+      $row['prt_foto']    = $foto;
+      $row['jbt_nama']    = $prt->jbt_nama;
       $row['opsi']     = '<div class="btn-group" role="group">
-									<button class="btn btn-icon btn-warning update-data" data-id="' . (string)$jbt->prj_id . '">
+									<button class="btn btn-icon btn-warning update-data" data-id="' . (string)$prt->prj_id . '">
 										<i class="fa fa-edit"></i>
 									</button>
-									<button class="btn btn-icon btn-danger delete-data" data-id="' . (string)$jbt->prj_id . '" data-name="' . (string)$jbt->jbt_nama . '">
+									<button class="btn btn-icon btn-danger delete-data" data-id="' . (string)$prt->prj_id . '" data-name="' . (string)$prt->jbt_nama . '">
 										<i class="fa fa-trash"></i>
 									</button>
 								</div>';
@@ -136,8 +151,19 @@ class Perangkat extends CI_Controller
     $data['ok'] = 500;
     $data['data'] = 'Data Tidak Ada';
     if ($dt->num_rows() > 0) {
+      $prt = $dt->row_array();
+      if ($prt['prt_foto']) {
+        $foto = base_url() . 'public/perangkat/' . $prt['prt_foto'];
+      } else {
+        if ($prt['prt_jk'] == 1) {
+          $foto = base_url() . 'public/perangkat/man.PNG';
+        } else {
+          $foto = base_url() . 'public/perangkat/woman.PNG';
+        }
+      }
+      $prt['prt_foto'] = $foto;
       $data['ok']   = 200;
-      $data['data']  = $dt->row();
+      $data['data']  = $prt;
     }
 
     echo json_encode($data);
@@ -151,7 +177,7 @@ class Perangkat extends CI_Controller
         $wr['prj_id'] = $this->input->post('prj_id');
 
         $data = [];
-        $pass = ['prj_id'];
+        $pass = ['prj_id', 'prt_foto', 'prt_foto_old'];
         foreach ($_POST as $k => $v) {
           if (!in_array($k, $pass)) {
             $data[$k] = $v;
@@ -169,8 +195,20 @@ class Perangkat extends CI_Controller
             'prj_jabatan' => $this->input->post('prj_jabatan')
           ], $wr);
           $wr2['prt_id'] = $this->db->get_where('perangkat_jabatan', $wr)->row()->prj_perangkat;
+          if ($this->input->post('prt_foto')) {
+            $foto = $this->input->post('prt_foto');
+            $nama_file = FCPATH . 'public/perangkat/' . str_replace(base_url() . 'public/perangkat/', '', $this->input->post('prt_foto_old'));
+
+            if ($this->input->post('prt_foto_old') && file_exists($nama_file)) {
+              unlink($nama_file);
+            }
+          } else {
+            $foto = str_replace(base_url() . 'public/perangkat/', '', $this->input->post('prt_foto_old'));
+          }
           $update_prt = $this->db->update('perangkat', [
-            'prt_nama' => $this->input->post('prt_nama')
+            'prt_nama'  => $this->input->post('prt_nama'),
+            'prt_jk'    => $this->input->post('prt_jk'),
+            'prt_foto'  => $foto,
           ], $wr2);
           if ($update_prj && $update_prt) {
             $ret['ok'] = 200;
@@ -202,11 +240,13 @@ class Perangkat extends CI_Controller
           }
         } else {
           $data_prt = [
-            'prt_nama' => strtoupper($this->input->post('prt_nama'))
+            'prt_nama'  => strtoupper($this->input->post('prt_nama')),
+            'prt_jk'    => $this->input->post('prt_jk'),
+            'prt_foto'  => $this->input->post('prt_foto'),
           ];
           $perangkat = $this->db->insert('perangkat', $data_prt);
           if ($perangkat) {
-            $data['prj_perangkat'] = $this->db->insert_id();
+            $data['prj_perangkat']  = $this->db->insert_id();
             $data['prj_jabatan']    = $this->input->post('prj_jabatan');
             $data['prj_status']     = 1;
             if ($this->db->insert('perangkat_jabatan', $data)) {
@@ -224,6 +264,7 @@ class Perangkat extends CI_Controller
     } else {
       $ret['form']['prj_jabatan'] = form_error('prj_jabatan');
       $ret['form']['prt_nama']    = form_error('prt_nama');
+      $ret['form']['prt_jk']      = form_error('prt_jk');
       $ret['ok']    = 400;
     }
     echo json_encode($ret);
@@ -233,7 +274,10 @@ class Perangkat extends CI_Controller
   {
     if ($this->input->post('id')) {
       $wr['prj_id'] = $this->input->post('id');
-      if ($this->db->update('perangkat_jabatan', ['prj_status' => 0], $wr)) {
+      $jbt = $this->db->get_where('perangkat_jabatan', $wr)->row();
+      $prt = $this->db->update('perangkat', ['prt_foto' => NULL], ['prt_id' => $jbt->prj_perangkat]);
+      $prj = $this->db->update('perangkat_jabatan', ['prj_status' => 0], $wr);
+      if ($prt && $prj) {
         $out["ok"]    = 200;
         $out["data"]  = "Berhasil Menghapus Data";
       } else {
@@ -259,6 +303,14 @@ class Perangkat extends CI_Controller
       [
         'field' => 'prt_nama',
         'label' => 'Nama Perangkat',
+        'rules' => 'required',
+        'errors' => [
+          'required' => '{field} harus diisi',
+        ],
+      ],
+      [
+        'field' => 'prt_jk',
+        'label' => 'Jenis Kelamin',
         'rules' => 'required',
         'errors' => [
           'required' => '{field} harus diisi',
@@ -304,6 +356,54 @@ class Perangkat extends CI_Controller
     $data = $this->db->get_where('perangkat', ['prt_status' => 1]);
     $ret = array_column($data->result_array(), 'prt_nama');
     header('Content-Type: application/json');
+    echo json_encode($ret);
+  }
+
+  function uploadSingleDokumen()
+  {
+    $ret['ok']    = 200;
+    $ret['form']  = 'Sukses Upload File';
+
+    if (!empty($_FILES['file']["name"]) && $_FILES['file']["error"] === 0) {
+      $f_type = strtolower(pathinfo($_FILES['file']["name"], PATHINFO_EXTENSION));
+      $config['upload_path']    = './public/perangkat/';
+      $config['allowed_types']  = 'jpg|png|jpeg|pdf|JPG|PNG|JPEG';
+      // $config['allowed_types']  = 'pdf|PDF';
+      $config['max_size']      = 5120;
+      $config['remove_spaces']  = TRUE;
+      $ext = explode(".", $_FILES['file']["name"]);
+      $config["file_name"]    = date('Y-m-d') . "-" . random_string("alnum", 20) . "." . strtolower(end($ext));
+      $this->upload->initialize($config);
+      $ret["form"] = [];
+      if (!$this->upload->do_upload('file')) {
+        $file  = NULL;
+      } else {
+        $file = $config["file_name"];
+
+        // Cek tipe file
+        if (in_array($f_type, ['jpg', 'jpeg', 'png'])) {
+          // File adalah gambar, lakukan kompresi
+          compressImage('./public/perangkat/' . $file, 80); // Nilai 80 adalah tingkat kualitas kompresi gambar, sesuaikan dengan kebutuhan Anda
+        }
+      }
+    } else {
+      $file  = NULL;
+    }
+
+    if (!$file) {
+      $ret["ok"]      = 400;
+      if ($this->upload->display_errors() == '<p>The filetype you are attempting to upload is not allowed.</p>') {
+        $err = 'Tipe file tidak sesuai ketentuan';
+      } else {
+        $err = 'Gagal Upload File';
+      }
+      $ret["form"][$_POST['id']] = $err;
+      echo json_encode($ret);
+      exit();
+    } else {
+      $ret['file'] = $file;
+      $ret["form"][$_POST['id']] = 'Upload Sukses';
+    }
     echo json_encode($ret);
   }
 }

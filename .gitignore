@@ -18,3 +18,7 @@ application/logs/*
 
 application/config/database.php
 public/progress/*
+public/perangkat/*
+!public/perangkat/man.PNG
+!public/perangkat/woman.PNG
+application/config/database.php

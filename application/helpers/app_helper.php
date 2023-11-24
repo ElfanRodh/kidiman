@@ -94,3 +94,26 @@ if (!function_exists("hitungSelisihWaktu")) {
     return $interval->format($format);
   }
 }
+
+if (!function_exists("compressImage")) {
+  function compressImage($source_path, $quality)
+  {
+    $config['image_library'] = 'gd2';
+    $config['source_image'] = $source_path;
+    $config['create_thumb'] = FALSE;
+    $config['maintain_ratio'] = TRUE;
+    $config['quality'] = $quality;
+    $config['width'] = 800;
+    $config['height'] = 600;
+
+    $CI = &get_instance();
+
+    $CI->load->library('image_lib');
+    $CI->image_lib->initialize($config);
+
+    if (!$CI->image_lib->resize()) {
+      // Jika gagal melakukan kompresi, Anda dapat menangani kesalahan di sini
+      log_message('error', 'Gagal melakukan kompresi gambar: ' . $CI->image_lib->display_errors());
+    }
+  }
+}

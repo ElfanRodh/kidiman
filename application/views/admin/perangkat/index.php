@@ -36,7 +36,9 @@ $this->load->view('dist/_partials/header');
                   <thead>
                     <tr>
                       <th class="text-center">No</th>
+                      <th>Foto</th>
                       <th>Nama</th>
+                      <th>Jenis Kelamin</th>
                       <th>Jabatan</th>
                       <th>Action</th>
                     </tr>
@@ -73,8 +75,35 @@ $this->load->view('dist/_partials/header');
               </div>
               <div class="col-12 col-md-6">
                 <div class="form-group">
+                  <label for="prt_jk">Jenis Kelamin</label>
+                  <select class="form-control select2" data-width="100%" data-allow-clear="true" data-placeholder="Pilih Jenis Kelamin" id="prt_jk" name="prt_jk">
+                    <option value="1">Laki-laki</option>
+                    <option value="2">Perempuan</option>
+                  </select>
+                </div>
+              </div>
+              <div class="col-12 col-md-6">
+                <div class="form-group">
                   <label for="prj_jabatan">Jabatan</label>
                   <select class="form-control select2" data-width="100%" data-allow-clear="true" data-placeholder="Pilih Jabatan" id="prj_jabatan" name="prj_jabatan"></select>
+                </div>
+              </div>
+              <div class="col-12">
+                <div class="row">
+                  <div class="col-12 col-md-6">
+                    <div class="form-group">
+                      <label for="prt_foto">Foto</label>
+                      <small class="form-text text-muted my-1">File maksimal 5MB</small>
+                      <input type="file" accept="image/*" class="form-control file" id="prt_foto" placeholder="Foto">
+                      <input type="hidden" name="prt_foto">
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6 konten_prt_foto d-none">
+                    <div class="form-group">
+                      <input type="hidden" name="prt_foto_old">
+                      <img src="" class="img-fluid" id="prt_foto_old" alt="">
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -113,20 +142,28 @@ $this->load->view('dist/_partials/header');
       },
       columns: [{
           data: "no",
-          className: "text-center align-top",
+          className: "text-center align-middle",
           orderable: false
         },
         {
+          data: "prt_foto",
+          className: "text-left align-middle"
+        },
+        {
           data: "prt_nama",
-          className: "text-left align-top"
+          className: "text-left align-middle"
+        },
+        {
+          data: "prt_jk",
+          className: "text-left align-middle"
         },
         {
           data: "jbt_nama",
-          className: "text-left align-top"
+          className: "text-left align-middle"
         },
         {
           data: "opsi",
-          className: "text-center align-top",
+          className: "text-center align-middle",
           orderable: false
         }
       ],
@@ -154,12 +191,19 @@ $this->load->view('dist/_partials/header');
               backdrop: false
             });
             $("#modal-form div.modal-header h4.modal-title").html("Ubah Data Perangkat Desa");
-            $("#modal-form form#form-data #prj_id").val(res.data.prj_id);
+            $("#modal-form form#form-data #prj_id").val(res.data.prj_id).trigger('change');
             getJabatan('prj_jabatan', res.data.prj_jabatan, 1).done(function() {
-              $("#modal-form form#form-data #prj_jabatan").val(res.data.prj_jabatan);
+              $("#modal-form form#form-data #prj_jabatan").val(res.data.prj_jabatan).trigger('change');
             });
-            $("#modal-form form#form-data #jbt_nama").val(res.data.jbt_nama);
-            $("#modal-form form#form-data #prt_nama").val(res.data.prt_nama);
+            $("#modal-form form#form-data #jbt_nama").val(res.data.jbt_nama).trigger('change');
+            $("#modal-form form#form-data #prt_jk").val(res.data.prt_jk).trigger('change');
+            $("#modal-form form#form-data #prt_nama").val(res.data.prt_nama).trigger('change');
+
+            if (res.data.prt_foto) {
+              $("#modal-form form#form-data [name=prt_foto_old]").val(res.data.prt_foto);
+              $("#modal-form form#form-data img#prt_foto_old").attr('src', res.data.prt_foto);
+              $("#modal-form form#form-data .konten_prt_foto").removeClass('d-none');
+            }
           } else {
             swal({
               title: "Error",
@@ -248,7 +292,82 @@ $this->load->view('dist/_partials/header');
       $("form#form-data input").removeClass("is-invalid");
       $("form#form-data textarea").removeClass("is-invalid");
       $("form#form-data select").removeClass("is-invalid");
+      $("form#form-data [name=prt_foto_old]").val(null);
+      $("form#form-data img#prt_foto_old").attr('src', null);
+      $("form#form-data .konten_prt_foto").addClass('d-none');
     })
+
+  $('input[type="file"]').change(function(e) {
+    var id = $(this).attr('id');
+    var fileInput = this;
+    $('.custom-file-label[for="' + id + '"]').html(fileInput.files[0].name);
+    // upload single file
+    var form_data = new FormData();
+    form_data.append('file', (this).files[0]);
+    form_data.append('id', id);
+
+    $.ajax({
+      url: "<?= site_url('admin/perangkat/uploadSingleDokumen') ?>",
+      type: 'POST',
+      data: form_data,
+      processData: false,
+      contentType: false,
+      dataType: 'json',
+      beforeSend: function() {
+        $('form#form-data input').removeClass('is-invalid');
+        $('form#form-data select').removeClass('is-invalid');
+        $('form#form-data textarea').removeClass('is-invalid');
+        $('form#form-data span').removeClass('is-invalid');
+        $('form#form-data .invalid-feedback').remove();
+        $('form#form-data .valid-feedback').remove();
+      },
+      success: function(res) {
+        var frm = Object.keys(res.form);
+        var val = Object.values(res.form);
+        $('form#form-data input').removeClass('is-invalid');
+        $('form#form-data select').removeClass('is-invalid');
+        $('form#form-data textarea').removeClass('is-invalid');
+        $('form#form-data span').removeClass('is-invalid');
+        $('form#form-data .invalid-feedback').remove();
+        $('form#form-data .valid-feedback').remove();
+        if (res.ok == 400) {
+          frm.forEach(function(el, ind) {
+            if (val[ind] != '') {
+              $('form#form-data #' + el).removeClass('is-invalid').addClass("is-invalid");
+              $('form#form-data span[aria-labelledby="select2-' + el + '-container"]').removeClass('is-invalid').addClass("is-invalid");
+              var app = '<div id="' + el + '-error" class="invalid-feedback d-block" for="' + el + '">' + val[ind] + '</div>';
+              $('form#form-data #' + el).closest('.form-group').append(app);
+            }
+          });
+        } else {
+          $('form#form-data input[name="' + id + '"]').val(res.file);
+          frm.forEach(function(el, ind) {
+            if (val[ind] != '') {
+              $('form#form-data #' + el).removeClass('is-invalid');
+              $('form#form-data span[aria-labelledby="select2-' + el + '-container"]').removeClass('is-invalid');
+              var app = '<div id="' + el + '-error" class="valid-feedback d-block" for="' + el + '">' + val[ind] + '</div>';
+              $('form#form-data #' + el).closest('.form-group').append(app);
+            }
+          });
+
+          // Memeriksa apakah pengguna telah memilih file gambar
+          if (fileInput.files && fileInput.files[0]) {
+            var reader = new FileReader();
+
+            // Ketika proses baca file selesai
+            reader.onload = function(e) {
+              // Menetapkan sumber gambar pada elemen img
+              $('#' + id + '_old').attr('src', e.target.result);
+              $('.konten_' + id + '').removeClass('d-none');
+            };
+
+            // Membaca file gambar yang dipilih
+            reader.readAsDataURL(fileInput.files[0]);
+          }
+        }
+      }
+    });
+  });
 
   function simpan() {
     var datas = new FormData($("form#form-data")[0]);
