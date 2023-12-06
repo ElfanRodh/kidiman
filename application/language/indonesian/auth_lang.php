@@ -1,34 +1,34 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 /**
-* Name:  Auth Lang - Indonesia
-*
-* Author: 	Daeng Muhammad Feisal
-*     http://daengdoang.wordpress.com
-*			daengdoang@gmail.com
-*			@daengdoang
-*
-*
-*
-* Location: https://github.com/benedmunds/CodeIgniter-Ion-Auth
-*
-* Created:  21.06.2013
-* Last-Edit: 03.05.2021
-*
-* Description:  Indonesia language file for Ion Auth example views
-*
-*/
+ * Name:  Auth Lang - Indonesia
+ *
+ * Author: 	Daeng Muhammad Feisal
+ *     http://daengdoang.wordpress.com
+ *			daengdoang@gmail.com
+ *			@daengdoang
+ *
+ *
+ *
+ * Location: https://github.com/benedmunds/CodeIgniter-Ion-Auth
+ *
+ * Created:  21.06.2013
+ * Last-Edit: 03.05.2021
+ *
+ * Description:  Indonesia language file for Ion Auth example views
+ *
+ */
 
 // Errors
 $lang['error_csrf'] = 'Form yang dikirim tidak lulus pemeriksaan keamanan kami.';
 
 // Login
 $lang['login_heading']         = 'Login';
-$lang['login_subheading']      = 'Silakan login dengan email/username dan password anda.';
-$lang['login_identity_label']  = 'Email/Username:';
+$lang['login_subheading']      = 'Silakan login dengan username/nik dan password anda.';
+$lang['login_identity_label']  = 'Username/NIK:';
 $lang['login_password_label']  = 'Kata Sandi:';
 $lang['login_remember_label']  = 'Ingatkan Saya:';
 $lang['login_submit_btn']      = 'Login';
-$lang['login_forgot_password'] = 'Lupa Kata Sandi?';
+$lang['login_forgot_password'] = 'Lupa Kata Sandi.?';
 
 // Index
 $lang['index_heading']           = 'Pengguna';
@@ -118,7 +118,7 @@ $lang['edit_group_validation_desc_label']    = 'Deskripsi';
 
 // Change Password
 $lang['change_password_heading']                               = 'Ganti Kata Sandi';
-$lang['change_password_old_password_label']                    = 'Kata Sandi Lama:';
+$lang['change_password_old_password_label']                    = 'Kata Santi Lama:';
 $lang['change_password_new_password_label']                    = 'Kata Sandi Baru (paling sedikit %s karakter):';
 $lang['change_password_new_password_confirm_label']            = 'Konfirmasi Kata Sandi:';
 $lang['change_password_submit_btn']                            = 'Ubah';

@@ -1,18 +1,18 @@
-<?php  if ( ! defined('BASEPATH')) exit('No direct script access allowed');
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 /**
-* Name:  Ion Auth Lang - English
-*
-* Author: Ben Edmunds
-*         ben.edmunds@gmail.com
-*         @benedmunds
-*
-* Location: https://github.com/benedmunds/CodeIgniter-Ion-Auth
-*
-* Created:  03.14.2010
-*
-* Description:  English language file for Ion Auth messages and errors
-*
-*/
+ * Name:  Ion Auth Lang - English
+ *
+ * Author: Ben Edmunds
+ *         ben.edmunds@gmail.com
+ *         @benedmunds
+ *
+ * Location: https://github.com/benedmunds/CodeIgniter-Ion-Auth
+ *
+ * Created:  03.14.2010
+ *
+ * Description:  English language file for Ion Auth messages and errors
+ *
+ */
 
 // Account Creation
 $lang['account_creation_successful']            = 'Account Successfully Created';
@@ -25,6 +25,7 @@ $lang['account_creation_invalid_default_group'] = 'Invalid default group name se
 
 // Password
 $lang['password_change_successful']          = 'Password Successfully Changed';
+$lang['password_change_expired']             = 'Token expired';
 $lang['password_change_unsuccessful']        = 'Unable to Change Password';
 $lang['forgot_password_successful']          = 'Password Reset Email Sent';
 $lang['forgot_password_unsuccessful']        = 'Unable to email the Reset Password link';
@@ -36,7 +37,7 @@ $lang['deactivate_successful']               = 'Account De-Activated';
 $lang['deactivate_unsuccessful']             = 'Unable to De-Activate Account';
 $lang['activation_email_successful']         = 'Activation Email Sent. Please check your inbox or spam';
 $lang['activation_email_unsuccessful']       = 'Unable to Send Activation Email';
-$lang['deactivate_current_user_unsuccessful']= 'You cannot De-Activate your self.';
+$lang['deactivate_current_user_unsuccessful'] = 'You cannot De-Activate your self.';
 
 // Login / Logout
 $lang['login_successful']                    = 'Logged In Successfully';
@@ -72,4 +73,3 @@ $lang['email_forgotten_password_subject']    = 'Forgotten Password Verification'
 $lang['email_forgot_password_heading']       = 'Reset Password for %s';
 $lang['email_forgot_password_subheading']    = 'Please click this link to %s.';
 $lang['email_forgot_password_link']          = 'Reset Your Password';
-

@@ -14,23 +14,36 @@ $this->load->view('dist/_partials/header');
 				<h1 class="text-app text-center mb-4">
 					KIDIMAN
 				</h1>
-				<div id="infoMessage"><?php echo $message; ?></div>
+				<!-- <div id="infoMessage"><?php echo $message; ?></div> -->
+				<div class="text-muted text-center text-danger fw-bold py-3" id="infoMessage">
+					<?= ($this->session->flashdata('message')) ? $this->session->flashdata('message') : $this->session->flashdata('message_success') ?>
+				</div>
 
-				<div class="wrap-input100 validate-input" data-validate="Username is required">
-					<input class="input100" type="text" name="identity" placeholder="Username">
+				<div class="wrap-input100 validate-input form-group" data-validate="Username is required">
+					<!-- <input class="input100" type="text" name="identity" placeholder="Username"> -->
+					<?= form_input($identity, '', 'class="input100" placeholder="Username"') ?>
 					<span class="focus-input100"></span>
 					<span class="symbol-input100">
 						<i class="fa fa-user" aria-hidden="true"></i>
 					</span>
+					<div class="invalid-feedback">
+						<?= form_error('identity') ?>
+					</div>
 				</div>
 
-				<div class="wrap-input100 validate-input" data-validate="Password is required">
-					<input class="input100" type="password" name="password" placeholder="Password">
+				<div id="show_hide_password" class="wrap-input100 validate-input form-group" data-validate="Password is required">
+					<!-- <input class="input100" type="password" name="password" placeholder="Password"> -->
+					<?= form_input($password, '', 'class="input100" placeholder="Password"') ?>
 					<span class="focus-input100"></span>
 					<span class="symbol-input100">
 						<i class="fa fa-lock" aria-hidden="true"></i>
 					</span>
-
+					<span class="symbol-input100-right">
+						<i class="fa fa-eye" aria-hidden="true"></i>
+					</span>
+					<div class="invalid-feedback">
+						<?= form_error('password') ?>
+					</div>
 				</div>
 
 				<div class="container-login100-form-btn">
@@ -51,6 +64,19 @@ $this->load->view('dist/_partials/header');
 		$('.js-tilt').tilt({
 			scale: 1.1
 		})
+	});
+
+	$("#show_hide_password .symbol-input100-right").on("click", function(event) {
+		event.preventDefault();
+		if ($("#show_hide_password input").attr("type") == "text") {
+			$("#show_hide_password input").attr("type", "password");
+			$("#show_hide_password .symbol-input100-right i").removeClass("fa-eye-slash");
+			$("#show_hide_password .symbol-input100-right i").addClass("fa-eye");
+		} else if ($("#show_hide_password input").attr("type") == "password") {
+			$("#show_hide_password input").attr("type", "text");
+			$("#show_hide_password .symbol-input100-right i").addClass("fa-eye-slash");
+			$("#show_hide_password .symbol-input100-right i").removeClass("fa-eye");
+		}
 	});
 </script>
 <!--===============================================================================================-->
