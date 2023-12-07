@@ -123,13 +123,25 @@
         <div class="row">
           <?php foreach ($keg as $x) : ?>
             <div class="col-xl-3 col-md-6 align-items-stretch" data-aos="zoom-in" data-aos-delay="100">
-              <div class="icon-box">
+              <!-- <div class="icon-box">
                 <div class="icon"><i class="bx bx-list-check"></i></div>
                 <h4><a href=""><?php echo strip_tags($x['keg_nama']); ?></a></h4>
                 <hr>
                 <p>
                   <?php echo $x['fun_nama']; ?>
                 </p>
+              </div> -->
+              <div class="card icon-box border-0">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="icon"><i class="bx bx-list-check"></i></div>
+                    <h4><a href=""><?php echo strip_tags($x['keg_nama']); ?></a></h4>
+                    <hr>
+                    <p>
+                      <?php echo $x['fun_nama']; ?>
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           <?php endforeach; ?>
@@ -183,10 +195,10 @@
                         <?php echo $x['tugas']; ?>
                       </p>
                       <div class="social">
-                        <a href=""><i class="ri-twitter-fill"></i></a>
-                        <a href=""><i class="ri-facebook-fill"></i></a>
-                        <a href=""><i class="ri-instagram-fill"></i></a>
-                        <a href=""> <i class="ri-linkedin-box-fill"></i> </a>
+                        <a href="javascript:void(0)"><i class="ri-twitter-fill"></i></a>
+                        <a href="javascript:void(0)"><i class="ri-facebook-fill"></i></a>
+                        <a href="javascript:void(0)"><i class="ri-instagram-fill"></i></a>
+                        <a href="javascript:void(0)"> <i class="ri-linkedin-box-fill"></i> </a>
                       </div>
                     </div>
                   </div>

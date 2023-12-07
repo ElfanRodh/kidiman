@@ -51,6 +51,11 @@ $this->load->view('dist/_partials/header');
 						Login
 					</button>
 				</div>
+				<div class="container-login101-form-btn">
+					<a href="<?= site_url('/'); ?>" class="login101-form-btn font-weight-bold">
+						Beranda
+					</a>
+				</div>
 
 			</form>
 		</div>
