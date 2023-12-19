@@ -590,9 +590,6 @@ class Kegiatan extends CI_Controller
               </td>
               ';
         $list .= '<td class="text-center">
-                    <button type="button" class="btn btn-icon btn-info" data-toggle="tooltip" data-placement="top" title="Detail Kegiatan" onclick="detailKegiatan(' . (string)$v->keg_id . ')">
-                      <i class="fa fa-list"></i>
-                    </button>
                     <div class="btn-group" role="group">
                       <button type="button" class="btn btn-icon btn-info" data-toggle="tooltip" data-placement="top" title="Detail Kegiatan" onclick="detailKegiatan(' . (string)$v->keg_id . ')">
                         <i class="fa fa-list"></i>
