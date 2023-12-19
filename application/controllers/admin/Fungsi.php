@@ -53,10 +53,10 @@ class Fungsi extends CI_Controller
       // 						</button>
       // 					</div>';
       $row['opsi']        = '<div class="btn-group" role="group">
-									<button class="btn btn-icon btn-warning update-data" data-id="' . (string)$fun->jbt_id . '">
-										<i class="fa fa-edit"></i>
-									</button>
-								</div>';
+                              <button class="btn btn-icon btn-warning update-data" data-toggle="tooltip" data-placement="top" title="Edit Data" data-original-title="Edit Data" data-id="' . (string)$fun->jbt_id . '">
+                                <i class="fa fa-edit"></i>
+                              </button>
+                            </div>';
       $data[]        = $row;
     }
 

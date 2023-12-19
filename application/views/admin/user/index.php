@@ -404,41 +404,43 @@ $this->load->view('dist/_partials/header');
 </script>
 
 <script>
-  const password = $('#modal-form form#form-data #usr_password'); // id dari input password
-  const password2 = $('#modal-form form#form-data #usr_password2'); // id dari input password2
-  const showHide = $('#modal-form form#form-data #showHide'); // id span showHide dalam input group password
-  const showHide2 = $('#modal-form form#form-data #showHide2'); // id span showHide2 dalam input group password
+  $(document).ready(function() {
+    var password = $('#modal-form form#form-data #usr_password'); // id dari input password
+    var password2 = $('#modal-form form#form-data #usr_password2'); // id dari input password2
+    var showHide = $('#modal-form form#form-data #showHide'); // id span showHide dalam input group password
+    var showHide2 = $('#modal-form form#form-data #showHide2'); // id span showHide2 dalam input group password
 
-  password.attr('type', 'password'); // set type input password menjadi password
-  password2.attr('type', 'password'); // set type input password menjadi password2
-  showHide.html('<i class="fa fa-eye"></i>'); // masukkan icon eye dalam icon bootstrap 5
-  showHide.css('cursor', 'pointer'); // ubah cursor menjadi pointer
-  showHide2.html('<i class="fa fa-eye"></i>'); // masukkan icon eye dalam icon bootstrap 5
-  showHide2.css('cursor', 'pointer'); // ubah cursor menjadi pointer
+    password.attr('type', 'password'); // set type input password menjadi password
+    password2.attr('type', 'password'); // set type input password menjadi password2
+    showHide.html('<i class="fa fa-eye"></i>'); // masukkan icon eye dalam icon bootstrap 5
+    showHide.css('cursor', 'pointer'); // ubah cursor menjadi pointer
+    showHide2.html('<i class="fa fa-eye"></i>'); // masukkan icon eye dalam icon bootstrap 5
+    showHide2.css('cursor', 'pointer'); // ubah cursor menjadi pointer
 
-  showHide.on('click', function() {
-    // ketika span diclick
-    if (password.attr('type') === 'password') {
-      // jika type inputnya password
-      password.attr('type', 'text'); // ubah type menjadi text
-      showHide.html('<i class="fa fa-eye-slash"></i>'); // ubah icon menjadi eye slash
-    } else {
-      // jika type bukan password (text)
-      showHide.html('<i class="fa fa-eye"></i>'); // ubah icon menjadi eye
-      password.attr('type', 'password'); // ubah type menjadi password
-    }
-  });
+    showHide.on('click', function() {
+      // ketika span diclick
+      if (password.attr('type') === 'password') {
+        // jika type inputnya password
+        password.attr('type', 'text'); // ubah type menjadi text
+        showHide.html('<i class="fa fa-eye-slash"></i>'); // ubah icon menjadi eye slash
+      } else {
+        // jika type bukan password (text)
+        showHide.html('<i class="fa fa-eye"></i>'); // ubah icon menjadi eye
+        password.attr('type', 'password'); // ubah type menjadi password
+      }
+    });
 
-  showHide2.on('click', function() {
-    // ketika span diclick
-    if (password2.attr('type') === 'password') {
-      // jika type inputnya password2
-      password2.attr('type', 'text'); // ubah type menjadi text
-      showHide2.html('<i class="fa fa-eye-slash"></i>'); // ubah icon menjadi eye slash
-    } else {
-      // jika type bukan password (text)
-      showHide2.html('<i class="fa fa-eye"></i>'); // ubah icon menjadi eye
-      password2.attr('type', 'password'); // ubah type menjadi password
-    }
+    showHide2.on('click', function() {
+      // ketika span diclick
+      if (password2.attr('type') === 'password') {
+        // jika type inputnya password2
+        password2.attr('type', 'text'); // ubah type menjadi text
+        showHide2.html('<i class="fa fa-eye-slash"></i>'); // ubah icon menjadi eye slash
+      } else {
+        // jika type bukan password (text)
+        showHide2.html('<i class="fa fa-eye"></i>'); // ubah icon menjadi eye
+        password2.attr('type', 'password'); // ubah type menjadi password
+      }
+    });
   });
 </script>

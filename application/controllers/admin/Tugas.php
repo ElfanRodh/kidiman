@@ -43,13 +43,13 @@ class Tugas extends CI_Controller
       $row['jbt_nama']    = $tgs->jbt_nama . '<br> (' . $tgs->prt_nama . ')';
       $row['tgs_nama']    = $tgs->tgs_nama;
       $row['opsi']        = '<div class="btn-group" role="group">
-									<button class="btn btn-icon btn-warning update-data" data-id="' . (string)$tgs->jbt_id . '">
-										<i class="fa fa-edit"></i>
-									</button>
-									<button class="btn btn-icon btn-danger delete-data" data-id="' . (string)$tgs->jbt_id . '" data-name="' . (string) strip_tags($tgs->tgs_nama) . '">
-										<i class="fa fa-trash"></i>
-									</button>
-								</div>';
+                              <button class="btn btn-icon btn-warning update-data" data-toggle="tooltip" data-placement="top" title="Edit Data" data-original-title="Edit Data" data-id="' . (string)$tgs->jbt_id . '">
+                                <i class="fa fa-edit"></i>
+                              </button>
+                              <button class="btn btn-icon btn-danger delete-data" data-toggle="tooltip" data-placement="top" title="Hapus Data" data-original-title="Hapus Data" data-id="' . (string)$tgs->jbt_id . '" data-name="' . (string) strip_tags($tgs->tgs_nama) . '">
+                                <i class="fa fa-trash"></i>
+                              </button>
+                            </div>';
       $data[]        = $row;
     }
 

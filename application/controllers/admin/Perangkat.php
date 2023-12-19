@@ -58,13 +58,13 @@ class Perangkat extends CI_Controller
       $row['prt_foto']    = $foto;
       $row['jbt_nama']    = $prt->jbt_nama;
       $row['opsi']     = '<div class="btn-group" role="group">
-									<button class="btn btn-icon btn-warning update-data" data-id="' . (string)$prt->prj_id . '">
-										<i class="fa fa-edit"></i>
-									</button>
-									<button class="btn btn-icon btn-danger delete-data" data-id="' . (string)$prt->prj_id . '" data-name="' . (string)$prt->jbt_nama . '">
-										<i class="fa fa-trash"></i>
-									</button>
-								</div>';
+                            <button class="btn btn-icon btn-warning update-data" data-toggle="tooltip" data-placement="top" title="Edit Data" data-original-title="Edit Data" data-id="' . (string)$prt->prj_id . '">
+                              <i class="fa fa-edit"></i>
+                            </button>
+                            <button class="btn btn-icon btn-danger delete-data" data-toggle="tooltip" data-placement="top" title="Hapus Data" data-original-title="Hapus Data" data-id="' . (string)$prt->prj_id . '" data-name="' . (string)$prt->jbt_nama . '">
+                              <i class="fa fa-trash"></i>
+                            </button>
+                          </div>';
       $data[]        = $row;
     }
 

@@ -43,10 +43,10 @@ class User extends CI_Controller
             $row['jbt_nama']        = $usr->jbt_nama;
             $row['group_name']      = $usr->group_name;
             $row['opsi']            = '<div class="btn-group" role="group">
-                                            <button class="btn btn-icon btn-warning update-data" data-id="' . (string)$usr->user_id . '">
+                                            <button class="btn btn-icon btn-warning update-data" data-toggle="tooltip" data-placement="top" title="Edit Data" data-original-title="Edit Data" data-id="' . (string)$usr->user_id . '">
                                                 <i class="fa fa-edit"></i>
                                             </button>
-                                            <button class="btn btn-icon btn-danger delete-data" data-id="' . (string)$usr->user_id . '" data-name="' . (string)$usr->username . '">
+                                            <button class="btn btn-icon btn-danger delete-data" data-toggle="tooltip" data-placement="top" title="Hapus Data" data-original-title="Hapus Data" data-id="' . (string)$usr->user_id . '" data-name="' . (string)$usr->username . '">
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         </div>';

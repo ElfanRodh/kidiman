@@ -48,6 +48,16 @@ if ($is_admin) {
           'text'    => '<i class="fa fa-tasks"></i> <span>Kegiatan</span>',
         ],
       ]
+    ],
+    [
+      'header' => 'Absensi',
+      'menus' => [
+        [
+          'active'  => 'histori',
+          'link'    => 'admin/histori',
+          'text'    => '<i class="fa fa-box"></i> <span>Histori Absensi</span>',
+        ],
+      ]
     ]
   ];
 } else {

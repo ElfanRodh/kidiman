@@ -110,7 +110,7 @@ class Kegiatan extends CI_Controller
       // $row['fun_nama']    = $keg->fun_nama;
       $row['kegiatan']      = $this->getKegiatanJabatan($keg->jbt_id);
       $row['opsi']        = '<div class="btn-group" role="group">
-                              <button class="btn btn-icon btn-warning update-data" data-id="' . (string)$keg->jbt_id . '">
+                              <button type="button" class="btn btn-icon btn-warning update-data" data-toggle="tooltip" data-placement="top" title="Edit Data" data-original-title="Edit Data" data-id="' . (string)$keg->jbt_id . '">
                                 <i class="fa fa-edit"></i>
                               </button>
                             </div>';
@@ -568,7 +568,7 @@ class Kegiatan extends CI_Controller
         $tgl_sekarang = date('Y-m-d');
         if (($tgl_sekarang <= $v->keg_tanggal_selesai) && (int) number_format($v->keg_progres, 0) != 100 && (!$this->is_admin || $this->user->jabatan_id == $jbt_id)) {
           $add_btn = '<div class="btn-group mt-2" role="group">
-                        <button class="btn btn-sm btn-icon btn-success add-progres" data-id="' . (string)$v->keg_id . '" data-name="' . strip_tags($v->keg_nama) . '">
+                        <button type="button" class="btn btn-sm btn-icon btn-success add-progres" data-toggle="tooltip" data-placement="top" title="Tambah Progres" data-original-title="Tambah Progres" data-id="' . (string)$v->keg_id . '" data-name="' . strip_tags($v->keg_nama) . '">
                           <i class="fa fa-plus mr-1"></i> Progres
                         </button>
                       </div>';
@@ -590,14 +590,17 @@ class Kegiatan extends CI_Controller
               </td>
               ';
         $list .= '<td class="text-center">
+                    <button type="button" class="btn btn-icon btn-info" data-toggle="tooltip" data-placement="top" title="Detail Kegiatan" onclick="detailKegiatan(' . (string)$v->keg_id . ')">
+                      <i class="fa fa-list"></i>
+                    </button>
                     <div class="btn-group" role="group">
-                      <button class="btn btn-icon btn-info" onclick="detailKegiatan(' . (string)$v->keg_id . ')">
+                      <button type="button" class="btn btn-icon btn-info" data-toggle="tooltip" data-placement="top" title="Detail Kegiatan" onclick="detailKegiatan(' . (string)$v->keg_id . ')">
                         <i class="fa fa-list"></i>
                       </button>
-                      <button class="btn btn-icon btn-warning update-data" data-id="' . (string)$v->keg_id . '">
+                      <button type="button" class="btn btn-icon btn-warning update-data" data-toggle="tooltip" data-placement="top" title="Edit Kegiatan" data-id="' . (string)$v->keg_id . '">
                         <i class="fa fa-edit"></i>
                       </button>
-                      <button class="btn btn-icon btn-danger delete-data" data-id="' . (string)$v->keg_id . '" data-name="' . strip_tags((string)$v->keg_nama) . '">
+                      <button type="button" class="btn btn-icon btn-danger delete-data" data-toggle="tooltip" data-placement="top" title="Hapus Kegiatan" data-id="' . (string)$v->keg_id . '" data-name="' . strip_tags((string)$v->keg_nama) . '">
                         <i class="fa fa-trash"></i>
                       </button>
                     </div>          

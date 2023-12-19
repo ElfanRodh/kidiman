@@ -5,7 +5,8 @@ defined('BASEPATH') or exit('No direct script access allowed');
 <!-- General JS Scripts -->
 <!-- <script src="<?= base_url("assets/modules/bootstrap/js/bootstrap.min.js"); ?>"></script> -->
 <!-- <script src="<?= base_url("assets/modules/popper.js"); ?>"></script> -->
-<script src="<?= base_url("assets/modules/tooltip.js"); ?>"></script>
+<!-- <script src="<?= base_url("assets/modules/tooltip.js"); ?>"></script> -->
+
 <script src="<?= base_url("assets/modules/nicescroll/jquery.nicescroll.min.js"); ?>"></script>
 <script src="<?= base_url("assets/modules/moment.min.js"); ?>"></script>
 <script src="<?= base_url("assets/js/stisla.js"); ?>"></script>
