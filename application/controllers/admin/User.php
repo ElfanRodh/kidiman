@@ -176,7 +176,7 @@ class User extends CI_Controller
                     $this->db->trans_begin(); // Memulai transaksi
 
                     $data_user['first_name'] = $this->input->post('usr_nama');
-                    if ($this->input->post('usr_password_baru')) {
+                    if ($this->input->post('usr_password')) {
                         $data_user['password'] = password_hash($this->input->post('usr_password'), PASSWORD_BCRYPT);
                     }
 
