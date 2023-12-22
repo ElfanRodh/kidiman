@@ -12,7 +12,8 @@ $this->load->view('dist/_partials/header');
 
 			<form class="login100-form validate-form" method="POST" action="<?= site_url("auth/login"); ?>">
 				<h1 class="text-app text-center mb-4">
-					KIDIMAN
+					KI DIMAN <br>
+					PERANGKAT <br> DESA
 				</h1>
 				<!-- <div id="infoMessage"><?php echo $message; ?></div> -->
 				<div class="text-muted text-center text-danger fw-bold py-3" id="infoMessage">

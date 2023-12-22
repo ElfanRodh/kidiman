@@ -5,7 +5,7 @@
   <meta charset="utf-8" />
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
-  <title>Kidiman Perang</title>
+  <title>Ki Diman Perangkat Desa Perang</title>
   <meta content="" name="description" />
   <meta content="" name="keywords" />
 
@@ -33,7 +33,7 @@
   <!-- ======= Header ======= -->
   <header id="header" class="fixed-top">
     <div class="container d-flex align-items-center">
-      <h1 class="logo me-auto"><a href="#">KIDIMAN PERANG</a></h1>
+      <h1 class="logo me-auto"><a href="#">KI DIMAN PERANGKAT DESA</a></h1>
       <!-- Uncomment below if you prefer to use an image logo -->
       <!-- <a href="index2.html" class="logo me-auto"><img src="assets/img/logo.png" alt="" class="img-fluid"></a>-->
 
@@ -56,8 +56,8 @@
     <div class="container">
       <div class="row">
         <div class="col-lg-6 d-flex flex-column justify-content-center pt-4 pt-lg-0 order-2 order-lg-1" data-aos="fade-up" data-aos-delay="200">
-          <h1>KIDIMAN PERANG </h1>
-          <h2 class="text-white">Koreksi Disiplin Mandiri Perangkat Desa </h2>
+          <h1>KI DIMAN <br> PERANGKAT DESA </h1>
+          <h2 class="text-white">Kinerja Disiplin Mandiri Perangkat Desa </h2>
           <h2>
             Solusi inovatif yang dirancang khusus untuk membantu meningkatkan efisiensi dan efektivitas tugas-tugas administratif di tingkat desa.
           </h2>
@@ -78,7 +78,7 @@
     <section id="about" class="about">
       <div class="container" data-aos="fade-up">
         <div class="section-title">
-          <h2>Tentang Kidiman</h2>
+          <h2>Tentang Ki Diman Perangkat Desa</h2>
         </div>
 
         <div class="row content">
@@ -88,7 +88,7 @@
               pada pemantauan dan peningkatan kedisiplinan para perangkat desa agar mampu menjalankan tugas-tugas mereka dengan lebih baik.
             </p>
             <p>
-              Fitur utama dari aplikasi KIDIMAN PERANG mencakup:
+              Fitur utama dari aplikasi KI DIMAN PERANGKAT DESA mencakup:
             </p>
             <ul>
               <li>
@@ -154,9 +154,9 @@
     <section id="team" class="team section">
       <div class="container" data-aos="fade-up">
         <div class="section-title">
-          <h2>Tim Kidiman</h2>
+          <h2>Tim Ki Diman Perangkat Desa</h2>
           <p>
-            Data Perangkat Desa KIDIMAN PERANG
+            Data Perangkat Desa KI DIMAN PERANGKAT DESA
           </p>
         </div>
 

@@ -49,16 +49,16 @@ if ($is_admin) {
         ],
       ]
     ],
-    [
-      'header' => 'Absensi',
-      'menus' => [
-        [
-          'active'  => 'histori',
-          'link'    => 'admin/histori',
-          'text'    => '<i class="fa fa-box"></i> <span>Histori Absensi</span>',
-        ],
-      ]
-    ]
+    // [
+    //   'header' => 'Absensi',
+    //   'menus' => [
+    //     [
+    //       'active'  => 'histori',
+    //       'link'    => 'admin/histori',
+    //       'text'    => '<i class="fa fa-box"></i> <span>Histori Absensi</span>',
+    //     ],
+    //   ]
+    // ]
   ];
 } else {
   $menu = [
@@ -91,7 +91,7 @@ if ($is_admin) {
 <div class="main-sidebar sidebar-style-2">
   <aside id="sidebar-wrapper">
     <div class="sidebar-brand">
-      <a href="<?= site_url(); ?>">KIDIMAN</a>
+      <a href="<?= site_url(); ?>">KIDIMAN <br> PERANGKAT DESA</a>
     </div>
     <div class="sidebar-brand sidebar-brand-sm">
       <a href="<?= site_url(); ?>">KDM</a>

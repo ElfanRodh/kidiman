@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-	<title><?= $title; ?> &mdash; Kidiman Perang</title>
+	<title><?= $title; ?> &mdash; Ki Diman Perangkat Desa Perang</title>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<!--===============================================================================================-->
