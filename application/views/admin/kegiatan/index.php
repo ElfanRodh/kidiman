@@ -140,7 +140,7 @@ $this->load->view('dist/_partials/header');
                   <textarea class="form-control keg-summernote" id="keg_nama" name="keg_nama"></textarea>
                 </div>
               </div>
-              <div class="col-12 col-md-6">
+              <!-- <div class="col-12 col-md-6">
                 <div class="form-group">
                   <label for="keg_foto">Foto</label>
                   <small class="form-text text-muted my-1">File maksimal 5MB</small>
@@ -151,7 +151,19 @@ $this->load->view('dist/_partials/header');
               <div class="col-12 col-md-6 konten_keg_foto d-none">
                 <div class="form-group">
                   <input type="hidden" name="keg_foto_old">
-                  <img src="" class="img-fluid" id="keg_foto_old" alt="">
+                  <img src="" class="" id="keg_foto_old" alt="" style="max-width: 95%; height: auto;">
+                  <button href="#" class="btn btn-icon btn-danger rounded-pill position-absolute" style="right: 10px; top: -20px;">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </div> -->
+              <div class="col-12">
+                <div class="form-group">
+                  <label for="keg_foto">Foto</label>
+                  <small class="form-text text-muted my-1">File maksimal 5MB</small>
+                  <div class="row py-2" id="imageContainer"></div>
+                  <button type="button" class="btn btn-success" onclick="addImage('imageContainer', 'keg_foto')">Tambah Foto</button>
+                  <!-- <button type="button" class="btn btn-danger" onclick="removeImage()">Hapus Foto Terakhir</button> -->
                 </div>
               </div>
             </div>
@@ -245,7 +257,7 @@ $this->load->view('dist/_partials/header');
                   </div>
                 </div>
               </div>
-              <div class="col-12 col-md-6">
+              <!-- <div class="col-12 col-md-6">
                 <div class="form-group">
                   <label for="prog_bukti">Bukti Kegiatan</label>
                   <small class="form-text text-muted my-1">File maksimal 5MB</small>
@@ -257,6 +269,14 @@ $this->load->view('dist/_partials/header');
                 <div class="form-group">
                   <input type="hidden" name="prog_bukti_old">
                   <img src="" class="img-fluid" id="prog_bukti_old" alt="">
+                </div>
+              </div> -->
+              <div class="col-12">
+                <div class="form-group">
+                  <label for="prog_bukti">Bukti Kegiatan</label>
+                  <small class="form-text text-muted my-1">File maksimal 5MB</small>
+                  <div class="row py-2" id="imageContainerProg"></div>
+                  <button type="button" class="btn btn-success" onclick="addImage('imageContainerProg', 'prog_bukti')">Tambah Foto</button>
                 </div>
               </div>
               <div class="col-12 col-md-12">
@@ -279,6 +299,84 @@ $this->load->view('dist/_partials/header');
 
 <?php $this->load->view('dist/_partials/footer'); ?>
 <script src="https://cdn.jsdelivr.net/gh/xcash/bootstrap-autocomplete@v2.3.7/dist/latest/bootstrap-autocomplete.min.js"></script>
+
+<script>
+  // Tambahkan gambar
+  function addImage(container, name) {
+    var container = $('#' + container);
+    var input = $('<input>').attr({
+      type: 'file',
+      name: name + '[]',
+      accept: 'image/*',
+      required: true,
+      class: 'form-control img-multi'
+    }).on('change', previewImage);
+
+    var inputHidden = $('<input>').attr({
+      type: 'hidden',
+      name: name + '_old[]'
+    });
+
+    var imageDiv = $('<div>').addClass('image-container col-12 col-md-6').append(input).append(inputHidden);
+    container.append(imageDiv);
+    return [
+      input,
+      inputHidden
+    ];
+  }
+
+  // Tampilkan pratinjau gambar
+  function previewImage(event) {
+    var input = event.target;
+    var imageContainer = $(input).parent();
+
+    // Hapus pratinjau sebelumnya
+    imageContainer.find('.preview').remove();
+
+    // Buat dan tampilkan pratinjau
+    var preview = $('<img>').addClass('preview img-fluid py-3').attr('src', URL.createObjectURL(input.files[0]));
+    imageContainer.append(preview);
+
+    // Buat tombol hapus
+    var removeBtn = $('<button>').addClass('btn btn-icon btn-danger rounded-pill position-absolute').css({
+      'right': '10px',
+      'top': '30px'
+    }).html('<i class="fas fa-times"></i>').click(function() {
+      imageContainer.remove();
+    });
+
+    imageContainer.append(removeBtn);
+  }
+
+  function setSrcImage(imgElement, inpHidden, file) {
+    var imageContainer = imgElement.parent();
+
+    // Hapus pratinjau sebelumnya
+    imageContainer.find('.preview').remove();
+
+    // Buat dan tampilkan pratinjau
+    var preview = $('<img>').addClass('preview img-fluid py-3').attr('src', file);
+    imageContainer.append(preview);
+
+    inpHidden.val(file)
+
+    // Buat tombol hapus
+    var removeBtn = $('<button>').addClass('btn btn-icon btn-danger rounded-pill position-absolute').css({
+      'right': '10px',
+      'top': '30px'
+    }).html('<i class="fas fa-times"></i>').click(function() {
+      imageContainer.remove();
+    });
+
+    imageContainer.append(removeBtn);
+  }
+
+  $(document).ready(function() {
+
+    // Event handler untuk tombol tambah dan hapus
+    $('#addImageButton').click(addImage);
+  });
+</script>
 
 <script>
   var fil_jabatan, fil_tanggal;
@@ -341,7 +439,7 @@ $this->load->view('dist/_partials/header');
       opens: 'down'
     });
 
-    $('input[type="file"]').change(function(e) {
+    $('input[type="file"].file').change(function(e) {
       var id = $(this).attr('id');
       var fileInput = this;
       $('.custom-file-label[for="' + id + '"]').html(fileInput.files[0].name);
@@ -482,8 +580,13 @@ $this->load->view('dist/_partials/header');
                 });
               }, 200);
               $("#modal-form form#form-data #keg_nama").summernote('code', res.data.keg_nama);
-              $("#modal-form form#form-data [name=keg_foto_old]").val(res.data.progres[0].prog_bukti);
-              $("#modal-form form#form-data img#keg_foto_old").attr('src', res.data.progres[0].prog_bukti);
+              // $("#modal-form form#form-data [name=keg_foto_old]").val(res.data.progres[0].prog_bukti);
+              // $("#modal-form form#form-data img#keg_foto_old").attr('src', res.data.progres[0].prog_bukti);
+              // console.log(res.data.progres[0].bukti);
+              res.data.progres[0].bukti.forEach((el, id) => {
+                var img = addImage('imageContainer', 'keg_foto');
+                setSrcImage(img[0], img[1], el.buk_foto)
+              });
               $("#modal-form form#form-data .konten_keg_foto").removeClass('d-none');
             }, 500);
           } else {
@@ -615,6 +718,8 @@ $this->load->view('dist/_partials/header');
       $("form .invalid-feedback").remove();
       $("form .valid-feedback").remove();
       $("form#form-data [name=keg_foto_old]").val(null);
+      $("form#form-data #imageContainer").html(null);
+      $("form#form-data #imageContainerProg").html(null);
       $("form#form-data img#keg_foto_old").attr('src', null);
       $("form#form-data .konten_keg_foto").addClass('d-none');
       $('#keg_tanggal').daterangepicker({
@@ -646,6 +751,8 @@ $this->load->view('dist/_partials/header');
       $("form .valid-feedback").remove();
       $("form#form-data .konten_keg_foto").addClass('d-none');
       $("form#form-data img#prog_bukti_old").attr('src', null);
+      $("form#form-data #imageContainer").html(null);
+      $("form#form-data #imageContainerProg").html(null);
       $("form#form-data .konten_prog_bukti").addClass('d-none');
       // $("#prog_tanggal").daterangepicker();
       $("#modal-progres form#form-data #prog_tanggal").daterangepicker({
@@ -691,12 +798,16 @@ $this->load->view('dist/_partials/header');
             $('form#form-data .invalid-feedback').remove();
             frm.forEach(function(el, ind) {
               if (val[ind] != '') {
-                $('form#form-data #' + el).removeClass('is-invalid').addClass("is-invalid");
                 var app = '<div id="' + el + '-error" class="invalid-feedback" for="' + el + '">' + val[ind] + '</div>';
                 if (el == 'keg_tanggal') {
                   $('form#form-data #' + el).closest('.form-group .input-group').append(app);
+                  $('form#form-data #' + el).removeClass('is-invalid').addClass("is-invalid");
+                } else if (el == 'keg_foto') {
+                  $('form#form-data .img-multi').closest('.form-group').append(app);
+                  $('form#form-data .img-multi').removeClass('is-invalid').addClass("is-invalid");
                 } else {
                   $('form#form-data #' + el).closest('.form-group').append(app);
+                  $('form#form-data #' + el).removeClass('is-invalid').addClass("is-invalid");
                 }
               }
             });
@@ -921,9 +1032,13 @@ $this->load->view('dist/_partials/header');
           });
         }, 500);
 
-        $("#modal-progres form#form-data [name=prog_bukti_old]").val(res.data.prog_bukti);
-        $("#modal-progres form#form-data img#prog_bukti_old").attr('src', res.data.prog_bukti);
-        $("#modal-progres form#form-data .konten_prog_bukti").removeClass('d-none');
+        // $("#modal-progres form#form-data [name=prog_bukti_old]").val(res.data.prog_bukti);
+        // $("#modal-progres form#form-data img#prog_bukti_old").attr('src', res.data.prog_bukti);
+        // $("#modal-progres form#form-data .konten_prog_bukti").removeClass('d-none');
+        res.data.bukti.forEach((el, id) => {
+          var img = addImage('imageContainerProg', 'prog_bukti');
+          setSrcImage(img[0], img[1], el.buk_foto)
+        });
         $("#modal-progres form#form-data #prog_keterangan").summernote('code', res.data.prog_keterangan);
 
       }
@@ -1012,16 +1127,21 @@ $this->load->view('dist/_partials/header');
           if (res.ok == 400) {
             var frm = Object.keys(res.form);
             var val = Object.values(res.form);
-            $('form#form-data .invalid-feedback').remove();
+            $('#modal-progres form#form-data .invalid-feedback').remove();
             frm.forEach(function(el, ind) {
               if (val[ind] != '') {
-                $('form#form-data #' + el).removeClass('is-invalid').addClass("is-invalid");
+                $('#modal-progres form#form-data #' + el).removeClass('is-invalid').addClass("is-invalid");
                 var app = '<div id="' + el + '-error" class="invalid-feedback" for="' + el + '">' + val[ind] + '</div>';
-                // if (el == 'prog_tanggal') {
-                //   $('form#form-data #' + el).closest('.form-group .input-group').append(app);
-                // } else {
-                // }
-                $('form#form-data #' + el).closest('.form-group').append(app);
+                if (el == 'keg_tanggal') {
+                  $('#modal-progres form#form-data #' + el).closest('.form-group .input-group').append(app);
+                  $('#modal-progres form#form-data #' + el).removeClass('is-invalid').addClass("is-invalid");
+                } else if (el == 'prog_bukti') {
+                  $('#modal-progres form#form-data .img-multi').closest('.form-group').append(app);
+                  $('#modal-progres form#form-data .img-multi').removeClass('is-invalid').addClass("is-invalid");
+                } else {
+                  $('#modal-progres form#form-data #' + el).closest('.form-group').append(app);
+                  $('#modal-progres form#form-data #' + el).removeClass('is-invalid').addClass("is-invalid");
+                }
               }
             });
           } else {

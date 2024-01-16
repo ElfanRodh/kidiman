@@ -54,7 +54,6 @@ class Home extends CI_Controller
       }
     }
 
-    $wr = [];
     if ($this->input->post('fil_jabatan')) {
       $wr['keg_jabatan'] = $this->input->post('fil_jabatan');
     }
@@ -77,7 +76,7 @@ class Home extends CI_Controller
     }
 
     $this->db->select('COUNT(*) as total');
-    $this->db->where('keg_status = 1');
+    $this->db->where('keg_status', '1');
     $query = $this->db->get_where('kegiatan', $wr)->row();
     $data = $query->total;
 

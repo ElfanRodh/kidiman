@@ -258,38 +258,115 @@ class Kegiatan extends CI_Controller
           $data = $wr;
 
           $kegiatan = $this->db->get_where('kegiatan', ['keg_id' => $this->input->post('keg_id')])->row();
-          $data_program = [];
+          $data_progres = [];
           if ($kegiatan->keg_tanggal_mulai != $wr['keg_tanggal_mulai'] || $kegiatan->keg_tanggal_selesai != $wr['keg_tanggal_selesai']) {
             $program = $this->db->order_by('prog_tanggal')->get_where('progres_kegiatan', ['prog_kegiatan' => $this->input->post('keg_id')]);
             foreach ($program->result() as $k => $v) {
               $persen = hitungPersentase($wr['keg_tanggal_mulai'], $wr['keg_tanggal_selesai'], $v->prog_tanggal);
-              $data_program[$k]['prog_id']          = $v->prog_id;
-              $data_program[$k]['prog_persentase']  = $persen['persentase'];
+              $data_progres[$k]['prog_id']          = $v->prog_id;
+              $data_progres[$k]['prog_persentase']  = $persen['persentase'];
             }
           }
 
-          if ($this->input->post('keg_foto')) {
-            $foto = $this->input->post('keg_foto');
-            $nama_file = FCPATH . 'public/progress/' . str_replace(base_url() . 'public/progress/', '', $this->input->post('keg_foto_old'));
 
-            if ($this->input->post('keg_foto_old') && file_exists($nama_file)) {
-              unlink($nama_file);
+          // if ($this->input->post('keg_foto')) {
+          //   $foto = $this->input->post('keg_foto');
+          //   $nama_file = FCPATH . 'public/progress/' . str_replace(base_url() . 'public/progress/', '', $this->input->post('keg_foto_old'));
+
+          //   if ($this->input->post('keg_foto_old') && file_exists($nama_file)) {
+          //     unlink($nama_file);
+          //   }
+          // } else {
+          //   $foto = str_replace(base_url() . 'public/progress/', '', $this->input->post('keg_foto_old'));
+          // }
+
+          $file_old = $this->input->post('keg_foto_old');
+
+          $file_upload = $this->uploadMiltipleDokumen('keg_foto');
+          if ($file_upload['file']) {
+            $file_arr = array_diff($file_old, $file_upload['file']);
+            $hasil_gabungan = array_unique(array_merge($file_old, $file_upload['file']));
+
+            $hasil_gabungan = array_map(function ($nilai) {
+              return str_replace(base_url() . 'public/progress/', '', $nilai);
+            }, $hasil_gabungan);
+
+            $bukti_kegiatan = $this->db->get_where('bukti_kegiatan', ['buk_kegiatan' => $this->input->post('keg_id')]);
+
+            foreach ($bukti_kegiatan->result() as $kb => $vb) {
+              $nama_file = FCPATH . 'public/progress/' . $vb->buk_foto;
+              $nama_file_url = FCPATH . 'public/progress/' . str_replace(base_url() . 'public/progress/', '', $vb->buk_foto);
+              if (file_exists($nama_file) && !in_array($vb->buk_foto, $hasil_gabungan)) {
+                unlink($nama_file);
+                $this->db->delete('bukti_kegiatan', ['buk_foto' => $vb->buk_foto]);
+              }
             }
+
+            // $progres_kegiatan = $this->db->get_where('progres_kegiatan', ['prog_kegiatan' => $this->input->post('keg_id'), 'prog_persentase' => 0])->row();
+            $progres_kegiatan = $this->db->order_by('prog_persentase')->limit(1)->get_where('progres_kegiatan', ['prog_kegiatan' => $this->input->post('keg_id')])->row();
+            $data_bukti = [];
+            foreach ($file_upload['file'] as $kf => $vf) {
+              $data_bukti[$kf] = [
+                'buk_progres'  => $progres_kegiatan->prog_id,
+                'buk_kegiatan' => $this->input->post('keg_id'),
+                'buk_tanggal'  => date('Y-m-d H:i:s'),
+                'buk_foto'    => $vf,
+              ];
+            }
+            if (!$data_bukti) {
+              $ret['ok'] = 500;
+              $ret['form'] = 'Foto tidak boleh kosong';
+              echo json_encode($ret);
+              exit();
+            }
+          } else if ($file_old) {
+            $hasil_gabungan = $file_old;
+            $hasil_gabungan = array_map(function ($nilai) {
+              return str_replace(base_url() . 'public/progress/', '', $nilai);
+            }, $hasil_gabungan);
+
+            // echo json_encode($hasil_gabungan);
+            // exit();
+
+            // $progres_kegiatan = $this->db->get_where('progres_kegiatan', ['prog_kegiatan' => $this->input->post('keg_id'), 'prog_persentase' => 0])->row();
+            $progres_kegiatan = $this->db->order_by('prog_persentase')->limit(1)->get_where('progres_kegiatan', ['prog_kegiatan' => $this->input->post('keg_id')])->row();
+            $bukti_kegiatan = $this->db->get_where('bukti_kegiatan', ['buk_kegiatan' => $this->input->post('keg_id'), 'buk_progres' => $progres_kegiatan->prog_id]);
+
+            foreach ($bukti_kegiatan->result() as $kb => $vb) {
+              $nama_file = FCPATH . 'public/progress/' . $vb->buk_foto;
+              $nama_file_url = FCPATH . 'public/progress/' . str_replace(base_url() . 'public/progress/', '', $vb->buk_foto);
+              if (file_exists($nama_file) && !in_array($vb->buk_foto, $hasil_gabungan)) {
+                unlink($nama_file);
+                $this->db->delete('bukti_kegiatan', ['buk_foto' => $vb->buk_foto]);
+              }
+            }
+
+            $data_bukti = [];
           } else {
-            $foto = str_replace(base_url() . 'public/progress/', '', $this->input->post('keg_foto_old'));
+            $ret['ok'] = 500;
+            $ret['form'] = 'Foto tidak boleh kosong';
+            echo json_encode($ret);
+            exit();
           }
+
+          // echo json_encode($hasil_gabungan);
+          // exit();
 
           $this->db->trans_begin(); // Memulai transaksi
 
           // Langkah 2: Input batch data
           $this->db->update('kegiatan', $data, ['keg_id' => $this->input->post('keg_id')]);
-          $this->db->update('progres_kegiatan', ['prog_keterangan' => 'Mulai Kegiatan <br>' . $this->input->post('keg_nama'), 'prog_bukti' => $foto], ['prog_kegiatan' => $this->input->post('keg_id'), 'prog_persentase' => 0]);
+          $progres_kegiatan = $this->db->order_by('prog_persentase')->limit(1)->get_where('progres_kegiatan', ['prog_kegiatan' => $this->input->post('keg_id')])->row();
+          $this->db->update('progres_kegiatan', ['prog_keterangan' => 'Mulai Kegiatan <br>' . $this->input->post('keg_nama'), 'prog_bukti' => str_replace(base_url() . 'public/progress/', '', $hasil_gabungan[0])], ['prog_kegiatan' => $this->input->post('keg_id'), 'prog_id' => $progres_kegiatan->prog_id]);
+          if ($data_bukti) {
+            $this->db->insert_batch('bukti_kegiatan', $data_bukti);
+          }
 
-          if ($data_program) {
-            foreach ($data_program as $k => $v) {
+          if ($data_progres) {
+            foreach ($data_progres as $k => $v) {
               $this->db->update('progres_kegiatan', ['prog_persentase' => $v['prog_persentase']], ['prog_id' => $v['prog_id']]);
             }
-            $progres_end = end($data_program);
+            $progres_end = end($data_progres);
             if ((int) $progres_end['prog_persentase'] > 100) {
               $this->db->trans_rollback();
               $ret['ok'] = 500;
@@ -334,31 +411,55 @@ class Kegiatan extends CI_Controller
           $data = [];
           $data = $wr1;
           $data['keg_progres'] = 0;
-          $this->db->trans_begin(); // Memulai transaksi
-          if ($this->db->insert('kegiatan', $data)) {
-            $data_progres = [
-              'prog_kegiatan' => $this->db->insert_id(),
-              'prog_persentase' => 0,
-              'prog_keterangan' => 'Mulai Kegiatan <br>' . $this->input->post('keg_nama'),
-              'prog_tanggal'  => date('Y-m-d H:i:s'),
-              'prog_bukti'    => $this->input->post('keg_foto'),
-            ];
-            if ($this->db->insert('progres_kegiatan', $data_progres)) {
-              $ret['ok']    = 200;
-              $ret['form']  = 'Sukses Insert Data';
-            }
-            if ($this->db->trans_status() === FALSE) {
-              $this->db->trans_rollback();
+
+          $file_upload = $this->uploadMiltipleDokumen('keg_foto');
+          if ($file_upload['file']) {
+            $this->db->trans_begin(); // Memulai transaksi
+            if ($this->db->insert('kegiatan', $data)) {
+              $keg_id = $this->db->insert_id();
+
+              $data_progres = [
+                'prog_kegiatan' => $keg_id,
+                'prog_persentase' => 0,
+                'prog_keterangan' => 'Mulai Kegiatan <br>' . $this->input->post('keg_nama'),
+                'prog_tanggal'  => date('Y-m-d H:i:s'),
+                'prog_bukti'    => $file_upload['file'][0],
+              ];
+
+              if ($this->db->insert('progres_kegiatan', $data_progres)) {
+                $prog_id = $this->db->insert_id();
+                $data_bukti = [];
+                foreach ($file_upload['file'] as $kf => $vf) {
+                  $data_bukti[$kf] = [
+                    'buk_progres'  => $prog_id,
+                    'buk_kegiatan' => $keg_id,
+                    'buk_tanggal'  => date('Y-m-d H:i:s'),
+                    'buk_foto'    => $vf,
+                  ];
+                }
+                if ($this->db->insert_batch('bukti_kegiatan', $data_bukti)) {
+                  $ret['ok']    = 200;
+                  $ret['form']  = 'Sukses Insert Data';
+                }
+              }
+              if ($this->db->trans_status() === FALSE) {
+                $this->db->trans_rollback();
+                $ret['ok']    = 500;
+                $ret['form']  = 'Gagal Insert Data';
+              } else {
+                $this->db->trans_commit(); // Transaksi berhasil, commit
+                $ret['ok']    = 200;
+                $ret['form']  = 'Sukses Insert Data';
+              }
+            } else {
               $ret['ok']    = 500;
               $ret['form']  = 'Gagal Insert Data';
-            } else {
-              $this->db->trans_commit(); // Transaksi berhasil, commit
-              $ret['ok']    = 200;
-              $ret['form']  = 'Sukses Insert Data';
             }
           } else {
             $ret['ok']    = 500;
-            $ret['form']  = 'Gagal Insert Data';
+            $ret['form'] = 'Foto tidak boleh kosong';
+            echo json_encode($ret);
+            exit();
           }
         }
       }
@@ -367,11 +468,11 @@ class Kegiatan extends CI_Controller
       $ret['form']['keg_fungsi']  = form_error('keg_fungsi');
       $ret['form']['keg_tanggal'] = form_error('keg_tanggal');
       $ret['form']['keg_nama'] = form_error('keg_nama');
-      if ($this->input->post('keg_edit')) {
-        $ret['form']['keg_foto_old'] = form_error('keg_foto_old');
-      } else {
-        $ret['form']['keg_foto'] = form_error('keg_foto');
-      }
+      // if ($this->input->post('keg_edit')) {
+      //   $ret['form']['keg_foto_old'] = form_error('keg_foto_old');
+      // } else {
+      //   $ret['form']['keg_foto'] = form_error('keg_foto');
+      // }
       $ret['ok']    = 400;
     }
     echo json_encode($ret);
@@ -437,25 +538,25 @@ class Kegiatan extends CI_Controller
       ]
     ];
 
-    if ($this->input->post('keg_edit')) {
-      $config[] = [
-        'field' => 'keg_foto_old',
-        'label' => 'Foto Kegiatan',
-        'rules' => 'required',
-        'errors' => [
-          'required' => '{field} harus diisi',
-        ],
-      ];
-    } else {
-      $config[] = [
-        'field' => 'keg_foto',
-        'label' => 'Foto Kegiatan',
-        'rules' => 'required',
-        'errors' => [
-          'required' => '{field} harus diisi',
-        ],
-      ];
-    }
+    // if ($this->input->post('keg_edit')) {
+    //   $config[] = [
+    //     'field' => 'keg_foto_old',
+    //     'label' => 'Foto Kegiatan',
+    //     'rules' => 'required',
+    //     'errors' => [
+    //       'required' => '{field} harus diisi',
+    //     ],
+    //   ];
+    // } else {
+    //   $config[] = [
+    //     'field' => 'keg_foto',
+    //     'label' => 'Foto Kegiatan',
+    //     'rules' => 'required',
+    //     'errors' => [
+    //       'required' => '{field} harus diisi',
+    //     ],
+    //   ];
+    // }
 
     $this->form_validation->set_rules($config);
     return $this->form_validation->run();
@@ -631,6 +732,7 @@ class Kegiatan extends CI_Controller
     $data = [];
     foreach ($progres->result() as $k => $v) {
       $data[$k]['prog_id'] = $v->prog_id;
+      $data[$k]['prog_kegiatan'] = $v->prog_kegiatan;
       $data[$k]['prog_persentase'] = $v->prog_persentase;
       if ($v->prog_bukti && file_exists(FCPATH . 'public/progress/' . $v->prog_bukti)) {
         $file = base_url() . 'public/progress/' . $v->prog_bukti;
@@ -640,6 +742,25 @@ class Kegiatan extends CI_Controller
       $data[$k]['prog_bukti'] = $file;
       $data[$k]['prog_keterangan'] = $v->prog_keterangan;
       $data[$k]['prog_tanggal'] = date('d-m-Y H:i:s', strtotime($v->prog_tanggal));
+      $data[$k]['bukti'] = $this->getBuktiProgres($v->prog_id, $prog_kegiatan);
+    }
+    return $data;
+  }
+
+  function getBuktiProgres($buk_progres, $buk_kegiatan)
+  {
+    $progres = $this->db->order_by('buk_tanggal')->get_where('bukti_kegiatan', ['buk_progres' => $buk_progres, 'buk_kegiatan' => $buk_kegiatan]);
+    $data = [];
+    foreach ($progres->result() as $k => $v) {
+      $data[$k]['buk_id'] = $v->buk_id;
+      $data[$k]['buk_kegiatan'] = $v->buk_kegiatan;
+      if ($v->buk_foto && file_exists(FCPATH . 'public/progress/' . $v->buk_foto)) {
+        $file = base_url() . 'public/progress/' . $v->buk_foto;
+      } else {
+        $file = 0;
+      }
+      $data[$k]['buk_foto'] = $file;
+      $data[$k]['buk_tanggal'] = date('d-m-Y H:i:s', strtotime($v->buk_tanggal));
     }
     return $data;
   }
@@ -690,6 +811,65 @@ class Kegiatan extends CI_Controller
       $ret["form"][$_POST['id']] = 'Upload Sukses';
     }
     echo json_encode($ret);
+  }
+
+  function uploadMiltipleDokumen($frm = 'keg_foto')
+  {
+    $ret['ok']    = 200;
+    $ret['form']  = 'Sukses Upload File';
+
+    $files = $_FILES;
+    $jumlahFile = 0;
+    if (isset($files[$frm])) {
+      $jumlahFile = count($files[$frm]['name']);
+    }
+
+    $data['totalFiles'] = [];
+    $ret["form"] = [];
+    if ($jumlahFile > 0) {
+      for ($i = 0; $i < $jumlahFile; $i++) {
+        if (!empty($_FILES[$frm]['name'][$i])) {
+          $_FILES['file']['name'] = $_FILES[$frm]['name'][$i];
+          $_FILES['file']['type'] = $_FILES[$frm]['type'][$i];
+          $_FILES['file']['tmp_name'] = $_FILES[$frm]['tmp_name'][$i];
+          $_FILES['file']['error'] = $_FILES[$frm]['error'][$i];
+          $_FILES['file']['size'] = $_FILES[$frm]['size'][$i];
+
+          $f_type = strtolower(pathinfo($_FILES[$frm]["name"][$i], PATHINFO_EXTENSION));
+          $config['upload_path']    = './public/progress/';
+          $config['allowed_types']  = 'jpg|png|jpeg|pdf|JPG|PNG|JPEG';
+          $config['max_size']      = 5120;
+          $config['remove_spaces']  = TRUE;
+
+          $ext = explode(".", $_FILES[$frm]["name"][$i]);
+          $config["file_name"]    = date('Y-m-d') . "-" . random_string("alnum", 20) . "." . strtolower(end($ext));
+          $this->upload->initialize($config);
+
+          if (!$this->upload->do_upload('file')) {
+            $file  = NULL;
+            if ($this->upload->display_errors() == '<p>The filetype you are attempting to upload is not allowed.</p>') {
+              $file = 'Tipe file tidak sesuai ketentuan';
+            } else {
+              $file = 'Gagal Upload File';
+            }
+          } else {
+            $file = $config["file_name"];
+
+            // Cek tipe file
+            if (in_array($f_type, ['jpg', 'jpeg', 'png'])) {
+              // File adalah gambar, lakukan kompresi
+              compressImage('./public/progress/' . $file, 80); // Nilai 80 adalah tingkat kualitas kompresi gambar, sesuaikan dengan kebutuhan Anda
+            }
+
+            $data['totalFiles'][$i] = $file;
+          }
+        }
+      }
+    }
+
+    $ret['file'] = $data['totalFiles'];
+    $ret['form'] = 'Upload Sukses';
+    return $ret;
   }
 }
 
