@@ -24,13 +24,24 @@ if (!function_exists("hitungPersentase")) {
     }
 
 
+    // // Menghitung persentase
+    // $selisih_total_hari = $tanggal_awal->diff($tanggal_akhir)->days + 1;
+    // $selisih_tanggal_sekarang = $tanggal_awal->diff($tanggal_sekarang)->days + 1;
+    // if ($tanggal_sekarang < $tanggal_awal) {
+    //   $selisih_tanggal_sekarang = -$selisih_tanggal_sekarang + 1;
+    // }
+    // $persentase = ($selisih_tanggal_sekarang / $selisih_total_hari) * 100;
+
     // Menghitung persentase
     $selisih_total_hari = $tanggal_awal->diff($tanggal_akhir)->days + 1;
     $selisih_tanggal_sekarang = $tanggal_awal->diff($tanggal_sekarang)->days + 1;
-    if ($tanggal_sekarang < $tanggal_awal) {
-      $selisih_tanggal_sekarang = -$selisih_tanggal_sekarang + 1;
-    }
-    $persentase = ($selisih_tanggal_sekarang / $selisih_total_hari) * 100;
+
+    // Pastikan selisih_tanggal_sekarang tidak melebihi selisih_total_hari
+    $selisih_tanggal_sekarang = min($selisih_tanggal_sekarang, $selisih_total_hari);
+
+    // Menghindari nilai persentase di luar rentang 0-100
+    $persentase = max(0, min(100, ($selisih_tanggal_sekarang / $selisih_total_hari) * 100));
+
 
     return [
       'selisih_total_hari' => $selisih_total_hari,

@@ -101,7 +101,7 @@ class ProgresKegiatan extends CI_Controller
     if ($cek) {
       if ($this->input->post('prog_id')) {
         $wr['prog_kegiatan']     = $this->input->post('keg_id');
-        $wr['prog_persentase']   = $this->input->post('prog_persentase');
+        // $wr['prog_persentase']   = $this->input->post('prog_persentase');
         $wr['prog_tanggal']      = date('Y-m-d', strtotime($this->input->post('prog_tanggal'))) . ' ' . date('H:i:s');
 
         $cek = $this->db->where('prog_id !=', $this->input->post('prog_id'))->get_where('progres_kegiatan', $wr);

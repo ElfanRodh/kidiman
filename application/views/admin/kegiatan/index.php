@@ -248,7 +248,7 @@ $this->load->view('dist/_partials/header');
                   <input type="text" class="form-control datepicker" id="prog_tanggal" name="prog_tanggal">
                 </div>
               </div>
-              <div class="col-12 col-md-12">
+              <div class="col-12 col-md-12 elem_keg_progres">
                 <div class="form-group">
                   <label for="keg_progres">Progres Kegiatan</label>
                   <input type="hidden" id="prog_persentase" name="prog_persentase">
@@ -974,6 +974,8 @@ $this->load->view('dist/_partials/header');
       endDate: currentDate
     });
 
+    $('.elem_keg_progres').removeClass('d-none');
+
     setTimeout(() => {
       $("#modal-progres form#form-data #prog_tanggal").trigger('change');
       $("#modal-progres form#form-data .prog-summernote").summernote({
@@ -1039,6 +1041,7 @@ $this->load->view('dist/_partials/header');
           var img = addImage('imageContainerProg', 'prog_bukti');
           setSrcImage(img[0], img[1], el.buk_foto)
         });
+        $('.elem_keg_progres').addClass('d-none');
         $("#modal-progres form#form-data #prog_keterangan").summernote('code', res.data.prog_keterangan);
 
       }
