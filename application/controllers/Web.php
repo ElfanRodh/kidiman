@@ -37,7 +37,7 @@ class Web extends CI_Controller
         $this->db->join('jabatan as j', 'j.jbt_id = pj.prj_jabatan', 'left');
         $this->db->join('jabatan_tugas as jt', 'j.jbt_id = jt.jt_jabatan', 'left');
         $this->db->join('tugas as t', 't.tgs_id = jt.jt_tugas', 'left');
-        $this->db->where(['prt_status' => 1]);
+        $this->db->where(['prt_status' => 1, 'prj_status' => 1, 'jt_status' => 1, 'tgs_status' => 1, 'jbt_status' => 1]);
         $this->db->order_by('j.jbt_id', 'ASC');
         $query = $this->db->get('perangkat as p');
 

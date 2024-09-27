@@ -186,6 +186,7 @@ class Perangkat extends CI_Controller
         $ex = $this->db
           ->where(['prj_id !=' => $this->input->post('prj_id')])
           ->join('perangkat', 'perangkat.prt_id = perangkat_jabatan.prj_perangkat', 'left')
+          ->where(['prj_status' => 1])
           ->get_where('perangkat_jabatan', $data);
         if ($ex->num_rows() > 0) {
           $ret['ok'] = 500;

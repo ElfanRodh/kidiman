@@ -282,6 +282,16 @@ class User extends CI_Controller
                     $ret['ok'] = 500;
                     $ret['form'] = 'Data Sudah Ada Sebelumnya';
                 } else {
+                    if ($this->input->post('prt_foto')) {
+                        $foto = $this->input->post('prt_foto');
+                        $nama_file = FCPATH . 'public/perangkat/' . str_replace(base_url() . 'public/perangkat/', '', $this->input->post('prt_foto_old'));
+
+                        if ($this->input->post('prt_foto_old') && file_exists($nama_file)) {
+                            unlink($nama_file);
+                        }
+                    } else {
+                        $foto = str_replace(base_url() . 'public/perangkat/', '', $this->input->post('prt_foto_old'));
+                    }
 
                     $this->db->trans_begin(); // Memulai transaksi
 
@@ -291,6 +301,9 @@ class User extends CI_Controller
                     }
 
                     $this->db->update('users', $data_user, $wr);
+                    $this->db->update('perangkat', [
+                        'prt_foto'  => $foto,
+                    ], ['prt_id' => $this->input->post('prt_id')]);
                     if ($ex_group->num_rows() > 0) {
                         $this->db->delete('users_groups', ['id' => $ex_group->row()->id]);
                     }

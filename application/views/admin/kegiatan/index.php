@@ -1168,4 +1168,22 @@ $this->load->view('dist/_partials/header');
 
     return formattedDate;
   }
+
+  function truncateWords(str, wordLimit = 10) {
+    // Pecah string menjadi array berdasarkan spasi
+    const words = str.split(' ');
+
+    // Ambil sejumlah kata yang dibatasi oleh wordLimit
+    const truncated = words.slice(0, wordLimit);
+
+    // Gabungkan kembali array kata menjadi string
+    let result = truncated.join(' ');
+
+    // Jika jumlah kata lebih dari batas, tambahkan "..." di akhir
+    if (words.length > wordLimit) {
+      result += '...';
+    }
+
+    return result;
+  }
 </script>

@@ -412,11 +412,11 @@ h6 {
 #hero .btn-get-started {
   font-family: "Jost", sans-serif;
   font-weight: 800;
-  font-size: 20px;
+  font-size: 18px;
   letter-spacing: 1px;
   display: inline-block;
   padding: 10px 28px 11px 28px;
-  border-radius: 50px;
+  border-radius: 10px;
   transition: 0.5s;
   margin: 10px 0 0 0;
   color: #fff;
@@ -888,8 +888,7 @@ section {
 # Cta
 --------------------------------------------------------------*/
 .cta {
-  background: linear-gradient(270deg, #39bdc4 -17.47%, #47da96 98.16%),
-    url("../img/cta-bg.jpg") fixed center center;
+  background: linear-gradient(270deg, #39bdc4 -17.47%, #47da96 98.16%), url("../img/cta-bg.jpg") fixed center center;
   background-size: cover;
   padding: 120px 0;
 }
@@ -1046,10 +1045,7 @@ section {
   position: relative;
 }
 
-.portfolio-details
-  .portfolio-details-slider
-  .swiper-pagination
-  .swiper-pagination-bullet {
+.portfolio-details .portfolio-details-slider .swiper-pagination .swiper-pagination-bullet {
   width: 12px;
   height: 12px;
   background-color: #fff;
@@ -1057,10 +1053,7 @@ section {
   border: 1px solid #47b2e4;
 }
 
-.portfolio-details
-  .portfolio-details-slider
-  .swiper-pagination
-  .swiper-pagination-bullet-active {
+.portfolio-details .portfolio-details-slider .swiper-pagination .swiper-pagination-bullet-active {
   background-color: #47b2e4;
 }
 

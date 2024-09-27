@@ -29,7 +29,96 @@ $selisihWaktu = hitungSelisihWaktu($user['last_login'], $waktu);
     $("#modal-profil form#form-profil #usr_level_profil").val(user.groups_id)
     $("#modal-profil form#form-profil #usr_nama_profil").val(user.first_name)
     $("#modal-profil form#form-profil #usr_username_profil").val(user.username)
+    $("#modal-profil form#form-profil #prt_id").val(user.prt_id)
+
+    if (user.prt_foto) {
+      var foto = base_url() + 'public/perangkat/' + user.prt_foto;
+    } else {
+      if (user.prt_jk == 1) {
+        var foto = base_url() + 'public/perangkat/man.PNG';
+      } else {
+        var foto = base_url() + 'public/perangkat/woman.PNG';
+      }
+    }
+    $("#modal-profil form#form-profil [name=prt_foto_old]").val(foto);
+    $("#modal-profil form#form-profil img#prt_foto_old").attr('src', foto);
+    $("#modal-profil form#form-profil .konten_prt_foto").removeClass('d-none');
   }
+
+  $(document).off("change", '#modal-profil form#form-profil input[type="file"]')
+    .on("change", '#modal-profil form#form-profil input[type="file"]', function(e) {
+      // $('#modal-profil form#form-profil input[type="file"]').change(function(e) {
+      var id = $(this).attr('id');
+      var fileInput = this;
+      $('.custom-file-label[for="' + id + '"]').html(fileInput.files[0].name);
+      // upload single file
+      var form_data = new FormData();
+      form_data.append('file', (this).files[0]);
+      form_data.append('id', id);
+
+      $.ajax({
+        url: "<?= site_url('admin/perangkat/uploadSingleDokumen') ?>",
+        type: 'POST',
+        data: form_data,
+        processData: false,
+        contentType: false,
+        dataType: 'json',
+        beforeSend: function() {
+          $('#modal-profil form#form-profil input').removeClass('is-invalid');
+          $('#modal-profil form#form-profil select').removeClass('is-invalid');
+          $('#modal-profil form#form-profil textarea').removeClass('is-invalid');
+          $('#modal-profil form#form-profil span').removeClass('is-invalid');
+          $('#modal-profil form#form-profil .invalid-feedback').remove();
+          $('#modal-profil form#form-profil .valid-feedback').remove();
+        },
+        success: function(res) {
+          var frm = Object.keys(res.form);
+          var val = Object.values(res.form);
+          $('#modal-profil form#form-profil input').removeClass('is-invalid');
+          $('#modal-profil form#form-profil select').removeClass('is-invalid');
+          $('#modal-profil form#form-profil textarea').removeClass('is-invalid');
+          $('#modal-profil form#form-profil span').removeClass('is-invalid');
+          $('#modal-profil form#form-profil .invalid-feedback').remove();
+          $('#modal-profil form#form-profil .valid-feedback').remove();
+          if (res.ok == 400) {
+            frm.forEach(function(el, ind) {
+              if (val[ind] != '') {
+                $('#modal-profil form#form-profil #' + el).removeClass('is-invalid').addClass("is-invalid");
+                $('#modal-profil form#form-profil span[aria-labelledby="select2-' + el + '-container"]').removeClass('is-invalid').addClass("is-invalid");
+                var app = '<div id="' + el + '-error" class="invalid-feedback d-block" for="' + el + '">' + val[ind] + '</div>';
+                $('#modal-profil form#form-profil #' + el).closest('.form-group').append(app);
+              }
+            });
+          } else {
+            $('#modal-profil form#form-profil input[name="' + id + '"]').val(res.file);
+            console.log($('#modal-profil form#form-profil input[name="' + id + '"]'))
+            frm.forEach(function(el, ind) {
+              if (val[ind] != '') {
+                $('#modal-profil form#form-profil #' + el).removeClass('is-invalid');
+                $('#modal-profil form#form-profil span[aria-labelledby="select2-' + el + '-container"]').removeClass('is-invalid');
+                var app = '<div id="' + el + '-error" class="valid-feedback d-block" for="' + el + '">' + val[ind] + '</div>';
+                $('#modal-profil form#form-profil #' + el).closest('.form-group').append(app);
+              }
+            });
+
+            // Memeriksa apakah pengguna telah memilih file gambar
+            if (fileInput.files && fileInput.files[0]) {
+              var reader = new FileReader();
+
+              // Ketika proses baca file selesai
+              reader.onload = function(e) {
+                // Menetapkan sumber gambar pada elemen img
+                $('#' + id + '_old').attr('src', e.target.result);
+                $('.konten_' + id + '').removeClass('d-none');
+              };
+
+              // Membaca file gambar yang dipilih
+              reader.readAsDataURL(fileInput.files[0]);
+            }
+          }
+        }
+      });
+    });
 
   function showHide(elem) {
     const password = $('#modal-profil form#form-profil #' + elem);
@@ -77,7 +166,7 @@ $selisihWaktu = hitungSelisihWaktu($user['last_login'], $waktu);
                 confirmButtonClass: "btn btn-main",
                 buttonsStyling: false,
               }).then(function(_res_) {
-                window.location.href = '/auth/logout';
+                window.location.href = '<?= site_url("auth/logout") ?>';
               });
             }, 200);
           });
@@ -130,6 +219,7 @@ $selisihWaktu = hitungSelisihWaktu($user['last_login'], $waktu);
                   <div class="form-group">
                     <label for="usr_nama_profil">Nama</label>
                     <input type="hidden" id="usr_id_profil" name="usr_id_profil">
+                    <input type="hidden" id="prt_id" name="prt_id">
                     <input type="hidden" id="usr_level_profil" name="usr_level_profil">
                     <input type="text" class="form-control" name="usr_nama_profil" id="usr_nama_profil" placeholder="Nama User" />
                   </div>
@@ -171,6 +261,24 @@ $selisihWaktu = hitungSelisihWaktu($user['last_login'], $waktu);
                       <span class="input-group-text" id="showHide-usr_password_baru2" onclick="showHide('usr_password_baru2')">
                         <i class="fa fa-eye"></i>
                       </span>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-12">
+                  <div class="row">
+                    <div class="col-12 col-md-6">
+                      <div class="form-group">
+                        <label for="prt_foto">Foto</label>
+                        <small class="form-text text-muted my-1">File maksimal 5MB</small>
+                        <input type="file" accept="image/*" class="form-control file" id="prt_foto" placeholder="Foto">
+                        <input type="hidden" name="prt_foto">
+                      </div>
+                    </div>
+                    <div class="col-12 col-md-6 konten_prt_foto d-none">
+                      <div class="form-group">
+                        <input type="hidden" name="prt_foto_old">
+                        <img src="" class="img-fluid" id="prt_foto_old" alt="">
+                      </div>
                     </div>
                   </div>
                 </div>

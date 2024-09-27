@@ -128,3 +128,24 @@ if (!function_exists("compressImage")) {
     }
   }
 }
+
+if (!function_exists("truncateWords")) {
+  function truncateWords($string, $wordLimit = 10)
+  {
+    // Pecah string menjadi array berdasarkan spasi
+    $words = explode(' ', $string);
+
+    // Ambil sejumlah kata yang dibatasi oleh $wordLimit
+    $truncated = array_slice($words, 0, $wordLimit);
+
+    // Gabungkan kembali menjadi string
+    $result = implode(' ', $truncated);
+
+    // Jika jumlah kata lebih dari batas, tambahkan "..." di akhir
+    if (count($words) > $wordLimit) {
+      $result .= '...';
+    }
+
+    return $result;
+  }
+}

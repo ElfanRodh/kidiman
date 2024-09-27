@@ -135,7 +135,11 @@
                 <div class="card-body">
                   <div class="row">
                     <div class="icon"><i class="bx bx-list-check"></i></div>
-                    <h4><a href=""><?php echo strip_tags($x['keg_nama']); ?></a></h4>
+                    <h4><a href="">
+                        <?php
+                        echo truncateWords(strip_tags($x['keg_nama']), 5) . '...';
+                        ?>
+                      </a></h4>
                     <hr>
                     <p>
                       <?php echo $x['fun_nama']; ?>
@@ -192,13 +196,15 @@
                       <h4><?php echo $x['jabatan']; ?></h4>
                       <span><?php echo $x['nama']; ?></span>
                       <p>
-                        <?php echo $x['tugas']; ?>
+                        <?php
+                        echo $x['tugas'];
+                        ?>
                       </p>
                       <div class="social">
                         <a href="javascript:void(0)"><i class="ri-twitter-fill"></i></a>
                         <a href="javascript:void(0)"><i class="ri-facebook-fill"></i></a>
                         <a href="javascript:void(0)"><i class="ri-instagram-fill"></i></a>
-                        <a href="javascript:void(0)"> <i class="ri-linkedin-box-fill"></i> </a>
+                        <!-- <a href="javascript:void(0)"> <i class="ri-linkedin-box-fill"></i> </a> -->
                       </div>
                     </div>
                   </div>
