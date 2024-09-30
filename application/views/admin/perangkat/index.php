@@ -297,10 +297,10 @@ $this->load->view('dist/_partials/header');
       $("form#form-data .konten_prt_foto").addClass('d-none');
     })
 
-  $('input[type="file"]').change(function(e) {
+  $('#modal-form form#form-data input[type="file"]').change(function(e) {
     var id = $(this).attr('id');
     var fileInput = this;
-    $('.custom-file-label[for="' + id + '"]').html(fileInput.files[0].name);
+    $('#modal-form form#form-data .custom-file-label[for="' + id + '"]').html(fileInput.files[0].name);
     // upload single file
     var form_data = new FormData();
     form_data.append('file', (this).files[0]);
@@ -314,39 +314,39 @@ $this->load->view('dist/_partials/header');
       contentType: false,
       dataType: 'json',
       beforeSend: function() {
-        $('form#form-data input').removeClass('is-invalid');
-        $('form#form-data select').removeClass('is-invalid');
-        $('form#form-data textarea').removeClass('is-invalid');
-        $('form#form-data span').removeClass('is-invalid');
-        $('form#form-data .invalid-feedback').remove();
-        $('form#form-data .valid-feedback').remove();
+        $('#modal-form form#form-data input').removeClass('is-invalid');
+        $('#modal-form form#form-data select').removeClass('is-invalid');
+        $('#modal-form form#form-data textarea').removeClass('is-invalid');
+        $('#modal-form form#form-data span').removeClass('is-invalid');
+        $('#modal-form form#form-data .invalid-feedback').remove();
+        $('#modal-form form#form-data .valid-feedback').remove();
       },
       success: function(res) {
         var frm = Object.keys(res.form);
         var val = Object.values(res.form);
-        $('form#form-data input').removeClass('is-invalid');
-        $('form#form-data select').removeClass('is-invalid');
-        $('form#form-data textarea').removeClass('is-invalid');
-        $('form#form-data span').removeClass('is-invalid');
-        $('form#form-data .invalid-feedback').remove();
-        $('form#form-data .valid-feedback').remove();
+        $('#modal-form form#form-data input').removeClass('is-invalid');
+        $('#modal-form form#form-data select').removeClass('is-invalid');
+        $('#modal-form form#form-data textarea').removeClass('is-invalid');
+        $('#modal-form form#form-data span').removeClass('is-invalid');
+        $('#modal-form form#form-data .invalid-feedback').remove();
+        $('#modal-form form#form-data .valid-feedback').remove();
         if (res.ok == 400) {
           frm.forEach(function(el, ind) {
             if (val[ind] != '') {
-              $('form#form-data #' + el).removeClass('is-invalid').addClass("is-invalid");
-              $('form#form-data span[aria-labelledby="select2-' + el + '-container"]').removeClass('is-invalid').addClass("is-invalid");
+              $('#modal-form form#form-data #' + el).removeClass('is-invalid').addClass("is-invalid");
+              $('#modal-form form#form-data span[aria-labelledby="select2-' + el + '-container"]').removeClass('is-invalid').addClass("is-invalid");
               var app = '<div id="' + el + '-error" class="invalid-feedback d-block" for="' + el + '">' + val[ind] + '</div>';
-              $('form#form-data #' + el).closest('.form-group').append(app);
+              $('#modal-form form#form-data #' + el).closest('.form-group').append(app);
             }
           });
         } else {
-          $('form#form-data input[name="' + id + '"]').val(res.file);
+          $('#modal-form form#form-data input[name="' + id + '"]').val(res.file);
           frm.forEach(function(el, ind) {
             if (val[ind] != '') {
-              $('form#form-data #' + el).removeClass('is-invalid');
-              $('form#form-data span[aria-labelledby="select2-' + el + '-container"]').removeClass('is-invalid');
+              $('#modal-form form#form-data #' + el).removeClass('is-invalid');
+              $('#modal-form form#form-data span[aria-labelledby="select2-' + el + '-container"]').removeClass('is-invalid');
               var app = '<div id="' + el + '-error" class="valid-feedback d-block" for="' + el + '">' + val[ind] + '</div>';
-              $('form#form-data #' + el).closest('.form-group').append(app);
+              $('#modal-form form#form-data #' + el).closest('.form-group').append(app);
             }
           });
 
@@ -357,8 +357,8 @@ $this->load->view('dist/_partials/header');
             // Ketika proses baca file selesai
             reader.onload = function(e) {
               // Menetapkan sumber gambar pada elemen img
-              $('#' + id + '_old').attr('src', e.target.result);
-              $('.konten_' + id + '').removeClass('d-none');
+              $('#modal-form form#form-data #' + id + '_old').attr('src', e.target.result);
+              $('#modal-form form#form-data .konten_' + id + '').removeClass('d-none');
             };
 
             // Membaca file gambar yang dipilih
