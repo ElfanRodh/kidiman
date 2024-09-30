@@ -159,10 +159,10 @@ $this->load->view('dist/_partials/header');
               </div> -->
               <div class="col-12">
                 <div class="form-group">
-                  <label for="keg_foto">Foto</label>
+                  <label for="keg_foto">Foto / Dokumen</label>
                   <small class="form-text text-muted my-1">File maksimal 5MB</small>
                   <div class="row py-2" id="imageContainer"></div>
-                  <button type="button" class="btn btn-success" onclick="addImage('imageContainer', 'keg_foto')">Tambah Foto</button>
+                  <button type="button" class="btn btn-success" onclick="addImage('imageContainer', 'keg_foto')">Tambah Foto / Dokumen</button>
                   <!-- <button type="button" class="btn btn-danger" onclick="removeImage()">Hapus Foto Terakhir</button> -->
                 </div>
               </div>
@@ -298,6 +298,7 @@ $this->load->view('dist/_partials/header');
 </div>
 
 <?php $this->load->view('dist/_partials/footer'); ?>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/xcash/bootstrap-autocomplete@v2.3.7/dist/latest/bootstrap-autocomplete.min.js"></script>
 
 <script>
@@ -307,10 +308,10 @@ $this->load->view('dist/_partials/header');
     var input = $('<input>').attr({
       type: 'file',
       name: name + '[]',
-      accept: 'image/*',
+      // accept: 'image/*',
       required: true,
       class: 'form-control img-multi'
-    }).on('change', previewImage);
+    }).on('change', previewFile);
 
     var inputHidden = $('<input>').attr({
       type: 'hidden',
@@ -348,17 +349,151 @@ $this->load->view('dist/_partials/header');
     imageContainer.append(removeBtn);
   }
 
-  function setSrcImage(imgElement, inpHidden, file) {
+  function previewFile(event) {
+    var input = event.target;
+    var imageContainer = $(input).parent();
+
+    // Hapus pratinjau sebelumnya
+    imageContainer.find('.preview').remove();
+    imageContainer.find('canvas').remove(); // Hapus canvas jika ada (untuk PDF)
+
+    // Dapatkan file yang dipilih
+    var file = input.files[0];
+    var fileType = file.type;
+
+    console.log(fileType);
+
+    // Buat tombol hapus
+    var removeBtn = $('<button>').addClass('btn btn-icon btn-danger rounded-pill position-absolute').css({
+      'right': '10px',
+      'top': '30px'
+    }).html('<i class="fas fa-times"></i>').click(function() {
+      // imageContainer.find('.preview').remove();
+      // imageContainer.find('canvas').remove();
+      // imageContainer.find('input[type="file"]').remove();
+      // imageContainer.find('input[type="hidden"]').remove();
+      // $(input).val(''); // Kosongkan input file
+      imageContainer.remove();
+    });
+
+    // Periksa tipe file
+    if (fileType.startsWith('image/')) {
+      // Jika file adalah gambar
+      var preview = $('<img>').addClass('preview img-fluid py-3').attr('src', URL.createObjectURL(file));
+      imageContainer.append(preview);
+    } else if (fileType === 'application/pdf') {
+      // Jika file adalah PDF
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        // Menggunakan pdf.js untuk menampilkan halaman pertama PDF
+        var loadingTask = pdfjsLib.getDocument({
+          data: e.target.result
+        });
+        loadingTask.promise.then(function(pdf) {
+          pdf.getPage(1).then(function(page) {
+            // Sesuaikan ukuran canvas dengan container
+            var containerWidth = imageContainer.width(); // Lebar container
+
+            console.log('Container : ', containerWidth);
+
+
+            var viewport = page.getViewport({
+              scale: 1
+            }); // Dapatkan ukuran default halaman PDF
+
+            // Hitung skala berdasarkan lebar container
+            var scale = containerWidth / viewport.width;
+
+            console.log('Scale:', scale);
+
+
+            var scaledViewport = page.getViewport({
+              scale: scale
+            });
+
+            // Siapkan elemen canvas untuk menampilkan PDF
+            var canvas = document.createElement('canvas');
+            var context = canvas.getContext('2d');
+            canvas.height = scaledViewport.height;
+            canvas.width = scaledViewport.width;
+
+            // Render halaman pertama PDF ke canvas
+            var renderContext = {
+              canvasContext: context,
+              viewport: scaledViewport
+            };
+            page.render(renderContext).promise.then(function() {
+              // Tambahkan canvas ke container
+              imageContainer.append(canvas);
+            });
+          });
+        });
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    // Tambahkan tombol hapus setelah pratinjau dibuat
+    imageContainer.append(removeBtn);
+  }
+
+
+  // function setSrcImage(imgElement, inpHidden, file) {
+  //   var imageContainer = imgElement.parent();
+
+  //   // Hapus pratinjau sebelumnya
+  //   imageContainer.find('.preview').remove();
+
+  //   // Buat dan tampilkan pratinjau
+  //   var preview = $('<img>').addClass('preview img-fluid py-3').attr('src', file);
+  //   imageContainer.append(preview);
+
+  //   inpHidden.val(file)
+
+  //   // Buat tombol hapus
+  //   var removeBtn = $('<button>').addClass('btn btn-icon btn-danger rounded-pill position-absolute').css({
+  //     'right': '10px',
+  //     'top': '30px'
+  //   }).html('<i class="fas fa-times"></i>').click(function() {
+  //     imageContainer.remove();
+  //   });
+
+  //   imageContainer.append(removeBtn);
+  // }
+  function setSrcImage(imgElement, inpHidden, fileUrl) {
     var imageContainer = imgElement.parent();
 
     // Hapus pratinjau sebelumnya
     imageContainer.find('.preview').remove();
 
-    // Buat dan tampilkan pratinjau
-    var preview = $('<img>').addClass('preview img-fluid py-3').attr('src', file);
+    // Dapatkan ekstensi file
+    var fileExtension = fileUrl.split('.').pop().toLowerCase();
+
+    // Variabel untuk menampung elemen pratinjau
+    var preview;
+
+    // Jika file adalah gambar
+    if (fileExtension === 'jpg' || fileExtension === 'jpeg' || fileExtension === 'png' || fileExtension === 'gif') {
+      preview = $('<img>').addClass('preview img-fluid py-3').attr('src', fileUrl);
+    }
+    // Jika file adalah PDF
+    else if (fileExtension === 'pdf') {
+      preview = $('<embed>').addClass('preview mb-2').attr({
+        src: fileUrl,
+        type: 'application/pdf',
+        width: '100%',
+        height: '500px'
+      });
+    }
+    // Jika tipe file tidak dikenal
+    else {
+      preview = $('<p>').addClass('preview').text('Pratinjau tidak tersedia untuk tipe file ini.');
+    }
+
+    // Tampilkan elemen pratinjau
     imageContainer.append(preview);
 
-    inpHidden.val(file)
+    // Simpan URL file dalam input hidden
+    inpHidden.val(fileUrl);
 
     // Buat tombol hapus
     var removeBtn = $('<button>').addClass('btn btn-icon btn-danger rounded-pill position-absolute').css({
@@ -368,6 +503,7 @@ $this->load->view('dist/_partials/header');
       imageContainer.remove();
     });
 
+    // Tambahkan tombol hapus ke dalam container
     imageContainer.append(removeBtn);
   }
 
@@ -662,6 +798,17 @@ $this->load->view('dist/_partials/header');
       $("#modal-form form#form-data input").val(null);
       $("#modal-form form#form-data .keg-summernote").summernote();
       setTimeout(() => {
+        $('#modal-form form#form-data .daterange-kegiatan').daterangepicker({
+          locale: {
+            format: 'DD-MM-YYYY',
+            applyLabel: 'Pilih',
+            cancelLabel: 'Batal'
+          },
+          autoUpdateInput: true,
+          showDropdowns: true,
+          drops: 'down',
+          opens: 'down'
+        });
         $("#modal-form form#form-data .keg-summernote").summernote({
           dialogsInBody: true,
           // airMode: true,
@@ -909,7 +1056,21 @@ $this->load->view('dist/_partials/header');
         var prog = '';
         $.each(res.progres, function(idx, val) {
           if (val.prog_bukti) {
-            var bukti = `<img src="` + val.prog_bukti + `" class="img-fluid mb-2">`;
+            // Periksa ekstensi file
+            var fileExtension = val.prog_bukti.split('.').pop().toLowerCase();
+
+            // Jika file adalah gambar
+            if (fileExtension === 'jpg' || fileExtension === 'jpeg' || fileExtension === 'png' || fileExtension === 'gif') {
+              var bukti = `<img src="` + val.prog_bukti + `" class="img-fluid mb-2">`;
+            }
+            // Jika file adalah PDF
+            else if (fileExtension === 'pdf') {
+              var bukti = `<embed src="` + val.prog_bukti + `" type="application/pdf" width="100%" height="500px" class="mb-2">`;
+            }
+            // Jika tipe file tidak dikenal
+            else {
+              var bukti = `<p>File tidak dapat ditampilkan.</p>`;
+            }
           } else {
             var bukti = ``;
           }
