@@ -599,6 +599,7 @@ class Kegiatan extends CI_Controller
   {
     $wr['keg_jabatan'] = $this->input->post('jbt_id');
     $wr['keg_fungsi'] = $this->input->post('fun_id');
+    $wr['keg_status'] = $wr['fun_status'] = 1;
 
     $this->db->join('fungsi', 'fungsi.fun_id = kegiatan.keg_fungsi', 'left');
     $kegiatan = $this->db->get_where('kegiatan', $wr);
