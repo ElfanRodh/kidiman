@@ -5,6 +5,14 @@ $user   = $_SESSION['usr'];
 $waktu  = date('Y-m-d H:i:s');
 $selisihWaktu = hitungSelisihWaktu($user['last_login'], $waktu);
 
+$nama_file = FCPATH . 'public/perangkat/' . str_replace(base_url() . 'public/perangkat/', '', $_SESSION['usr']['prt_foto']);
+
+if ($_SESSION['usr']['prt_foto'] && file_exists($nama_file)) {
+  $foto = base_url('public/perangkat/' . $_SESSION['usr']['prt_foto']);
+} else {
+  $foto = base_url('public/perangkat/man.PNG');
+}
+
 ?>
 
 <style>
@@ -305,7 +313,8 @@ $selisihWaktu = hitungSelisihWaktu($user['last_login'], $waktu);
         </form>
         <ul class="navbar-nav navbar-right">
           <li class="dropdown"><a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
-              <img alt="image" src="<?= base_url(); ?>assets/img/avatar/avatar-1.png" class="rounded-circle mr-1">
+              <!-- <img alt="image" src="<?= base_url(); ?>assets/img/avatar/avatar-1.png" class="rounded-circle mr-1"> -->
+              <img alt="image" src="<?= $foto ?>" class="rounded-circle mr-1">
               <div class="d-sm-none d-lg-inline-block">Halo, <?= $_SESSION['usr']['first_name'] . ' (' . $_SESSION['usr']['prt_nama'] . ')' ?></div>
             </a>
             <div class="dropdown-menu dropdown-menu-right">
