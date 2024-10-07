@@ -125,7 +125,7 @@ class ProgresKegiatan extends CI_Controller
 
           $file_old = $this->input->post('prog_bukti_old');
 
-          $file_upload = $this->uploadMiltipleDokumen('prog_bukti');
+          $file_upload = $this->uploadMultipleDokumen('prog_bukti');
 
           // echo json_encode($file_old);
           // exit();
@@ -246,7 +246,7 @@ class ProgresKegiatan extends CI_Controller
           $data['prog_keterangan'] = $this->input->post('prog_keterangan');
           // $data['prog_bukti'] = $this->input->post('prog_bukti');
 
-          $file_upload = $this->uploadMiltipleDokumen('prog_bukti');
+          $file_upload = $this->uploadMultipleDokumen('prog_bukti');
           if ($file_upload['file']) {
             $this->db->trans_begin(); // Memulai transaksi
 
@@ -386,7 +386,7 @@ class ProgresKegiatan extends CI_Controller
     return $this->form_validation->run();
   }
 
-  function uploadMiltipleDokumen($frm = 'keg_foto')
+  function uploadMultipleDokumen($frm = 'keg_foto')
   {
     $ret['ok']    = 200;
     $ret['form']  = 'Sukses Upload File';
@@ -410,8 +410,8 @@ class ProgresKegiatan extends CI_Controller
 
           $f_type = strtolower(pathinfo($_FILES[$frm]["name"][$i], PATHINFO_EXTENSION));
           $config['upload_path']    = './public/progress/';
-          $config['allowed_types']  = 'jpg|png|jpeg|pdf|JPG|PNG|JPEG';
-          $config['max_size']      = 5120;
+          $config['allowed_types']  = 'jpg|png|jpeg|pdf|JPG|PNG|JPEG|PDF';
+          $config['max_size']      = 10240;
           $config['remove_spaces']  = TRUE;
 
           $ext = explode(".", $_FILES[$frm]["name"][$i]);

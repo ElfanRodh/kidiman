@@ -156,6 +156,8 @@ class Kegiatan extends CI_Controller
     $this->db->where(['prj_status' => 1]);
     $this->db->where(['prt_status' => 1]);
     $this->db->where($wr_admin);
+    $this->db->order_by('prj_jabatan');
+    $this->db->order_by('keg_tanggal_mulai', 'DESC');
     $this->db->group_by('jbt_id');
     if ($where) {
       $this->db->where($where);
@@ -171,6 +173,15 @@ class Kegiatan extends CI_Controller
       $this->db->where("keg_tanggal_mulai BETWEEN '$keg_tanggal_mulai' AND '$keg_tanggal_selesai'");
       $this->db->or_where("keg_tanggal_selesai BETWEEN '$keg_tanggal_mulai' AND '$keg_tanggal_selesai'");
       $this->db->group_end();
+    }
+    if ($this->input->post("fil_status")) {
+      if ($this->input->post("fil_status") == 'selesai') {
+        $status = 1;
+        $this->db->where(['keg_is_selesai' => $status]);
+      } else if ($this->input->post("fil_status") == 'proses') {
+        $status = 0;
+        $this->db->where(['keg_is_selesai' => $status]);
+      }
     }
 
     $i = 0;
@@ -282,7 +293,7 @@ class Kegiatan extends CI_Controller
 
           $file_old = $this->input->post('keg_foto_old');
 
-          $file_upload = $this->uploadMiltipleDokumen('keg_foto');
+          $file_upload = $this->uploadMultipleDokumen('keg_foto');
           if ($file_upload['file']) {
             $file_arr = array_diff($file_old, $file_upload['file']);
             $hasil_gabungan = array_unique(array_merge($file_old, $file_upload['file']));
@@ -412,7 +423,7 @@ class Kegiatan extends CI_Controller
           $data = $wr1;
           $data['keg_progres'] = 0;
 
-          $file_upload = $this->uploadMiltipleDokumen('keg_foto');
+          $file_upload = $this->uploadMultipleDokumen('keg_foto');
           if ($file_upload['file']) {
             $this->db->trans_begin(); // Memulai transaksi
             if ($this->db->insert('kegiatan', $data)) {
@@ -630,6 +641,26 @@ class Kegiatan extends CI_Controller
     $this->db->where(['keg_status' => 1]);
     $this->db->where(['fun_status' => 1]);
 
+    if ($this->input->post("fil_tanggal")) {
+      $tanggal = explode(' - ', $this->input->post('fil_tanggal'));
+      $keg_tanggal_mulai   = date('Y-m-d', strtotime($tanggal[0]));
+      $keg_tanggal_selesai = date('Y-m-d', strtotime($tanggal[1]));
+      $this->db->group_start();
+      $this->db->where("keg_tanggal_mulai BETWEEN '$keg_tanggal_mulai' AND '$keg_tanggal_selesai'");
+      $this->db->or_where("keg_tanggal_selesai BETWEEN '$keg_tanggal_mulai' AND '$keg_tanggal_selesai'");
+      $this->db->group_end();
+    }
+
+    if ($this->input->post("fil_status")) {
+      if ($this->input->post("fil_status") == 'selesai') {
+        $status = 1;
+        $this->db->where(['keg_is_selesai' => $status]);
+      } else if ($this->input->post("fil_status") == 'proses') {
+        $status = 0;
+        $this->db->where(['keg_is_selesai' => $status]);
+      }
+    }
+
     $i = 0;
     foreach ($this->column_search_kegiatan as $item) {
       if ($this->input->post('search')['value']) {
@@ -645,6 +676,7 @@ class Kegiatan extends CI_Controller
       $i++;
     }
 
+    $this->db->order_by('keg_tanggal_mulai', 'DESC');
     $data = $this->db->get_where('kegiatan', ['keg_jabatan' => $jbt_id]);
 
     $list = '';
@@ -776,7 +808,7 @@ class Kegiatan extends CI_Controller
       $config['upload_path']    = './public/progress/';
       $config['allowed_types']  = 'jpg|png|jpeg|pdf|JPG|PNG|JPEG';
       // $config['allowed_types']  = 'pdf|PDF';
-      $config['max_size']      = 5120;
+      $config['max_size']      = 10240;
       $config['remove_spaces']  = TRUE;
       $ext = explode(".", $_FILES['file']["name"]);
       $config["file_name"]    = date('Y-m-d') . "-" . random_string("alnum", 20) . "." . strtolower(end($ext));
@@ -814,7 +846,7 @@ class Kegiatan extends CI_Controller
     echo json_encode($ret);
   }
 
-  function uploadMiltipleDokumen($frm = 'keg_foto')
+  function uploadMultipleDokumen($frm = 'keg_foto')
   {
     $ret['ok']    = 200;
     $ret['form']  = 'Sukses Upload File';
@@ -824,6 +856,9 @@ class Kegiatan extends CI_Controller
     if (isset($files[$frm])) {
       $jumlahFile = count($files[$frm]['name']);
     }
+
+    // Tambahkan debugging untuk menampilkan data $_FILES
+    log_message('debug', json_encode($_FILES));
 
     $data['totalFiles'] = [];
     $ret["form"] = [];
@@ -837,9 +872,10 @@ class Kegiatan extends CI_Controller
           $_FILES['file']['size'] = $_FILES[$frm]['size'][$i];
 
           $f_type = strtolower(pathinfo($_FILES[$frm]["name"][$i], PATHINFO_EXTENSION));
+          log_message('debug', "File Type: " . $f_type);
           $config['upload_path']    = './public/progress/';
-          $config['allowed_types']  = 'jpg|png|jpeg|pdf|JPG|PNG|JPEG';
-          $config['max_size']      = 5120;
+          $config['allowed_types']  = 'jpg|png|jpeg|pdf|JPG|PNG|JPEG|PDF';
+          $config['max_size']      = 10240;
           $config['remove_spaces']  = TRUE;
 
           $ext = explode(".", $_FILES[$frm]["name"][$i]);

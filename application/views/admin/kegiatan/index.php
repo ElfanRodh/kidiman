@@ -63,6 +63,16 @@ $this->load->view('dist/_partials/header');
           </div>
         </div>
       </div>
+      <div class="col-12 col-md-4">
+        <div class="form-group">
+          <label for="fil_status">Status</label>
+          <select class="form-control select2" data-width="100%" data-allow-clear="true" data-placeholder="Pilih Status" id="fil_status" name="fil_status">
+            <option value="all">Semua</option>
+            <option value="proses">Proses</option>
+            <option value="selesai">Selesai</option>
+          </select>
+        </div>
+      </div>
     </div>
 
     <div class="section-body">
@@ -104,6 +114,13 @@ $this->load->view('dist/_partials/header');
         </button>
       </div>
       <div class="modal-body pb-0">
+        <!-- Spinner -->
+        <div id="loading-spinner" class="d-none justify-content-center align-items-center">
+          <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
+
         <form id="form-data" class="form form-horizontal">
           <div class="form-body">
             <input type="hidden" name="keg_id" id="keg_id">
@@ -233,6 +250,13 @@ $this->load->view('dist/_partials/header');
         </button>
       </div>
       <div class="modal-body pb-0">
+        <!-- Spinner -->
+        <div id="loading-spinner" class="d-none justify-content-center align-items-center">
+          <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Loading...</span>
+          </div>
+        </div>
+
         <form id="form-data" class="form form-horizontal">
           <div class="form-body">
             <input type="hidden" name="prog_id" id="prog_id">
@@ -515,7 +539,7 @@ $this->load->view('dist/_partials/header');
 </script>
 
 <script>
-  var fil_jabatan, fil_tanggal;
+  var fil_jabatan, fil_tanggal, fil_status;
   var tb_data;
   var id_kegiatan;
 
@@ -534,6 +558,7 @@ $this->load->view('dist/_partials/header');
         data: function(posts) {
           posts.fil_jabatan = fil_jabatan ?? null;
           posts.fil_tanggal = fil_tanggal ?? null;
+          posts.fil_status = fil_status ?? null;
         }
       },
       columns: [{
@@ -660,6 +685,13 @@ $this->load->view('dist/_partials/header');
       .on("change", "input#fil_tanggal", function(e) {
         e.preventDefault();
         fil_tanggal = $(this).val()
+        tb_data.ajax.reload(null, true);
+      });
+
+    $(document).off("change", "select#fil_status")
+      .on("change", "select#fil_status", function(e) {
+        e.preventDefault();
+        fil_status = $(this).val()
         tb_data.ajax.reload(null, true);
       });
 
@@ -926,7 +958,15 @@ $this->load->view('dist/_partials/header');
       cache: false,
       contentType: false,
       processData: false,
+      beforeSend: function() {
+        $('#modal-form #loading-spinner').removeClass('d-none').addClass('d-flex')
+        $('#modal-form #form-data').addClass('d-none')
+        $('#modal-form #save-form').attr('disabled', 'disabled')
+      },
       success: function(res) {
+        $('#modal-form #loading-spinner').removeClass('d-flex').addClass('d-none')
+        $('#modal-form #form-data').removeClass('d-none')
+        $('#modal-form #save-form').removeAttr('disabled')
         if (res.ok == 200) {
           swal({
             title: "Sukses",
@@ -1274,7 +1314,15 @@ $this->load->view('dist/_partials/header');
       cache: false,
       contentType: false,
       processData: false,
+      beforeSend: function() {
+        $('#modal-progres #loading-spinner').removeClass('d-none').addClass('d-flex')
+        $('#modal-progres #form-data').addClass('d-none')
+        $('#modal-progres #save-form').attr('disabled', 'disabled')
+      },
       success: function(res) {
+        $('#modal-progres #loading-spinner').removeClass('d-flex').addClass('d-none')
+        $('#modal-progres #form-data').removeClass('d-none')
+        $('#modal-progres #save-form').removeAttr('disabled')
         if (res.ok == 200) {
           swal({
             title: "Sukses",

@@ -13,7 +13,7 @@ $(document).ready(function () {
 
 function base_url() {
   var pathparts, url;
-  if (location.host == "localhost" || location.host == "127.0.0.1" || location.host == "10.0.44.112") {
+  if (location.host == "localhost" || location.host == "127.0.0.1" || location.host == "10.0.44.112" || location.host == "10.0.49.243") {
     pathparts = location.pathname.split("/");
     url = location.protocol + "//" + location.host + "/" + pathparts[1].trim("/") + "/";
   } else {

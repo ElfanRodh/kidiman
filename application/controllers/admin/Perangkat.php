@@ -368,9 +368,9 @@ class Perangkat extends CI_Controller
     if (!empty($_FILES['file']["name"]) && $_FILES['file']["error"] === 0) {
       $f_type = strtolower(pathinfo($_FILES['file']["name"], PATHINFO_EXTENSION));
       $config['upload_path']    = './public/perangkat/';
-      $config['allowed_types']  = 'jpg|png|jpeg|pdf|JPG|PNG|JPEG';
+      $config['allowed_types']  = 'jpg|png|jpeg|pdf|JPG|PNG|JPEG|PDF';
       // $config['allowed_types']  = 'pdf|PDF';
-      $config['max_size']      = 5120;
+      $config['max_size']      = 10240;
       $config['remove_spaces']  = TRUE;
       $ext = explode(".", $_FILES['file']["name"]);
       $config["file_name"]    = date('Y-m-d') . "-" . random_string("alnum", 20) . "." . strtolower(end($ext));
