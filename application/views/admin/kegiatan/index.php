@@ -38,9 +38,11 @@ $this->load->view('dist/_partials/header');
       <div class="col-12 col-md-6">
         <h2 class="section-title">Data Kegiatan</h2>
       </div>
-      <div class="col-12 col-md-6 text-center text-md-right m-auto">
-        <button class="btn btn-primary" id="add-form-data">Tambah Data</button>
-      </div>
+      <?php if ($this->ion_auth->is_admin()) : ?>
+        <div class="col-12 col-md-6 text-center text-md-right m-auto">
+          <button class="btn btn-primary" id="add-form-data">Tambah Data</button>
+        </div>
+      <?php endif; ?>
     </div>
 
     <div class="row">

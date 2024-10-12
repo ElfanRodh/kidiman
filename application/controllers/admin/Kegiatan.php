@@ -636,6 +636,7 @@ class Kegiatan extends CI_Controller
 
   private function getKegiatanJabatan($jbt_id)
   {
+    $is_admin = $this->ion_auth->is_admin();
     $this->db->join('jabatan', 'jabatan.jbt_id = kegiatan.keg_jabatan', 'left');
     $this->db->join('fungsi', 'fungsi.fun_id = kegiatan.keg_fungsi', 'left');
     $this->db->where(['keg_status' => 1]);
@@ -723,17 +724,23 @@ class Kegiatan extends CI_Controller
                 ' . $add_btn . '
               </td>
               ';
+        $btn_detail = '<button type="button" class="btn btn-icon btn-info" data-toggle="tooltip" data-placement="top" title="Detail Kegiatan" onclick="detailKegiatan(' . (string)$v->keg_id . ')">
+                              <i class="fa fa-list"></i>
+                            </button>';
+        if ($is_admin = $this->ion_auth->is_admin()) {
+          $btn_update = '<button type="button" class="btn btn-icon btn-warning update-data" data-toggle="tooltip" data-placement="top" title="Edit Kegiatan" data-id="' . (string)$v->keg_id . '">
+                          <i class="fa fa-edit"></i>
+                        </button>';
+          $btn_delete = '<button type="button" class="btn btn-icon btn-danger delete-data" data-toggle="tooltip" data-placement="top" title="Hapus Kegiatan" data-id="' . (string)$v->keg_id . '" data-name="' . strip_tags((string)$v->keg_nama) . '">
+                          <i class="fa fa-trash"></i>
+                        </button>';
+        } else {
+          $btn_update = '';
+          $btn_delete = '';
+        }
         $list .= '<td class="text-center">
                     <div class="btn-group" role="group">
-                      <button type="button" class="btn btn-icon btn-info" data-toggle="tooltip" data-placement="top" title="Detail Kegiatan" onclick="detailKegiatan(' . (string)$v->keg_id . ')">
-                        <i class="fa fa-list"></i>
-                      </button>
-                      <button type="button" class="btn btn-icon btn-warning update-data" data-toggle="tooltip" data-placement="top" title="Edit Kegiatan" data-id="' . (string)$v->keg_id . '">
-                        <i class="fa fa-edit"></i>
-                      </button>
-                      <button type="button" class="btn btn-icon btn-danger delete-data" data-toggle="tooltip" data-placement="top" title="Hapus Kegiatan" data-id="' . (string)$v->keg_id . '" data-name="' . strip_tags((string)$v->keg_nama) . '">
-                        <i class="fa fa-trash"></i>
-                      </button>
+                      ' . $btn_detail . $btn_update . $btn_delete . '
                     </div>          
                   </td>';
         $list .= '</tr>';
