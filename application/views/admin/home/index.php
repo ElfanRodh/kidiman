@@ -133,11 +133,11 @@ $this->load->view('dist/_partials/header');
 
   $(document).ready(function() {
     getJabatanFilter('fil_jabatan');
-    getKegiatan('', 'kegTotal');
-    getKegiatan('proses', 'kegProses');
-    getKegiatan('selesai', 'kegSelesai');
+    // getKegiatan('', 'kegTotal');
+    // getKegiatan('proses', 'kegProses');
+    // getKegiatan('selesai', 'kegSelesai');
     getPerangkat();
-    getChart();
+    // getChart();
 
     $('.daterange-kegiatan').daterangepicker({
       locale: {
