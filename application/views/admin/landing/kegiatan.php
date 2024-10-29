@@ -322,7 +322,7 @@
       opens: 'down'
     });
 
-    getJabatanFilter('fil_jabatan');
+    getJabatan('fil_jabatan');
 
     $(document).off("change", "select#fil_jabatan")
       .on("change", "select#fil_jabatan", function(e) {
@@ -363,20 +363,21 @@
       }
     });
 
-  function getJabatan(elem, id, isEdit = 0) {
-    var link = base_url() + "admin/kegiatan/getJabatan";
-    var param = null;
+  function getJabatan(elem, id = null, val = null, fixElem = null) {
+    var link = base_url() + "web/getJabatan";
     if (id) {
       param = {
-        id: id,
-        is_edit: isEdit
+        id: id
       };
     } else {
-      param = {
-        is_edit: isEdit
-      };
+      param = {};
     }
-    $("select#" + elem).html("");
+    if (fixElem) {
+      var elemen = $(elem);
+    } else {
+      var elemen = $("select#" + elem);
+    }
+    elemen.html("");
     return $.ajax({
       url: link,
       type: "POST",
@@ -385,13 +386,10 @@
       success: function(res) {
         var list = "";
         res.forEach(function(el, ind) {
-          list += '<option value="' + el.jbt_id + '">' + el.jbt_nama + "</option>";
+          list += '<option data-subtext="(' + el.prt_nama + ')" value="' + el.jbt_id + '">' + el.jbt_nama + "</option>";
         });
-
-        $("select#" + elem).html(list);
-        $("select#" + elem)
-          .val(null)
-          .trigger("change");
+        $(elemen).html(list);
+        $(elemen).val(val).trigger("change");
       },
     });
   }
