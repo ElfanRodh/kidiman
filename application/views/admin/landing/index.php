@@ -6,12 +6,12 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
 
   <title>Ki Diman Perangkat Desa Perang</title>
-  <meta content="" name="description" />
-  <meta content="" name="keywords" />
+  <meta content="Kidiman Perang adalah Aplikasi ini dibuat dengan fokus utama pada pemantauan dan peningkatan kedisiplinan para perangkat desa agar mampu menjalankan tugas-tugas mereka dengan lebih baik." name="description" />
+  <meta content="Trucuk, Desa, Desa Trucuk, Kidiman, Ki Diman Perang, Perangkat, Bojonegoro" name="keywords" />
 
   <!-- Favicons -->
-  <link href="assets/img/favicon.png" rel="icon" />
-  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon" />
+  <link href="assets/login/images/landing.jpg" rel="icon" />
+  <link href="assets/login/images/landing.jpg" rel="apple-touch-icon" />
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i|Jost:300,300i,400,400i,500,500i,600,600i,700,700i|Poppins:300,300i,400,400i,500,500i,600,600i,700,700i" rel="stylesheet" />
@@ -27,6 +27,26 @@
 
   <!-- Template Main CSS File -->
   <link href=<?= base_url("assets/landing/css/style.css"); ?> rel="stylesheet" />
+
+  <!-- PWA -->
+  <script>
+    var BASE_URL = '<?= base_url() ?>';
+    document.addEventListener('DOMContentLoaded', init, false);
+
+    function init() {
+      if ('serviceWorker' in navigator && navigator.onLine) {
+        navigator.serviceWorker.register(BASE_URL + 'service-worker.js')
+          .then((reg) => {
+            // console.log('Registrasi service worker Berhasil', reg);
+          }, (err) => {
+            console.error('Registrasi service worker Gagal', err);
+          });
+      }
+    }
+  </script>
+
+  <link rel="manifest" href="<?= base_url('manifest.json') ?>">
+  <meta name="theme-color" content="#17b57d">
 </head>
 
 <body>
