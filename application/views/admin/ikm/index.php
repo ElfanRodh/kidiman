@@ -166,7 +166,7 @@ $this->load->view('dist/_partials/header');
       serverSide: true,
       ajax: {
         type: "POST",
-        url: base_url() + "admin/ikm/viewData",
+        url: base_url() + "admin/IKM/viewData",
         data: function(posts) {
           posts.fil_kritik = fil_kritik ?? null;
         }
@@ -373,7 +373,7 @@ $this->load->view('dist/_partials/header');
   function getChart() {
     $.ajax({
       type: "POST",
-      url: base_url() + 'admin/ikm/getChart',
+      url: base_url() + 'admin/IKM/getChart',
       dataType: "json",
       beforeSend: function() {
         $('#ikmChart').html(null)
