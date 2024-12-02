@@ -53,7 +53,7 @@ if ($is_admin) {
       'header' => 'IKM',
       'menus' => [
         [
-          'active'  => 'ikm',
+          'active'  => 'IKM',
           'link'    => 'admin/IKM',
           'text'    => '<i class="fa fa-comment"></i> <span>Kritik & Saran</span>',
         ],
