@@ -1,12 +1,39 @@
 <style>
+  /*--------------------------------------------------------------
+# IKM button
+--------------------------------------------------------------*/
+  .ikm {
+    position: fixed;
+    right: 65px;
+    bottom: 15px;
+    z-index: 996;
+    background: linear-gradient(270deg, #39bdc4 -17.47%, #47da96 98.16%);
+    width: 45px;
+    height: 45px;
+    border-radius: 50px;
+    transition: all 0.4s;
+    border: 1px solid #fff;
+  }
+
+  .ikm i {
+    font-size: 24px;
+    color: #fff;
+    line-height: 0;
+  }
+
+  .ikm:hover {
+    background: #dc3545;
+    color: #fff;
+  }
+
+  .ikm.active {
+    visibility: visible;
+    opacity: 1;
+  }
+
   .fa-chat-2x {
     font-size: 28px !important;
   }
-
-  /* input.form-control {
-    font-size: 1em !important;
-    height: calc(2em + 1rem + 2px);
-  } */
 
   label {
     font-weight: bold;
