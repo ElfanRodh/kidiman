@@ -198,6 +198,9 @@
   <!-- End Footer -->
 
   <div id="preloader"></div>
+  <!-- IKM -->
+  <a href="#" id="ikm" class="ikm d-flex align-items-center justify-content-center"><i class="bi bi-chat-heart"></i></a>
+  <!-- IKM -->
   <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
   <div class="modal fade text-left" id="modal-kegiatan" tabindex="-1" role="dialog" aria-labelledby="modal-kegiatan-data" aria-hidden="true">
@@ -259,6 +262,7 @@
 <!-- Template Main JS File -->
 <script src="<?= base_url("assets/landing/js/main.js"); ?>"></script>
 <?php $this->load->view('dist/_partials/js'); ?>
+<?php $this->load->view('admin/landing/ikm'); ?>
 
 <script>
   var fil_jabatan, fil_tanggal, fil_status;

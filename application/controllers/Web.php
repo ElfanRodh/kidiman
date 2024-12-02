@@ -351,4 +351,104 @@ class Web extends CI_Controller
         }
         return $data;
     }
+
+    public function storeIKM()
+    {
+        $cek = $this->validasiIKM();
+        $ret = [];
+        if ($cek['status'] == 1) {
+            $this->load->library('user_agent');
+            $data['sar_url']         = $_POST['sar_url'];
+            $data['sar_nama']     = $_POST['sar_nama'];
+            $data['sar_email']     = $_POST['sar_email'];
+            $data['sar_no_hp']     = $_POST['sar_no_hp'];
+            $data['sar_kritik'] = $_POST['sar_kritik'];
+            $data['sar_rating'] = $_POST['sar_rating'];
+
+            $data['sar_ip']     = $_SERVER['REMOTE_ADDR'];
+            $data['sar_platform']     = $this->agent->platform();
+            $data['sar_user_agent'] = $this->agent->agent_string();
+
+            if ($this->db->insert('ref_saran', $data)) {
+                $ret['status']     = 1;
+                $ret['message'] = 'Terimakasih Atas Krik & Saran Anda';
+                $ret['url_wa']     = $this->sendMessage();
+            } else {
+                $ret['status']     = 2;
+                $ret['message'] = 'Ups, terjadi kesalahan';
+            }
+        } else {
+            $ret = $cek;
+        }
+
+        echo json_encode($ret);
+    }
+
+    public function sendMessage()
+    {
+        $phone      = '08123456789';
+        $text        = $_POST['sar_nama'] . "\r\n";
+        $text        .= $_POST['sar_email'] . "\r\n";
+        $text        .= $_POST['sar_no_hp'] . "\r\n\r\n";
+        $text        .= $_POST['sar_kritik'] . "\r\n\r\n";
+
+        $feed = [
+            1 => 'Tidak Puas',
+            2 => 'Cukup Puas',
+            3 => 'Puas',
+            4 => 'Sangat Puas',
+        ];
+
+        $text        .= "Saya merasa " . $feed[$_POST['sar_rating']] . " dengan adanya KIDIMAN PERANG (" . site_url() . ") ini";
+        $msg         = "https://api.whatsapp.com/send?phone=" . $phone . "&text=" . urlencode($text);
+
+        return $msg;
+    }
+
+    private function validasiIKM()
+    {
+        $val = array();
+        $val['status']  = 1;
+        $val['form']   = [];
+        if (!isset($_POST['sar_nama']) || $_POST['sar_nama'] == '') {
+            $val['form'][] = 'sar_nama';
+            $val['status']  = 0;
+            $val['message'][] = 'Nama Tidak Valid';
+        }
+        if (!isset($_POST['sar_email']) || $_POST['sar_email'] == '' || !filter_var($_POST['sar_email'], FILTER_VALIDATE_EMAIL)) {
+            $val['form'][] = 'sar_email';
+            $val['status']  = 0;
+            $val['message'][] = 'E-mail Tidak Valid';
+        }
+        if (!isset($_POST['sar_no_hp']) || $_POST['sar_no_hp'] == '' || !is_numeric($_POST['sar_no_hp']) || strlen($_POST['sar_no_hp']) > 13) {
+            $val['form'][] = 'sar_no_hp';
+            $val['status']  = 0;
+            $val['message'][] = 'No. HP Tidak Valid';
+        }
+        if (!isset($_POST['sar_kritik']) || $_POST['sar_kritik'] == '') {
+            $val['form'][] = 'sar_kritik';
+            $val['status']  = 0;
+            $val['message'][] = 'IKM Harus Diisi';
+        }
+        if (!isset($_POST['sar_rating']) || $_POST['sar_rating'] == '' || $_POST['sar_rating'] <= 0 || $_POST['sar_rating'] > 4) {
+            $val['form'][] = 'sar_rating';
+            $val['status']  = 0;
+            $val['message'][] = 'Rating Harus Diisi';
+        }
+        // if (isset($_POST['g-recaptcha-response'])) {
+        //     $verify     = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=' . $this->config->item('recaptcha_secret_key') . '&response=' . $_POST['g-recaptcha-response']);
+        //     $response = json_decode($verify);
+        //     if (!$response->success) {
+        //         $val['form'][] = 'g-recaptcha';
+        //         $val['status']  = 0;
+        //         $val['message'][] = 'Captcha Tidak Valid';
+        //     }
+        // } else {
+        //     $val['form'][] = 'g-recaptcha';
+        //     $val['status']  = 0;
+        //     $val['message'][] = 'Captcha Tidak Valid';
+        // }
+
+        return $val;
+    }
 }

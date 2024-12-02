@@ -49,6 +49,16 @@ if ($is_admin) {
         ],
       ]
     ],
+    [
+      'header' => 'IKM',
+      'menus' => [
+        [
+          'active'  => 'ikm',
+          'link'    => 'admin/ikm',
+          'text'    => '<i class="fa fa-comment"></i> <span>Kritik & Saran</span>',
+        ],
+      ]
+    ],
     // [
     //   'header' => 'Absensi',
     //   'menus' => [
