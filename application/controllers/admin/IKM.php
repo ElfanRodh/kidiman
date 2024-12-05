@@ -42,13 +42,13 @@ class IKM extends CI_Controller
             $row['email']           = $ikm->sar_email;
             $row['no_hp']           = $ikm->sar_no_hp;
             $row['kritik']          = $ikm->sar_kritik;
-            if ($ikm->sar_rating == 1) {
+            if ($ikm->sar_rating == 4) {
                 $row['rating'] = '<div class="text-center"><img src="' . base_url() . '/assets/img/ikm/sar4.png"  class="sar" style="width: 48px; height: 48px;"><p class="text-center">Sangat Puas</p></div>';
-            } else if ($ikm->sar_rating == 2) {
-                $row['rating'] = '<div class="text-center"><img src="' . base_url() . '/assets/img/ikm/sar3.png"  class="sar" style="width: 48px; height: 48px;"><p class="text-center">Puas</p></div>';
             } else if ($ikm->sar_rating == 3) {
+                $row['rating'] = '<div class="text-center"><img src="' . base_url() . '/assets/img/ikm/sar3.png"  class="sar" style="width: 48px; height: 48px;"><p class="text-center">Puas</p></div>';
+            } else if ($ikm->sar_rating == 2) {
                 $row['rating'] = '<div class="text-center"><img src="' . base_url() . '/assets/img/ikm/sar2.png"  class="sar" style="width: 48px; height: 48px;"><p class="text-center">Cukup Puas</p></div>';
-            } else if ($ikm->sar_rating == 4) {
+            } else if ($ikm->sar_rating == 1) {
                 $row['rating'] = '<div class="text-center"><img src="' . base_url() . '/assets/img/ikm/sar1.png"  class="sar" style="width: 48px; height: 48px;"><p class="text-center">Tidak Puas</p></div>';
             }
             $row['opsi']            = '<div class="btn-group" role="group">
@@ -355,24 +355,23 @@ class IKM extends CI_Controller
 
     function getChart()
     {
-        $wr = []; // Filter jika dibutuhkan
+        $wr = [];
         $arrIKM = [
             'label' => [],
             'jumlah' => []
         ];
 
-        // Mapping sar_rating ke label
         $ratingLabels = [
-            1 => 'Sangat Puas',
-            2 => 'Puas',
-            3 => 'Cukup Puas',
-            4 => 'Tidak Puas'
+            4 => 'Sangat Puas',
+            3 => 'Puas',
+            2 => 'Cukup Puas',
+            1 => 'Tidak Puas'
         ];
 
         // Query data dari database
         $ikm = $this->db
             ->select('COUNT(sar_id) AS jumlah, sar_rating as label')
-            ->order_by('sar_rating')
+            ->order_by('sar_rating', 'desc')
             ->group_by('sar_rating')
             ->get_where('ref_saran', $wr)
             ->result();

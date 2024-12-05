@@ -402,15 +402,15 @@ $this->load->view('dist/_partials/header');
         backgroundColor: [
           '#4cb050', //Sangat Puas
           '#8cc34b', //Puas
-          '#f39c12',
-          '#d9534f',
+          '#f39c12', //Cukup Puas
+          '#d9534f', //Tidak Puas
         ],
-        // borderColor: 'rgba(210, 214, 222, 1)',
-        // pointRadius: false,
-        // pointColor: 'rgba(210, 214, 222, 1)',
-        // pointStrokeColor: '#c1c7d1',
-        // pointHighlightFill: '#fff',
-        // pointHighlightStroke: 'rgba(220,220,220,1)',
+        borderColor: 'rgba(210, 214, 222, 1)',
+        pointRadius: false,
+        pointColor: 'rgba(210, 214, 222, 1)',
+        pointStrokeColor: '#c1c7d1',
+        pointHighlightFill: '#fff',
+        pointHighlightStroke: 'rgba(220,220,220,1)',
       }],
     }
 
