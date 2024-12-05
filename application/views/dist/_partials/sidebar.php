@@ -91,7 +91,17 @@ if ($is_admin) {
           'text'    => '<i class="fa fa-tasks"></i> <span>Kegiatan</span>',
         ],
       ]
-    ]
+    ],
+    [
+      'header' => 'IKM',
+      'menus' => [
+        [
+          'active'  => 'IKM',
+          'link'    => 'admin/IKM',
+          'text'    => '<i class="fa fa-comment"></i> <span>Kritik & Saran</span>',
+        ],
+      ]
+    ],
   ];
 }
 
